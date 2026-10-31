@@ -1,47 +1,53 @@
-# talmonlab.bgu.ac.il — how the server is set up
+# talmonlab.bgu.ac.il — how the server works
 
-A Windows machine at BGU (132.72.116.76), reachable from inside via VPN + Remote
-Desktop. Ports 80 and 443 are open to the internet. Everything lives in `C:\sites`.
+A Windows machine at BGU (132.72.116.76). Ports 80 and 443 are open to the
+internet; logging in needs the BGU VPN and Remote Desktop, but day-to-day changes
+do not: **the server follows this repo.**
 
-## Pieces
+Status: <https://talmonlab.bgu.ac.il/status/> (apps up or down, deployed commit,
+last restart, missing secrets, recent log).
 
-- **Caddy** (`C:\sites\caddy\caddy.exe`, Windows service `caddy`) listens on 80/443,
-  gets the HTTPS certificate from Let's Encrypt by itself, and routes by path
-  (`Caddyfile`). Apply a change with `Restart-Service caddy`.
-- **Home page** (`/`): this repo, cloned to `C:\sites\root`; the task
-  `talmonlab-root-pull` pulls it every 5 minutes. Caddy serves it as static files.
-- **Apps**, each a repo cloned to `C:\sites\<name>`, listening only on 127.0.0.1:
+## How it works
 
-  | path   | repo                              | port | runtime |
-  |--------|-----------------------------------|------|---------|
-  | `/lab` | nimrodtalmon/BGULAB               | 4101 | Python (uvicorn), `BASE_PATH=/lab` |
-  | `/cdw` | nimrodtalmon/CDW                  | 4201 | Python (waitress), models cached in `C:\sites\cdw-cache` |
-  | `/glp` | nimrodtalmon/grassroots-contracts | 4301 | Dart; built into `C:\sites\glp-build` by `build-glp.ps1` |
+Every 5 minutes (and at boot) the task `talmonlab-reconcile` runs
+[`reconcile.ps1`](reconcile.ps1) as SYSTEM. It pulls this repo into `C:\sites\root`
+and then makes the server match it:
 
-  Caddy strips the path prefix, so an app sees `/` but must link with its prefix
-  (BGULAB does this via `BASE_PATH`; the GLP pages use relative links).
-
-- Per app, two scheduled tasks (SYSTEM), set up by `add-app.ps1`:
-  `<name>-run` starts `C:\sites\run-<name>.ps1` at boot; `<name>-update` runs
-  `update.ps1` every 5 minutes, which moves the clone to the GitHub version and,
-  if it changed, reinstalls (or runs `build-<name>.ps1`) and restarts the app.
-  So a push to an app's repo is live within about 5 minutes.
-- Logs: `C:\sites\logs\<name>.log` (app) and `C:\sites\logs\update.log`.
-- Secrets exist only on the server, in `C:\sites\run-<name>.ps1` (readable by
-  Administrators and SYSTEM). The copies here have them blanked.
+- **Home page** (`/`): `index.html` of this repo, served as static files.
+- **Apps** ([`apps.json`](apps.json)): each is cloned to `C:\sites\<name>` and kept at
+  its GitHub version. When the code changes it is reinstalled (Python:
+  `requirements.txt` into `.venv`; otherwise the app's `build` script from this
+  folder) and restarted. An app that is down is restarted. Each app runs from the
+  generated `C:\sites\run-<name>.ps1` as the boot-time task `<name>-run`, listening
+  only on 127.0.0.1:`port`. An app removed from `apps.json` is stopped (its files stay).
+- **Caddy** (Windows service `caddy`) is the only thing facing the internet. It gets
+  the HTTPS certificate by itself and routes `/<name>/…` to each app with the prefix
+  stripped, so an app sees `/` but must link with its prefix (BGULAB: `BASE_PATH`;
+  the GLP pages use relative links). The Caddyfile is generated from `apps.json`
+  and checked before Caddy is restarted.
+- **Logs**: `C:\sites\logs\reconcile.log` and `C:\sites\logs\<name>.log`.
+- **Secrets** never enter this repo: `C:\sites\secrets\<name>.ps1` (lines like
+  `$env:KEY = '...'`), readable only by Administrators and SYSTEM. An app lists the
+  names it needs under `secrets`; the status page shows the missing ones.
 
 ## Add an app
 
-1. Repo with the app; it must work under its path prefix.
-2. On the server: clone to `C:\sites\<name>`, install (`python -m venv .venv`,
-   `.\.venv\Scripts\pip install -r requirements.txt`), write `C:\sites\run-<name>.ps1`
-   with a free port.
-3. Add a `redir` + `handle_path` block to the `Caddyfile`, `Restart-Service caddy`.
-4. `. C:\sites\add-app.ps1; Add-App <name> <port>; Start-ScheduledTask <name>-run`.
+Add an entry to `apps.json` and push; it is live at `/<name>` within about 5 minutes.
 
-## Notes
+```json
+{ "name": "demo", "repo": "https://github.com/nimrodtalmon/demo.git", "port": 4401,
+  "env": { "BASE_PATH": "/demo" },
+  "start": ".\\.venv\\Scripts\\uvicorn app:app --host 127.0.0.1 --port 4401" }
+```
 
-- Interactive PowerShell blocks scripts; run `Set-ExecutionPolicy Bypass -Scope Process -Force`
-  first in the window (the tasks pass `-ExecutionPolicy Bypass` themselves).
-- Windows Defender flags `dart compile exe` output, so the GLP server runs with
-  `dart bin\server.dart` instead.
+- `start` runs in the app's folder (or `workdir`); it must listen on 127.0.0.1:`port`.
+- Ports in use: 4101 lab, 4201 cdw, 4301 glp. Take the next free hundred.
+- Only an app that needs secrets requires one login, to write `C:\sites\secrets\<name>.ps1`.
+- The first run of a heavy app (e.g. CDW downloads models) can take several minutes.
+
+## One-time setup
+
+Caddy as a service, Git, Python, Dart in `C:\tools\dart-sdk`, then
+[`bootstrap.ps1`](bootstrap.ps1). Notes: interactive PowerShell blocks scripts
+(run `Set-ExecutionPolicy Bypass -Scope Process -Force` first in a window);
+Windows Defender flags `dart compile exe` output, so GLP runs with `dart bin\server.dart`.

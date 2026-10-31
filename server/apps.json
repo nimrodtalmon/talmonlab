@@ -1,0 +1,26 @@
+[
+  {
+    "name": "lab",
+    "repo": "https://github.com/nimrodtalmon/BGULAB.git",
+    "port": 4101,
+    "env": { "BASE_PATH": "/lab", "GITHUB_REPO": "nimrodtalmon/BGULAB" },
+    "secrets": ["GOVERN_PASS", "GITHUB_TOKEN", "SESSION_SECRET"],
+    "start": ".\\.venv\\Scripts\\uvicorn app.main:app --host 127.0.0.1 --port 4101"
+  },
+  {
+    "name": "cdw",
+    "repo": "https://github.com/nimrodtalmon/CDW.git",
+    "port": 4201,
+    "env": { "HF_HOME": "C:\\sites\\cdw-cache" },
+    "start": ".\\.venv\\Scripts\\waitress-serve --host 127.0.0.1 --port 4201 app:app"
+  },
+  {
+    "name": "glp",
+    "repo": "https://github.com/nimrodtalmon/grassroots-contracts.git",
+    "port": 4301,
+    "build": "build-glp.ps1",
+    "workdir": "C:\\sites\\glp-build\\live_server",
+    "env": { "GLP_ROOT": "C:\\sites\\glp-build", "PORT": "4301" },
+    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
+  }
+]
