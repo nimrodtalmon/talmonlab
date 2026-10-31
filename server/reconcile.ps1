@@ -29,7 +29,7 @@ $GitExe = 'git.exe'   # explicit, so it never resolves to a PowerShell function
 function Invoke-Git([string]$dir) {
     # Runs git in $dir with the remaining arguments; returns stdout, logs stderr.
     $out = & $GitExe -C $dir @args 2>&1
-    $out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] } | ForEach-Object { Log "  git: $_" }
+    $out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] -and "$($_.Exception.Message)".Trim() -and $_.Exception.Message -ne 'System.Management.Automation.RemoteException' } | ForEach-Object { Log "  git: $($_.Exception.Message)" }
     $out | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }
 }
 
@@ -134,9 +134,15 @@ if (Test-Path $StateF) {
 if (Sync-Repo $Root $null) { Log 'home repo updated' }
 
 try {
-    $apps = @(Get-Content "$Here\apps.json" -Raw | ConvertFrom-Json)
+    # Windows PowerShell 5.1 emits a JSON array as ONE object; ForEach-Object unrolls it.
+    $apps = @(Get-Content "$Here\apps.json" -Raw | ConvertFrom-Json | ForEach-Object { $_ })
 } catch {
     Log "apps.json unreadable, nothing else done: $_"
+    exit 1
+}
+$bad = @($apps | Where-Object { "$($_.name)" -notmatch '^[a-z0-9-]+$' -or "$($_.port)" -notmatch '^\d+$' -or -not $_.repo -or -not $_.start })
+if ($bad.Count -or -not $apps.Count) {
+    Log "apps.json has a malformed entry (name, port, repo, start); nothing else done"
     exit 1
 }
 
@@ -174,8 +180,8 @@ foreach ($app in $apps) {
 # 3. removed apps
 foreach ($name in @($state.Keys)) {
     if ($apps.name -notcontains $name) {
-        $port = $state[$name].port
-        if ($port) { Stop-App $name $port } else { Stop-ScheduledTask "$name-run" -ErrorAction SilentlyContinue }
+        $port = "$($state[$name].port)"
+        if ($port -match '^\d+$') { Stop-App $name $port } else { Stop-ScheduledTask "$name-run" -ErrorAction SilentlyContinue }
         Unregister-ScheduledTask "$name-run" -Confirm:$false -ErrorAction SilentlyContinue
         $state.Remove($name)
         Log "${name}: removed (files left in $Sites\$name)"
