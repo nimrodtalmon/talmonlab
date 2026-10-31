@@ -24,9 +24,11 @@ New-Item $Logs, $Status, "$Sites\secrets" -ItemType Directory -Force | Out-Null
 
 function Log($m) { Add-Content $LogFile "$(Get-Date -Format s) $m" }
 
-function Git([string]$dir) {
+$GitExe = 'git.exe'   # explicit, so it never resolves to a PowerShell function
+
+function Invoke-Git([string]$dir) {
     # Runs git in $dir with the remaining arguments; returns stdout, logs stderr.
-    $out = & git -C $dir @args 2>&1
+    $out = & $GitExe -C $dir @args 2>&1
     $out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] } | ForEach-Object { Log "  git: $_" }
     $out | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }
 }
@@ -34,13 +36,13 @@ function Git([string]$dir) {
 function Sync-Repo($dir, $url) {
     # Clone, or move to the GitHub version. Returns $true if the code changed.
     if (!(Test-Path "$dir\.git")) {
-        & git clone -q $url $dir 2>&1 | ForEach-Object { Log "  git: $_" }
+        & $GitExe clone -q $url $dir 2>&1 | ForEach-Object { Log "  git: $_" }
         return $true
     }
-    $before = Git $dir rev-parse HEAD
-    Git $dir fetch -q origin | Out-Null
-    Git $dir reset -q --hard '@{u}' | Out-Null
-    return ((Git $dir rev-parse HEAD) -ne $before)
+    $before = Invoke-Git $dir rev-parse HEAD
+    Invoke-Git $dir fetch -q origin | Out-Null
+    Invoke-Git $dir reset -q --hard '@{u}' | Out-Null
+    return ((Invoke-Git $dir rev-parse HEAD) -ne $before)
 }
 
 function Run-Script($app) {
@@ -201,7 +203,7 @@ $state | ConvertTo-Json -Depth 3 | Set-Content $StateF
 # 5. status page
 $rows = foreach ($app in $apps) {
     $name = $app.name
-    $c = (Git "$Sites\$name" log -1 '--format=%h|%cd|%s' '--date=format:%Y-%m-%d %H:%M') -split '\|', 3
+    $c = (Invoke-Git "$Sites\$name" log -1 '--format=%h|%cd|%s' '--date=format:%Y-%m-%d %H:%M') -split '\|', 3
     $up = Listening $app.port
     $missing = @()
     if ($app.secrets) {
@@ -215,7 +217,7 @@ $rows = foreach ($app in $apps) {
     "<td><code>$(Html $c[0])</code> $(Html $c[1])<br><span class=""m"">$(Html $c[2])</span></td>" +
     "<td>$(Html $state[$name].restarted)</td><td>$(Html ($note -join '; '))</td></tr>"
 }
-$homeCommit = (Git $Root log -1 '--format=%h %cd' '--date=format:%Y-%m-%d %H:%M')
+$homeCommit = (Invoke-Git $Root log -1 '--format=%h %cd' '--date=format:%Y-%m-%d %H:%M')
 $tail = Get-Content $LogFile -Tail 25 | ForEach-Object { Html $_ }
 @"
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
