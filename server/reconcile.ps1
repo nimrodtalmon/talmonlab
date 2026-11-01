@@ -38,6 +38,11 @@ function Sync-Repo($dir, $url, $branch) {
     # With a branch: that branch alone, shallow (for big repositories such as GLP),
     # long paths allowed.  An app whose repo or branch changed is cloned afresh;
     # the old clone is moved aside to <dir>.old-<time>, not deleted.
+    if ((Test-Path $dir) -and !(Test-Path "$dir\.git")) {
+        $aside = "$dir.old-$(Get-Date -Format yyyyMMddHHmmss)"
+        Log "  $dir is not a clone; moving it to $aside"
+        Move-Item $dir $aside
+    }
     if (Test-Path "$dir\.git") {
         $haveUrl = "$(Invoke-Git $dir remote get-url origin)".Trim()
         $haveBranch = "$(Invoke-Git $dir rev-parse --abbrev-ref HEAD)".Trim()
@@ -77,10 +82,14 @@ function Run-Script($app) {
 }
 
 function Setup-App($app) {
+    # Install or build; on success, record the commit built in <name>.built, so that
+    # a build that did not finish (or failed) is tried again on the next run.
     $dir = "$Sites\$($app.name)"
+    Remove-Item "$Sites\$($app.name).built" -ErrorAction SilentlyContinue
     if ($app.build) {
         Log "  building $($app.name)"
         & powershell -ExecutionPolicy Bypass -File "$Here\$($app.build)" 2>&1 | ForEach-Object { Log "  $_" }
+        if ($LASTEXITCODE -ne 0) { throw "build script failed ($LASTEXITCODE)" }
     } elseif (Test-Path "$dir\requirements.txt") {
         if (!(Test-Path "$dir\.venv")) {
             $python = (Get-Content "$Sites\python.txt" -ErrorAction SilentlyContinue | Select-Object -First 1)
@@ -91,6 +100,13 @@ function Setup-App($app) {
         Log "  installing $($app.name)"
         & "$dir\.venv\Scripts\pip" install -q -r "$dir\requirements.txt" 2>&1 | ForEach-Object { Log "  $_" }
     }
+    Set-Content "$Sites\$($app.name).built" "$(Invoke-Git $dir rev-parse HEAD)"
+}
+
+function Built($app) {
+    # The commit last built and installed is the one checked out.
+    $f = "$Sites\$($app.name).built"
+    (Test-Path $f) -and ("$(Get-Content $f -Raw)".Trim() -eq "$(Invoke-Git "$Sites\$($app.name)" rev-parse HEAD)".Trim())
 }
 
 function Listening($port) {
@@ -178,7 +194,9 @@ foreach ($app in $apps) {
         $old = if (Test-Path $runPath) { "$(Get-Content $runPath -Raw)".TrimEnd() } else { '' }
         $scriptChanged = ($old -ne $script)
         if ($scriptChanged) { Set-Content $runPath $script; Log "${name}: run script written" }
-        if ($changed -or $isNew) { Setup-App $app }
+        $unbuilt = -not (Built $app)
+        if ($unbuilt -and -not ($changed -or $isNew)) { Log "${name}: not built at this commit; building" }
+        if ($changed -or $isNew -or $unbuilt) { Setup-App $app; $changed = $true }
         Ensure-Task $name
         $down = -not (Listening $app.port) -and (Get-ScheduledTask "$name-run").State -ne 'Running'
         if ($changed -or $scriptChanged -or $isNew -or $down) {
