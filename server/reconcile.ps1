@@ -38,7 +38,7 @@ function Sync-Repo($dir, $url, $branch) {
     # With a branch: that branch alone, shallow (for big repositories such as GLP),
     # long paths allowed.  An app whose repo or branch changed is cloned afresh;
     # the old clone is moved aside to <dir>.old-<time>, not deleted.
-    if ((Test-Path $dir) -and !(Test-Path "$dir\.git")) {
+    if ($url -and (Test-Path $dir) -and !(Test-Path "$dir\.git")) {
         $aside = "$dir.old-$(Get-Date -Format yyyyMMddHHmmss)"
         Log "  $dir is not a clone; moving it to $aside"
         Move-Item $dir $aside
@@ -46,7 +46,8 @@ function Sync-Repo($dir, $url, $branch) {
     if (Test-Path "$dir\.git") {
         $haveUrl = "$(Invoke-Git $dir remote get-url origin)".Trim()
         $haveBranch = "$(Invoke-Git $dir rev-parse --abbrev-ref HEAD)".Trim()
-        if ($haveUrl -ne $url -or ($branch -and $haveBranch -ne $branch)) {
+        # Only an app names its repo; this repo (C:\sites\root) is synced with none, and is never moved.
+        if (($url -and $haveUrl -ne $url) -or ($branch -and $haveBranch -ne $branch)) {
             $aside = "$dir.old-$(Get-Date -Format yyyyMMddHHmmss)"
             Log "  repo or branch changed ($haveUrl $haveBranch); moving the old clone to $aside"
             Move-Item $dir $aside
