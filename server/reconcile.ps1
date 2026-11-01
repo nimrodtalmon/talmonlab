@@ -33,14 +33,32 @@ function Invoke-Git([string]$dir) {
     $out | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }
 }
 
-function Sync-Repo($dir, $url) {
+function Sync-Repo($dir, $url, $branch) {
     # Clone, or move to the GitHub version. Returns $true if the code changed.
+    # With a branch: that branch alone, shallow (for big repositories such as GLP),
+    # long paths allowed.  An app whose repo or branch changed is cloned afresh;
+    # the old clone is moved aside to <dir>.old-<time>, not deleted.
+    if (Test-Path "$dir\.git") {
+        $haveUrl = "$(Invoke-Git $dir remote get-url origin)".Trim()
+        $haveBranch = "$(Invoke-Git $dir rev-parse --abbrev-ref HEAD)".Trim()
+        if ($haveUrl -ne $url -or ($branch -and $haveBranch -ne $branch)) {
+            $aside = "$dir.old-$(Get-Date -Format yyyyMMddHHmmss)"
+            Log "  repo or branch changed ($haveUrl $haveBranch); moving the old clone to $aside"
+            Move-Item $dir $aside
+        }
+    }
     if (!(Test-Path "$dir\.git")) {
-        & $GitExe clone -q $url $dir 2>&1 | ForEach-Object { Log "  git: $_" }
+        if ($branch) {
+            & $GitExe -c core.longpaths=true clone -q --depth 1 --single-branch -b $branch $url $dir 2>&1 | ForEach-Object { Log "  git: $_" }
+            Invoke-Git $dir config core.longpaths true | Out-Null
+        } else {
+            & $GitExe clone -q $url $dir 2>&1 | ForEach-Object { Log "  git: $_" }
+        }
         return $true
     }
     $before = Invoke-Git $dir rev-parse HEAD
-    Invoke-Git $dir fetch -q origin | Out-Null
+    if ($branch) { Invoke-Git $dir fetch -q --depth 1 origin $branch | Out-Null }
+    else { Invoke-Git $dir fetch -q origin | Out-Null }
     Invoke-Git $dir reset -q --hard '@{u}' | Out-Null
     return ((Invoke-Git $dir rev-parse HEAD) -ne $before)
 }
@@ -153,7 +171,7 @@ foreach ($app in $apps) {
     if ($isNew) { $state[$name] = @{ restarted = ''; error = ''; port = $app.port } }
     $state[$name].port = $app.port
     try {
-        $changed = Sync-Repo "$Sites\$name" $app.repo
+        $changed = Sync-Repo "$Sites\$name" $app.repo $app.branch
         if ($changed) { Log "${name}: code changed" }
         $runPath = "$Sites\run-$name.ps1"
         $script = Run-Script $app

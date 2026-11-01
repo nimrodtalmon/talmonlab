@@ -16,11 +16,12 @@
   },
   {
     "name": "glp",
-    "repo": "https://github.com/nimrodtalmon/grassroots-contracts.git",
+    "repo": "https://github.com/nimrodtalmon/GLP.git",
+    "branch": "talmonlab-deploy",
     "port": 4301,
-    "build": "build-glp.ps1",
-    "workdir": "C:\\sites\\glp-build\\live_server",
-    "env": { "GLP_ROOT": "C:\\sites\\glp-build", "PORT": "4301" },
+    "build": "build-gas.ps1",
+    "workdir": "C:\\sites\\glp\\servers\\gas",
+    "env": { "PORT": "4301" },
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
   }
 ]
