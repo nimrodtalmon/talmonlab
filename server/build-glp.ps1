@@ -7,7 +7,7 @@ git -C $g checkout -f FETCH_HEAD
 Copy-Item "$src\live\overlay\*" $g -Recurse -Force
 $web = "$g\live_server\web"
 New-Item "$web\stack" -ItemType Directory -Force | Out-Null
-Copy-Item "$src\index.html", "$src\data.js" $web -Force
+Copy-Item "$src\index.html", "$src\how.html", "$src\data.js" $web -Force
 Copy-Item "$src\stack\*" "$web\stack" -Recurse -Force
 Copy-Item "$src\live\web\*" $web -Recurse -Force
 Set-Location "$g\live_server"
