@@ -1,20 +1,46 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>talmonlab</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 40em; margin: 4em auto; padding: 0 1em; }
-  a { display: block; font-size: 1.3em; margin: .6em 0; }
+  :root {
+    --bg: #f6f5f1; --card: #ffffff; --text: #1f2328; --muted: #6b6f76;
+    --line: #e4e2dc; --accent: #2f6f5e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #16181b; --card: #1f2226; --text: #e8e6e1; --muted: #9a9ea5;
+            --line: #2e3237; --accent: #7cc2ad; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { width: 100%; max-width: 30em; padding: 2em 1.2em; }
+  h1 { margin: 0; font-size: 1.9em; font-weight: 650; letter-spacing: -.01em; }
+  .sub { margin: .35em 0 2em; color: var(--muted); }
+  a.card {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1em 1.2em; margin: .7em 0;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    color: var(--text); text-decoration: none; font-size: 1.15em;
+    transition: border-color .15s, transform .15s;
+  }
+  a.card::after { content: "→"; color: var(--muted); transition: color .15s, transform .15s; }
+  a.card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  a.card:hover::after { color: var(--accent); transform: translateX(3px); }
 </style>
 </head>
 <body>
-<h1>talmonlab</h1>
-<p>Digital Cooperation Lab, Ben-Gurion University</p>
-<a href="https://nimrodtalmon.github.io/zutot/">Nimrod's homepage</a>
-<a href="/lab/">Lab</a>
-<a href="/glp/">Grassroots contracts</a>
-<a href="/cdw/">CDW</a>
+<main>
+  <h1>talmonlab</h1>
+  <p class="sub">Nimrod Talmon · Ben-Gurion University</p>
+  <a class="card" href="https://nimrodtalmon.github.io/zutot/">Zutot homepage</a>
+  <a class="card" href="/lab/">Digital Cooperation Lab</a>
+  <a class="card" href="/glp/">Grassroots contracts</a>
+</main>
 </body>
 </html>
