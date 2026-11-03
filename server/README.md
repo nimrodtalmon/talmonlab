@@ -41,8 +41,9 @@ Add an entry to `apps.json` and push; it is live at `/<name>` within about 5 min
 ```
 
 - `start` runs in the app's folder (or `workdir`); it must listen on 127.0.0.1:`port`.
-- `branch` (optional): follow that branch alone, in a shallow clone, as for big repositories. The `/glp` app is GAS from the GLP repository (`servers/gas`), built by `build-gas.ps1`; it follows the `talmonlab-deploy` branch of nimrodtalmon/GLP until Udi's main has GAS and its contracts. A change of `repo` or `branch` moves the old clone aside (`<name>.old-<time>`) and clones afresh.
-- Ports in use: 4101 lab, 4201 cdw, 4301 glp. Take the next free hundred.
+- `branch` (optional): follow that branch alone, in a shallow clone, as for big repositories. The `/gas` app is GAS, the GLP app store, from the GLP repository (`servers/gas`), built by `build-gas.ps1`; it follows the `talmonlab-deploy` branch of nimrodtalmon/GLP until Udi's main has GAS and its contracts. A change of `repo` or `branch` moves the old clone aside (`<name>.old-<time>`) and clones afresh.
+- `aliases` (optional): old names of the app; `/<alias>/…` redirects to `/<name>/…` (GAS was `/glp`).
+- Ports in use: 4101 lab, 4201 cdw, 4401 gas (4301 was glp). Take the next free hundred.
 - Only an app that needs secrets requires one login, to write `C:\sites\secrets\<name>.ps1`.
 - The first run of a heavy app (e.g. CDW downloads models) can take several minutes.
 
@@ -51,4 +52,4 @@ Add an entry to `apps.json` and push; it is live at `/<name>` within about 5 min
 Caddy as a service, Git, Python, Dart in `C:\tools\dart-sdk`, then
 [`bootstrap.ps1`](bootstrap.ps1). Notes: interactive PowerShell blocks scripts
 (run `Set-ExecutionPolicy Bypass -Scope Process -Force` first in a window);
-Windows Defender flags `dart compile exe` output, so GLP runs with `dart bin\server.dart`.
+Windows Defender flags `dart compile exe` output, so GAS runs with `dart bin\server.dart`.

@@ -15,13 +15,14 @@
     "start": ".\\.venv\\Scripts\\waitress-serve --host 127.0.0.1 --port 4201 app:app"
   },
   {
-    "name": "glp",
+    "name": "gas",
+    "aliases": ["glp"],
     "repo": "https://github.com/nimrodtalmon/GLP.git",
     "branch": "talmonlab-deploy",
-    "port": 4301,
+    "port": 4401,
     "build": "build-gas.ps1",
-    "workdir": "C:\\sites\\glp\\servers\\gas",
-    "env": { "PORT": "4301" },
+    "workdir": "C:\\sites\\gas\\servers\\gas",
+    "env": { "PORT": "4401" },
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
   }
 ]

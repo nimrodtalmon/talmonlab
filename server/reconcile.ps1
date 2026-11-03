@@ -136,6 +136,13 @@ function Caddyfile($apps) {
         $b += "`thandle_path /$($a.name)/* {"
         $b += "`t`treverse_proxy 127.0.0.1:$($a.port)"
         $b += "`t}"
+        # An old name of the app (aliases): its links go on working, redirected.
+        foreach ($al in @($a.aliases | Where-Object { "$_" -match '^[a-z0-9-]+$' })) {
+            $b += "`tredir /$al /$($a.name)/"
+            $b += "`thandle_path /$al/* {"
+            $b += "`t`tredir * /$($a.name){uri}"
+            $b += "`t}"
+        }
     }
     $b += "`tredir /status /status/"
     $b += "`thandle_path /status/* {"
