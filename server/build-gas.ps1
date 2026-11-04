@@ -31,10 +31,4 @@ foreach ($b in 'C:\Program Files\Git\bin\bash.exe', 'C:\Program Files\Git\usr\bi
 }
 # The REPL, once: it starts and reads the root self.glp.
 ':quit' | & "$rt\bin\glp_repl.exe" 2>&1 | Select-String -Pattern 'Loaded root|Error' | ForEach-Object { "repl: $_" }
-# The Windows refusal of a program named with a trailing separator (temporary).
-Set-Location $rt
-& $dart run ..\servers\gas\tools\windiag.dart 2>&1 | ForEach-Object { "diag: $_" }
-foreach ($p in '../programs/gsc/', '../programs/gsc', '..\programs\gsc\') {
-    "$p`n:quit" | & "$rt\bin\glp_repl.exe" 2>&1 | Select-String -Pattern 'Loaded program|Error loading' | ForEach-Object { "repl $p : $($_.ToString().Substring(0, [Math]::Min(160, $_.ToString().Length)))" }
-}
 'build-gas: done'
