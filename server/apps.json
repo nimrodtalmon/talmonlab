@@ -48,5 +48,12 @@
       "DATA": "C:\\sites\\gasrelay-data"
     },
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\relay.dart 4601"
+  },
+  {
+    "name": "downloads",
+    "repo": "https://github.com/nimrodtalmon/GLP.git",
+    "branch": "gas-downloads",
+    "port": 4701,
+    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) serve.py 4701"
   }
 ]

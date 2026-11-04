@@ -43,7 +43,7 @@ Add an entry to `apps.json` and push; it is live at `/<name>` within about 5 min
 - `start` runs in the app's folder (or `workdir`); it must listen on 127.0.0.1:`port`.
 - `branch` (optional): follow that branch alone, in a shallow clone, as for big repositories. The `/gas` app is GAS, the GLP app store, from the GLP repository (`servers/gas`), built by `build-gas.ps1`; it follows the `talmonlab-deploy` branch of nimrodtalmon/GLP until Udi's main has GAS and its contracts. A change of `repo` or `branch` moves the old clone aside (`<name>.old-<time>`) and clones afresh.
 - `aliases` (optional): old names of the app; `/<alias>/…` redirects to `/<name>/…` (GAS was `/glp`).
-- Ports in use: 4101 lab, 4201 cdw, 4401 gas (4301 was glp), 4601 gasrelay (the relay of GAS phones not near each other, server/gasrelay; 4501 was udpcheck, which showed that inbound UDP never reaches talmonlab through BGU's network; Caddy still runs without HTTP/3). Take the next free hundred.
+- Ports in use: 4101 lab, 4201 cdw, 4401 gas (4301 was glp), 4601 gasrelay (the relay of GAS phones not near each other, server/gasrelay), 4701 downloads (the GAS apps to download, the GLP fork's branch gas-downloads, served by its serve.py; 4501 was udpcheck, which showed that inbound UDP never reaches talmonlab through BGU's network; Caddy still runs without HTTP/3). Take the next free hundred.
 - Only an app that needs secrets requires one login, to write `C:\sites\secrets\<name>.ps1`.
 - The first run of a heavy app (e.g. CDW downloads models) can take several minutes.
 
