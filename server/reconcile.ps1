@@ -130,7 +130,9 @@ function Stop-App($name, $port) {
 }
 
 function Caddyfile($apps) {
-    $b = @('talmonlab.bgu.ac.il {')
+    # HTTP/3 off, so that UDP 443 is free for the udpcheck app (and later a
+    # rendezvous server); browsers keep HTTP/1.1 and HTTP/2 over TCP 443.
+    $b = @('{', "`tservers {", "`t`tprotocols h1 h2", "`t}", '}', 'talmonlab.bgu.ac.il {')
     foreach ($a in $apps) {
         $b += "`tredir /$($a.name) /$($a.name)/"
         $b += "`thandle_path /$($a.name)/* {"

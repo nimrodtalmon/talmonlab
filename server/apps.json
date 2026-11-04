@@ -3,26 +3,47 @@
     "name": "lab",
     "repo": "https://github.com/nimrodtalmon/BGULAB.git",
     "port": 4101,
-    "env": { "BASE_PATH": "/lab", "GITHUB_REPO": "nimrodtalmon/BGULAB" },
-    "secrets": ["GOVERN_PASS", "GITHUB_TOKEN", "SESSION_SECRET"],
+    "env": {
+      "BASE_PATH": "/lab",
+      "GITHUB_REPO": "nimrodtalmon/BGULAB"
+    },
+    "secrets": [
+      "GOVERN_PASS",
+      "GITHUB_TOKEN",
+      "SESSION_SECRET"
+    ],
     "start": ".\\.venv\\Scripts\\uvicorn app.main:app --host 127.0.0.1 --port 4101"
   },
   {
     "name": "cdw",
     "repo": "https://github.com/nimrodtalmon/CDW.git",
     "port": 4201,
-    "env": { "HF_HOME": "C:\\sites\\cdw-cache" },
+    "env": {
+      "HF_HOME": "C:\\sites\\cdw-cache"
+    },
     "start": ".\\.venv\\Scripts\\waitress-serve --host 127.0.0.1 --port 4201 app:app"
   },
   {
     "name": "gas",
-    "aliases": ["glp"],
+    "aliases": [
+      "glp"
+    ],
     "repo": "https://github.com/nimrodtalmon/GLP.git",
     "branch": "talmonlab-deploy",
     "port": 4401,
     "build": "build-gas.ps1",
     "workdir": "C:\\sites\\gas\\servers\\gas",
-    "env": { "PORT": "4401" },
+    "env": {
+      "PORT": "4401"
+    },
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
+  },
+  {
+    "name": "udpcheck",
+    "repo": "https://github.com/nimrodtalmon/talmonlab.git",
+    "port": 4501,
+    "build": "build-udpcheck.ps1",
+    "workdir": "C:\\sites\\udpcheck\\server\\udpcheck",
+    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) udp_echo.py 4501 443 9516 3478"
   }
 ]
