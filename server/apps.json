@@ -42,6 +42,22 @@
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
   },
   {
+    "name": "gasweb",
+    "repo": "https://github.com/nimrodtalmon/GLP.git",
+    "branch": "gas-deploy",
+    "port": 4501,
+    "build": "build-gasweb.ps1",
+    "workdir": "C:\\sites\\gasweb\\servers\\gas\\core",
+    "env": {
+      "PORT": "4501",
+      "DATA": "C:\\sites\\gasweb-data",
+      "TREE": "C:\\sites\\gasweb\\servers\\gas\\phone\\assets\\tree",
+      "LIBSODIUM_PATH": "C:\\sites\\libsodium\\libsodium.dll",
+      "RELAY_URL": "http://127.0.0.1:4601"
+    },
+    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\webagents.dart"
+  },
+  {
     "name": "gasrelay",
     "repo": "https://github.com/nimrodtalmon/talmonlab.git",
     "port": 4601,
