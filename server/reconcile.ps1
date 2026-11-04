@@ -33,7 +33,7 @@ function Invoke-Git([string]$dir) {
     $out | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }
 }
 
-function Sync-Repo($dir, $url, $branch) {
+function Sync-Repo($dir, $url, $branch, $port) {
     # Clone, or move to the GitHub version. Returns $true if the code changed.
     # With a branch: that branch alone, shallow (for big repositories such as GLP),
     # long paths allowed.  An app whose repo or branch changed is cloned afresh;
@@ -41,7 +41,7 @@ function Sync-Repo($dir, $url, $branch) {
     if ($url -and (Test-Path $dir) -and !(Test-Path "$dir\.git")) {
         $aside = "$dir.old-$(Get-Date -Format yyyyMMddHHmmss)"
         Log "  $dir is not a clone; moving it to $aside"
-        Move-Item $dir $aside
+        Move-Item $dir $aside -ErrorAction Stop
     }
     if (Test-Path "$dir\.git") {
         $haveUrl = "$(Invoke-Git $dir remote get-url origin)".Trim()
@@ -50,7 +50,9 @@ function Sync-Repo($dir, $url, $branch) {
         if (($url -and $haveUrl -ne $url) -or ($branch -and $haveBranch -ne $branch)) {
             $aside = "$dir.old-$(Get-Date -Format yyyyMMddHHmmss)"
             Log "  repo or branch changed ($haveUrl $haveBranch); moving the old clone to $aside"
-            Move-Item $dir $aside
+            # A running app holds its clone, which Windows will not move: stopped first.
+            if ($port) { Stop-App (Split-Path $dir -Leaf) $port; Start-Sleep -Seconds 3 }
+            Move-Item $dir $aside -ErrorAction Stop
         }
     }
     if (!(Test-Path "$dir\.git")) {
@@ -197,7 +199,7 @@ foreach ($app in $apps) {
     if ($isNew) { $state[$name] = @{ restarted = ''; error = ''; port = $app.port } }
     $state[$name].port = $app.port
     try {
-        $changed = Sync-Repo "$Sites\$name" $app.repo $app.branch
+        $changed = Sync-Repo "$Sites\$name" $app.repo $app.branch $app.port
         if ($changed) { Log "${name}: code changed" }
         $runPath = "$Sites\run-$name.ps1"
         $script = Run-Script $app
