@@ -29,12 +29,15 @@
       "glp"
     ],
     "repo": "https://github.com/nimrodtalmon/GLP.git",
-    "branch": "talmonlab-deploy",
+    "branch": "gas-deploy",
     "port": 4401,
     "build": "build-gas.ps1",
     "workdir": "C:\\sites\\gas\\servers\\gas",
     "env": {
-      "PORT": "4401"
+      "PORT": "4401",
+      "MADE_DIR": "C:\\sites\\gas-made",
+      "PYTHON_PATH_FILE": "C:\\sites\\python.txt",
+      "GLPC": "C:\\sites\\gas\\glp_runtime\\bin\\glp_repl.exe"
     },
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
   },
