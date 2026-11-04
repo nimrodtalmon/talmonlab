@@ -39,11 +39,14 @@
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
   },
   {
-    "name": "udpcheck",
+    "name": "gasrelay",
     "repo": "https://github.com/nimrodtalmon/talmonlab.git",
-    "port": 4501,
-    "build": "build-udpcheck.ps1",
-    "workdir": "C:\\sites\\udpcheck\\server\\udpcheck",
-    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) udp_echo.py 4501 443 9516 3478"
+    "port": 4601,
+    "build": "build-gasrelay.ps1",
+    "workdir": "C:\\sites\\gasrelay\\server\\gasrelay",
+    "env": {
+      "DATA": "C:\\sites\\gasrelay-data"
+    },
+    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\relay.dart 4601"
   }
 ]

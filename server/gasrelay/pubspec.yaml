@@ -1,0 +1,9 @@
+name: gasrelay
+description: The relay of GAS phones that are not near each other.
+publish_to: none
+environment:
+  sdk: ^3.5.0
+dependencies:
+  cryptography: ^2.7.0
+dev_dependencies:
+  test: ^1.25.0
