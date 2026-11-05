@@ -74,5 +74,15 @@
     "branch": "gas-downloads",
     "port": 4701,
     "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) serve.py 4701"
+  },
+  {
+    "name": "cgraph",
+    "repo": "https://github.com/nimrodtalmon/talmonlab.git",
+    "port": 4801,
+    "workdir": "C:\\sites\\cgraph\\apps\\cgraph",
+    "env": {
+      "DATA": "C:\\sites\\cgraph-data"
+    },
+    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 4801"
   }
 ]
