@@ -83,5 +83,16 @@
       "DATA": "C:\\sites\\cgraph-data"
     },
     "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 4801"
+  },
+  {
+    "name": "gfv",
+    "repo": "https://github.com/nimrodtalmon/GFV.git",
+    "port": 4901,
+    "workdir": "C:\\sites\\gfv\\app",
+    "env": {
+      "DATA": "C:\\sites\\gfv-data",
+      "PORT": "4901"
+    },
+    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 4901"
   }
 ]
