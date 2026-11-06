@@ -85,14 +85,17 @@
     "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 4801"
   },
   {
-    "name": "gfv",
+    "name": "gcv",
     "repo": "https://github.com/nimrodtalmon/GFV.git",
-    "port": 4901,
-    "workdir": "C:\\sites\\gfv\\app",
+    "port": 5001,
+    "workdir": "C:\\sites\\gcv\\app",
     "env": {
-      "DATA": "C:\\sites\\gfv-data",
-      "PORT": "4901"
+      "DATA": "C:\\sites\\gcv-data",
+      "PORT": "5001"
     },
-    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 4901"
+    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 5001",
+    "aliases": [
+      "gfv"
+    ]
   }
 ]
