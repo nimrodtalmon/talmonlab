@@ -77,9 +77,8 @@
   },
   {
     "name": "cgraph",
-    "repo": "https://github.com/nimrodtalmon/talmonlab.git",
+    "repo": "https://github.com/nimrodtalmon/cgraph.git",
     "port": 4801,
-    "workdir": "C:\\sites\\cgraph\\apps\\cgraph",
     "env": {
       "DATA": "C:\\sites\\cgraph-data"
     },
