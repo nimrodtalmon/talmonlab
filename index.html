@@ -4,50 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>talmonlab</title>
-<style>
-  :root {
-    --bg: #f6f5f1; --card: #ffffff; --text: #1f2328; --muted: #6b6f76;
-    --line: #e4e2dc; --c1: #2f6f8f; --c2: #2f7a5e; --c3: #b5652d;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #16181b; --card: #1f2226; --text: #e8e6e1; --muted: #9a9ea5;
-            --line: #2e3237; --c1: #7fb3d5; --c2: #7cc2ad; --c3: #e3a170; }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    background: var(--bg); color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  }
-  main { width: 100%; max-width: 30em; padding: 2em 1.2em; }
-  h1 { margin: 0; font-size: 1.9em; font-weight: 700; letter-spacing: .08em; }
-  h1::after { content: ""; display: block; width: 3em; height: 4px; margin-top: .35em; border-radius: 2px;
-    background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3)); }
-  .sub { margin: .35em 0 2em; color: var(--muted); }
-  a.card {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 1em 1.2em; margin: .7em 0;
-    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-    color: var(--text); text-decoration: none; font-size: 1.15em;
-    border-left: 5px solid var(--c, var(--line));
-    transition: border-color .15s, transform .15s;
-  }
-  a.c1 { --c: var(--c1); } a.c2 { --c: var(--c2); } a.c3 { --c: var(--c3); }
-  a.card::after { content: "→"; color: var(--muted); transition: color .15s, transform .15s; }
-  a.card:hover { border-color: var(--c); transform: translateY(-1px); }
-  a.card:hover::after { color: var(--c); transform: translateX(3px); }
-</style>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <main>
   <h1>TALMONLAB</h1>
-  <p class="sub">Nimrod Talmon · Ben-Gurion University</p>
-  <a class="card c1" href="https://nimrodtalmon.github.io/zutot/">Zutot homepage</a>
-  <a class="card c3" href="/gas/">GAS · the GLP app store</a>
-  <a class="card c2" href="/gas2/">GAS2 · contracts on the Grassroots Super-App</a>
-  <a class="card c2" href="/lab/">Digital Cooperation Lab</a>
-  <a class="card c1" href="/cgraph/">Contribution Graph</a>
-  <a class="card c2" href="/gcv/">GCV · Grassroots Contracts Verifier</a>
+  <p class="sub"><a href="https://nimrodtalmon.github.io/zutot/">Nimrod Talmon</a> · Ben-Gurion University</p>
+  <a class="card c3" href="/grassroots/"><span>Grassroots<small>GAS · GAS2 · GCV</small></span></a>
+  <a class="card c2" href="/research/"><span>Research<small>Lab · Contribution Graph</small></span></a>
 </main>
 </body>
 </html>
