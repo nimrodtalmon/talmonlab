@@ -24,40 +24,6 @@
     "start": ".\\.venv\\Scripts\\waitress-serve --host 127.0.0.1 --port 4201 app:app"
   },
   {
-    "name": "gas",
-    "aliases": [
-      "glp"
-    ],
-    "repo": "https://github.com/nimrodtalmon/GLP.git",
-    "branch": "gas-deploy",
-    "port": 4401,
-    "build": "build-gas.ps1",
-    "workdir": "C:\\sites\\gas\\servers\\gas",
-    "env": {
-      "PORT": "4401",
-      "MADE_DIR": "C:\\sites\\gas-made",
-      "PYTHON_PATH_FILE": "C:\\sites\\python.txt",
-      "GLPC": "C:\\sites\\gas\\glp_runtime\\bin\\glp_repl.exe"
-    },
-    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart"
-  },
-  {
-    "name": "gasweb",
-    "repo": "https://github.com/nimrodtalmon/GLP.git",
-    "branch": "gas-deploy",
-    "port": 4501,
-    "build": "build-gasweb.ps1",
-    "workdir": "C:\\sites\\gasweb\\servers\\gas\\core",
-    "env": {
-      "PORT": "4501",
-      "DATA": "C:\\sites\\gasweb-data",
-      "TREE": "C:\\sites\\gasweb\\servers\\gas\\phone\\assets\\tree",
-      "LIBSODIUM_PATH": "C:\\sites\\libsodium\\libsodium.dll",
-      "RELAY_URL": "http://127.0.0.1:4601"
-    },
-    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\webagents.dart"
-  },
-  {
     "name": "gasrelay",
     "repo": "https://github.com/nimrodtalmon/talmonlab.git",
     "port": 4601,
@@ -67,13 +33,6 @@
       "DATA": "C:\\sites\\gasrelay-data"
     },
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\relay.dart 4601"
-  },
-  {
-    "name": "downloads",
-    "repo": "https://github.com/nimrodtalmon/GLP.git",
-    "branch": "gas-downloads",
-    "port": 4701,
-    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) serve.py 4701"
   },
   {
     "name": "cgraph",
@@ -97,35 +56,5 @@
     "aliases": [
       "gfv"
     ]
-  },
-  {
-    "name": "gas2",
-    "repo": "https://github.com/nimrodtalmon/GLP.git",
-    "branch": "GAS2",
-    "port": 5101,
-    "workdir": "C:\\sites\\gas2\\servers\\gas2",
-    "env": {
-      "PORT": "5101",
-      "DATA": "C:\\sites\\gas2-data",
-      "DART": "C:\\tools\\dart-sdk\\bin\\dart.exe"
-    },
-    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) -I server.py 5101"
-  },
-  {
-    "name": "gas2web",
-    "repo": "https://github.com/nimrodtalmon/GLP.git",
-    "branch": "GAS2",
-    "port": 5201,
-    "build": "build-gas2web.ps1",
-    "workdir": "C:\\sites\\gas2web\\servers\\gas2\\device",
-    "env": {
-      "PORT": "5201",
-      "DATA": "C:\\sites\\gas2web-data",
-      "GAS2_DATA": "C:\\sites\\gas2-data",
-      "LIBSODIUM_PATH": "C:\\sites\\libsodium\\libsodium.dll",
-      "RELAY_URL": "http://127.0.0.1:4601",
-      "GAS2_SITE": "http://127.0.0.1:5101"
-    },
-    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\web.dart"
   }
 ]
