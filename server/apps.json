@@ -110,5 +110,21 @@
       "DART": "C:\\tools\\dart-sdk\\bin\\dart.exe"
     },
     "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) -I server.py 5101"
+  },
+  {
+    "name": "gas2web",
+    "repo": "https://github.com/nimrodtalmon/GLP.git",
+    "branch": "GAS2",
+    "port": 5201,
+    "build": "build-gas2web.ps1",
+    "workdir": "C:\\sites\\gas2web\\servers\\gas2\\device",
+    "env": {
+      "PORT": "5201",
+      "DATA": "C:\\sites\\gas2web-data",
+      "GAS2_DATA": "C:\\sites\\gas2-data",
+      "LIBSODIUM_PATH": "C:\\sites\\libsodium\\libsodium.dll",
+      "RELAY_URL": "http://127.0.0.1:4601"
+    },
+    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\web.dart"
   }
 ]
