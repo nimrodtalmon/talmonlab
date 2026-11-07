@@ -123,7 +123,8 @@
       "DATA": "C:\\sites\\gas2web-data",
       "GAS2_DATA": "C:\\sites\\gas2-data",
       "LIBSODIUM_PATH": "C:\\sites\\libsodium\\libsodium.dll",
-      "RELAY_URL": "http://127.0.0.1:4601"
+      "RELAY_URL": "http://127.0.0.1:4601",
+      "GAS2_SITE": "http://127.0.0.1:5101"
     },
     "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\web.dart"
   }
