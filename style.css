@@ -34,3 +34,10 @@ a.card:hover { border-color: var(--c); transform: translateY(-1px); }
 a.card:hover::after { color: var(--c); transform: translateX(3px); }
 a.card small { display: block; margin-top: .25em; font-size: .75em; color: var(--muted); }
 .sub a.back { text-decoration: none; margin-right: .3em; }
+a.folder::before {
+  content: ""; width: 1.05em; height: .85em; margin-right: -.45em; flex: none;
+  background: var(--muted); opacity: .55;
+  clip-path: polygon(0 12%, 38% 12%, 46% 0, 100% 0, 100% 100%, 0 100%);
+}
+a.folder { justify-content: flex-start; }
+a.folder::after { margin-left: auto; }

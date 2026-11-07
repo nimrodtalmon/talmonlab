@@ -13,7 +13,7 @@ Every 5 minutes (and at boot) the task `talmonlab-reconcile` runs
 [`reconcile.ps1`](reconcile.ps1) as SYSTEM. It pulls this repo into `C:\sites\root`
 and then makes the server match it:
 
-- **Home page** (`/`): `index.html` of this repo, served as static files, with section pages in subfolders (`grassroots/`, `research/`; shared `style.css`). A subfolder name must not clash with an app name.
+- **Home page** (`/`): `index.html` of this repo, served as static files, with section pages in subfolders (`grassroots/`, `contribution-graph/`; shared `style.css`). A subfolder name must not clash with an app name.
 - **Apps** ([`apps.json`](apps.json)): each is cloned to `C:\sites\<name>` and kept at
   its GitHub version. When the code changes it is reinstalled (Python:
   `requirements.txt` into `.venv`; otherwise the app's `build` script from this
