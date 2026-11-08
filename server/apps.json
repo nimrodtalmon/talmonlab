@@ -36,7 +36,9 @@
     "env": {
       "PORT": "5101",
       "DATA": "C:\\sites\\gas2-data",
-      "DART": "C:\\tools\\dart-sdk\\bin\\dart.exe"
+      "DART": "C:\\tools\\dart-sdk\\bin\\dart.exe",
+      "UPSTREAM": "https://github.com/nimrodtalmon/GLP.git",
+      "BRANCH": "main"
     },
     "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) -I server.py 5101"
   },
