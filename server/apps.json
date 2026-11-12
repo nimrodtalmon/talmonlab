@@ -95,5 +95,15 @@
     "aliases": [
       "gfv"
     ]
+  },
+  {
+    "name": "ben",
+    "repo": "https://github.com/nimrodtalmon/benanimation.git",
+    "port": 5301,
+    "workdir": "C:\\sites\\ben\\ben-app",
+    "env": {
+      "DATA": "C:\\sites\\ben-data"
+    },
+    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 5301"
   }
 ]
