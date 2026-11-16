@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steer</title>
+<style>
+:root{--bg:#fcfcfb;--card:#ffffff;--ink:#0b0b0b;--ink2:#52514e;--ink3:#8a8984;--line:#e6e5e0;--acc:#2a78d6;--warm:#eb6834;--ok:#1baf7a}
+@media (prefers-color-scheme:dark){:root{--bg:#1a1a19;--card:#232322;--ink:#f0efec;--ink2:#c3c2b7;--ink3:#8f8e88;--line:#3a3a37;--acc:#3987e5;--warm:#d95926;--ok:#199e70}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:20px;font-weight:600;margin:0}h2{font-size:15px;font-weight:600;margin:0 0 8px}
+.sub{color:var(--ink2);margin:2px 0 16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.scroll{max-height:430px;overflow-y:auto}
+button{font:inherit;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--ink3)}button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input,select{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 9px;width:100%}
+.row{display:flex;gap:8px;align-items:center}.muted{color:var(--ink2)}.small{font-size:13px}.tiny{font-size:12px;color:var(--ink3)}
+table{width:100%;border-collapse:collapse}td{padding:5px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:3px;background:var(--acc)}.barbg{background:var(--line);border-radius:3px;width:70px}
+.fl{padding:1px 6px;font-size:12px;border-radius:6px}.fl.on{border-color:var(--warm);color:var(--warm)}
+.proj{border:1px solid var(--line);border-radius:10px;padding:10px 12px;flex:1;min-width:0}
+.proj b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.answers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}.answers button{white-space:nowrap;padding:7px 4px}
+@media(max-width:520px){.barcol{display:none}}
+.ev{padding:4px 0;border-bottom:1px solid var(--line);font-size:13px}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:6px;padding:0 5px;color:var(--ink2);margin-left:4px}
+.err{color:#e34948;font-size:13px;min-height:18px}
+a{color:var(--acc)}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}.stat b{font-size:18px;font-weight:600;display:block}
+</style>
+</head>
+<body>
+<main>
+  <div class="row" style="justify-content:space-between">
+    <h1>Steer</h1><a class="small" href="about">How it works</a>
+  </div>
+  <p class="sub">A living split of a fund among 98 Ethereum repositories. An AI layer proposed it; the community keeps it on course with a few taps.</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="grid">
+    <section class="box" id="left">
+      <div id="join">
+        <h2>Join</h2>
+        <p class="small muted" style="margin-top:0">No account needed. Maintainers never get questions about their own project; their flags on it count half.</p>
+        <div class="row" style="margin-bottom:8px"><input id="name" placeholder="Your name or handle" maxlength="40"></div>
+        <div class="row" style="margin-bottom:8px"><select id="own"><option value="">I don't maintain any of these projects</option></select></div>
+        <button class="pri" onclick="join()">Start</button>
+        <div class="err" id="joinerr"></div>
+      </div>
+      <div id="cardbox" style="display:none">
+        <div class="row" style="justify-content:space-between"><h2>Your question</h2><span class="tiny" id="used"></span></div>
+        <div id="card"></div>
+        <div class="err" id="carderr"></div>
+      </div>
+    </section>
+
+    <section class="box">
+      <div class="row" style="justify-content:space-between"><h2>The current split</h2><span class="tiny">flag: too low / too high</span></div>
+      <div class="scroll"><table id="split"></table></div>
+    </section>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <section class="box">
+      <h2>What happened</h2>
+      <div class="scroll" style="max-height:260px" id="log"></div>
+    </section>
+    <section class="box">
+      <h2>The constitution</h2>
+      <div class="small" id="const"></div>
+      <div id="propose" style="display:none;margin-top:10px">
+        <div class="row"><input id="prop" placeholder="Propose a change to these rules" maxlength="500"><button onclick="propose()">Send</button></div>
+        <div class="err" id="properr"></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+let TOKEN = null; try { TOKEN = localStorage.getItem('steer-token'); } catch (e) {}
+let STATE = null, MYFLAGS = {};
+try { MYFLAGS = JSON.parse(localStorage.getItem('steer-flags') || '{}'); } catch (e) {}
+const $ = id => document.getElementById(id);
+const money = v => '$' + Math.round(v).toLocaleString('en-US');
+const pct = v => (v * 100).toFixed(2) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function api(path, body) {
+  const r = await fetch(path, body ? {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)} : {});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Something went wrong. Try again.');
+  return j;
+}
+
+function renderStats(s) {
+  $('stats').innerHTML = [
+    ['Answers so far', s.answers.toLocaleString()],
+    ['From people', s.answers_people.toLocaleString()],
+    ['Standing flags', s.flags],
+    ['Escalations', s.escalations],
+    ['Moved from the AI split', pct(s.moved)],
+  ].map(([k, v]) => `<div class="stat"><span class="tiny">${k}</span><b>${v}</b></div>`).join('');
+}
+
+function renderSplit(items) {
+  const max = Math.max(...items.map(i => i.share));
+  $('split').innerHTML = items.map((it, r) => {
+    const f = MYFLAGS[it.k] || 0;
+    const chg = it.share / it.ai_share;
+    const chgTxt = Math.abs(chg - 1) < 0.02 ? '' : `<span class="tiny">${chg > 1 ? '+' : ''}${((chg - 1) * 100).toFixed(0)}% vs AI</span>`;
+    return `<tr title="${esc(it.id)}">
+      <td class="tiny">${r + 1}</td>
+      <td style="max-width:170px"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(it.name)}${it.escalated ? '<span class="tag">panel</span>' : ''}</div>${chgTxt}</td>
+      <td class="barcol"><div class="barbg"><div class="bar" style="width:${(it.share / max * 100).toFixed(1)}%"></div></div></td>
+      <td class="num small">${money(it.amount)}</td>
+      <td class="num">${TOKEN ? `<button class="fl ${f === 1 ? 'on' : ''}" onclick="flag(${it.k},1)" aria-label="too low">&#9650;</button> <button class="fl ${f === -1 ? 'on' : ''}" onclick="flag(${it.k},-1)" aria-label="too high">&#9660;</button>` : ''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function when(ts) { const d = (Date.now() / 1000 - ts); return d < 90 ? 'now' : d < 3600 ? Math.round(d / 60) + ' min' : d < 86400 ? Math.round(d / 3600) + ' h' : Math.round(d / 86400) + ' d'; }
+
+function renderLog(ev) {
+  $('log').innerHTML = ev.map(e => {
+    let t = '';
+    if (e.kind === 'answer') t = e.value === 0 ? `kept ${esc(e.a_name)} : ${esc(e.b_name)}` : `moved money from ${esc(e.value > 0 ? e.b_name : e.a_name)} to ${esc(e.value > 0 ? e.a_name : e.b_name)}`;
+    else if (e.kind === 'flag') t = `flagged ${esc(e.a_name)} as too ${e.value > 0 ? 'low' : 'high'}`;
+    else if (e.kind === 'escalation') t = `<b>escalated ${esc(e.a_name)}</b>: ${esc(e.note)}`;
+    else if (e.kind === 'join') t = `a ${esc(e.note)} joined`;
+    else if (e.kind === 'proposal') t = `proposed: ${esc(e.note)}`;
+    return `<div class="ev"><span class="tiny">${when(e.ts)}</span> ${e.simulated ? '<span class="tag">sim</span>' : ''} ${t}</div>`;
+  }).join('') || '<div class="tiny">Nothing yet.</div>';
+}
+
+function renderConst(c) {
+  const rows = [
+    ['One answer moves a ratio by', `${((Math.exp(c.step) - 1) * 100).toFixed(0)}%`],
+    ['Answers per person per day', c.daily_cap],
+    ['Questions that go to flagged projects', `${Math.round(c.flag_mix * 100)}%`],
+    ['Weight of a flag on one’s own project', c.self_flag_weight],
+    ['Net flags that convene a panel', c.escalate_at],
+    ['Panel size', c.escalation_panel],
+    ['Simulated answers per hour', c.sim_answers_per_hour],
+  ];
+  $('const').innerHTML = '<table>' + rows.map(([k, v]) => `<tr><td class="muted">${k}</td><td class="num">${v}</td></tr>`).join('') + '</table>';
+}
+
+async function refresh() {
+  try {
+    STATE = await api('api/state');
+    renderStats(STATE.stats); renderSplit(STATE.items); renderLog(STATE.events); renderConst(STATE.constitution);
+    if (!$('own').dataset.done) {
+      const opts = [...STATE.items].sort((a, b) => a.name.localeCompare(b.name)).map(it => `<option value="${it.k}">I maintain ${esc(it.name)}</option>`).join('');
+      $('own').insertAdjacentHTML('beforeend', opts); $('own').dataset.done = 1;
+    }
+  } catch (e) { /* try again on the next tick */ }
+}
+
+async function join() {
+  $('joinerr').textContent = '';
+  const name = $('name').value.trim();
+  if (!name) { $('joinerr').textContent = 'Enter a name first'; return; }
+  try {
+    const j = await api('api/join', {name, item: $('own').value === '' ? null : Number($('own').value)});
+    TOKEN = j.token; try { localStorage.setItem('steer-token', TOKEN); } catch (e) {}
+    showCardBox(); nextCard(); refresh();
+  } catch (e) { $('joinerr').textContent = e.message; }
+}
+$('name').addEventListener('input', () => $('joinerr').textContent = '');
+
+function showCardBox() { $('join').style.display = 'none'; $('cardbox').style.display = ''; $('propose').style.display = ''; }
+
+let CARD = null;
+async function nextCard() {
+  $('carderr').textContent = '';
+  try {
+    const j = await api('api/card?token=' + encodeURIComponent(TOKEN));
+    $('used').textContent = `${j.used} of ${j.cap} today`;
+    if (j.done) { $('card').innerHTML = '<p class="muted">That’s all for today. Thanks — come back tomorrow, or flag anything that looks off.</p>'; return; }
+    CARD = j.card; const a = CARD.a, b = CARD.b;
+    const proj = p => `<div class="proj"><b>${esc(p.name)}</b><span class="tiny">${esc(p.org)}</span><div class="small muted" style="margin:6px 0;min-height:42px">${esc(p.description)}</div><div class="small">${money(p.amount)} <span class="tiny">(${pct(p.share)})</span></div></div>`;
+    const r = CARD.ratio;
+    const now = Math.abs(r - 1) < 0.05 ? `${esc(a.name)} and ${esc(b.name)} get about the same`
+      : r > 1 ? `${esc(a.name)} gets ${r.toFixed(1)}× what ${esc(b.name)} gets` : `${esc(b.name)} gets ${(1 / r).toFixed(1)}× what ${esc(a.name)} gets`;
+    $('card').innerHTML = `<p class="small muted" style="margin-top:0">Right now ${now}. Judged by impact on Ethereum, should that change?</p>
+      <div class="row" style="align-items:stretch">${proj(a)}${proj(b)}</div>
+      <div class="answers"><button onclick="answer(1)" title="More to ${esc(a.name)}">&#9664; More here</button><button onclick="answer(0)">About right</button><button onclick="answer(-1)" title="More to ${esc(b.name)}">More here &#9654;</button></div>
+      <p class="tiny" style="margin-bottom:0">Not sure? <a href="#" onclick="nextCard();return false">Skip this one</a>.</p>`;
+  } catch (e) {
+    if (/join/.test(e.message)) { TOKEN = null; try { localStorage.removeItem('steer-token'); } catch (x) {} $('join').style.display = ''; $('cardbox').style.display = 'none'; return; }
+    $('carderr').textContent = e.message;
+  }
+}
+async function answer(v) {
+  try { await api('api/answer', {token: TOKEN, a: CARD.a.k, b: CARD.b.k, answer: v}); nextCard(); refresh(); }
+  catch (e) { $('carderr').textContent = e.message; }
+}
+async function flag(k, d) {
+  const cur = MYFLAGS[k] || 0; const nd = cur === d ? 0 : d;
+  try {
+    await api('api/flag', {token: TOKEN, item: k, dir: nd});
+    if (nd) MYFLAGS[k] = nd; else delete MYFLAGS[k];
+    try { localStorage.setItem('steer-flags', JSON.stringify(MYFLAGS)); } catch (e) {}
+    refresh();
+  } catch (e) { alert(e.message); }
+}
+async function propose() {
+  $('properr').textContent = '';
+  const text = $('prop').value.trim();
+  if (!text) { $('properr').textContent = 'Write the proposal first'; return; }
+  try { await api('api/propose', {token: TOKEN, text}); $('prop').value = ''; refresh(); }
+  catch (e) { $('properr').textContent = e.message; }
+}
+$('prop').addEventListener('input', () => $('properr').textContent = '');
+
+(async () => {
+  await refresh();
+  if (TOKEN) {
+    try { const me = await api('api/me?token=' + encodeURIComponent(TOKEN)); if (me.member) { showCardBox(); nextCard(); } else { TOKEN = null; } } catch (e) {}
+  }
+  setInterval(refresh, 8000);
+})();
+</script>
+</body>
+</html>

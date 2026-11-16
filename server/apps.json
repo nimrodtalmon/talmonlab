@@ -72,5 +72,15 @@
     "repo": "https://github.com/nimrodtalmon/aiagora.git",
     "port": 5401,
     "start": ".\\.venv\\Scripts\\python.exe web\\server.py 5401"
+  },
+  {
+    "name": "steer",
+    "repo": "https://github.com/nimrodtalmon/talmonlab.git",
+    "port": 5501,
+    "workdir": "C:\\sites\\steer\\server\\steer",
+    "env": {
+      "DATA": "C:\\sites\\steer-data"
+    },
+    "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 5501"
   }
 ]

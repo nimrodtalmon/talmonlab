@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Steer: how it works</title>
+<style>body{margin:0;background:#fcfcfb;color:#0b0b0b;font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:720px;margin:0 auto;padding:24px 16px 48px}h1{font-size:22px}h2{font-size:17px;margin-top:28px}a{color:#2a78d6}.muted{color:#52514e}@media (prefers-color-scheme:dark){body{background:#1a1a19;color:#f0efec}.muted{color:#c3c2b7}a{color:#3987e5}}</style></head>
+<body><main>
+<p><a href="./">&larr; Back to the split</a></p>
+<h1>How Steer works</h1>
+<p>An AI layer proposes how to split a fund among projects. It is fast and mostly right, but it has blind spots. People can fix them, but their attention is scarce and the people most eager to help are often the ones with a stake. Steer is a policy for spending a little human attention where it matters, without letting anyone grab the fund.</p>
+<h2>Four rules</h2>
+<ol>
+<li><b>Flags set the agenda, never the money.</b> Anyone can flag a project as too low or too high. Flags only decide which questions get asked next. Opposite flags cancel, and a maintainer's flag on their own project counts half.</li>
+<li><b>Questions go to people without a stake.</b> A question shows two projects and their current amounts and asks: more to A, about right, or more to B. Maintainers never get questions about their own project. Half of the questions go to flagged projects; the rest go where the money is.</li>
+<li><b>One answer moves one small step.</b> Nobody types a multiplier. Each answer moves the ratio of the two amounts by a fixed step, so no single answer, however extreme the opinion behind it, can move much money.</li>
+<li><b>Persistent flags escalate.</b> When the net flags on a project pass a threshold, a small panel is convened: the next questions all go to it. A proposal to change the rules themselves is logged for the community.</li>
+</ol>
+<h2>What is real here</h2>
+<p class="muted">The 98 repositories and the starting split come from the GG24 Deep Funding round: the starting split is the AI layer's weights (LLM jurors) published in <a href="https://github.com/davidgasquez/gg24-deepfunding-market-weights">davidgasquez/gg24-deepfunding-market-weights</a>. The amounts are illustrative ($350,000, the size of that round). This site moves no money. To keep the split alive when few people are around, a simulated community also answers questions; its actions are marked "sim" in the log.</p>
+<p class="muted">Steer is a research prototype of the Digital Cooperation Lab, Ben-Gurion University.</p>
+</main></body></html>

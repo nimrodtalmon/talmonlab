@@ -1,0 +1,691 @@
+{
+ "source": "AI-layer weights: huber-log weights from github.com/davidgasquez/gg24-deepfunding-market-weights (phase 2, LLM jurors); repositories of the GG24 Deep Funding round",
+ "items": [
+  {
+   "id": "argotorg/solidity",
+   "name": "solidity",
+   "org": "argotorg",
+   "description": "Solidity, the Smart Contract Programming Language",
+   "ai_weight": 0.024067881815968112
+  },
+  {
+   "id": "ethereum/EIPs",
+   "name": "EIPs",
+   "org": "ethereum",
+   "description": "The Ethereum Improvement Proposal repository",
+   "ai_weight": 0.023013053213322598
+  },
+  {
+   "id": "OpenZeppelin/openzeppelin-contracts",
+   "name": "openzeppelin-contracts",
+   "org": "OpenZeppelin",
+   "description": "OpenZeppelin Contracts is a library for secure smart contract development.",
+   "ai_weight": 0.022944947735650045
+  },
+  {
+   "id": "ethereum/go-ethereum",
+   "name": "go-ethereum",
+   "org": "ethereum",
+   "description": "Go implementation of the Ethereum protocol",
+   "ai_weight": 0.02225559385807182
+  },
+  {
+   "id": "ethereum/consensus-specs",
+   "name": "consensus-specs",
+   "org": "ethereum",
+   "description": "Ethereum Proof-of-Stake Consensus Specifications",
+   "ai_weight": 0.021575439370599154
+  },
+  {
+   "id": "NomicFoundation/hardhat",
+   "name": "hardhat",
+   "org": "NomicFoundation",
+   "description": "Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software.",
+   "ai_weight": 0.02105928647697051
+  },
+  {
+   "id": "OffchainLabs/prysm",
+   "name": "prysm",
+   "org": "OffchainLabs",
+   "description": "Go implementation of Ethereum proof of stake",
+   "ai_weight": 0.020294413561182063
+  },
+  {
+   "id": "ethers-io/ethers.js",
+   "name": "ethers.js",
+   "org": "ethers-io",
+   "description": "Complete Ethereum library and wallet implementation in JavaScript.",
+   "ai_weight": 0.02019152220671594
+  },
+  {
+   "id": "ethereum/execution-apis",
+   "name": "execution-apis",
+   "org": "ethereum",
+   "description": "Collection of APIs provided by Ethereum execution layer clients",
+   "ai_weight": 0.019389061808726894
+  },
+  {
+   "id": "foundry-rs/foundry",
+   "name": "foundry",
+   "org": "foundry-rs",
+   "description": "Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.",
+   "ai_weight": 0.019181166515855348
+  },
+  {
+   "id": "erigontech/erigon",
+   "name": "erigon",
+   "org": "erigontech",
+   "description": "Ethereum implementation on the efficiency frontier",
+   "ai_weight": 0.019058209266933048
+  },
+  {
+   "id": "supranational/blst",
+   "name": "blst",
+   "org": "supranational",
+   "description": "Multilingual BLS12-381 signature library",
+   "ai_weight": 0.019047521337461678
+  },
+  {
+   "id": "sigp/lighthouse",
+   "name": "lighthouse",
+   "org": "sigp",
+   "description": "Ethereum consensus client in Rust",
+   "ai_weight": 0.01893709171432766
+  },
+  {
+   "id": "NethermindEth/nethermind",
+   "name": "nethermind",
+   "org": "NethermindEth",
+   "description": "A robust execution client for Ethereum node operators.",
+   "ai_weight": 0.018583148053707962
+  },
+  {
+   "id": "remix-project-org/remix-project",
+   "name": "remix-project",
+   "org": "remix-project-org",
+   "description": "Remix is a browser-based compiler and IDE that enables users to build Ethereum contracts with Solidity language and to debug transactions.",
+   "ai_weight": 0.01825744947478559
+  },
+  {
+   "id": "flashbots/mev-boost",
+   "name": "mev-boost",
+   "org": "flashbots",
+   "description": "MEV-Boost allows Ethereum validators to source high-MEV blocks from a competitive builder marketplace",
+   "ai_weight": 0.017287173782728912
+  },
+  {
+   "id": "ethereum/web3.py",
+   "name": "web3.py",
+   "org": "ethereum",
+   "description": "A python interface for interacting with the Ethereum blockchain and ecosystem.",
+   "ai_weight": 0.016749553174671482
+  },
+  {
+   "id": "Consensys/teku",
+   "name": "teku",
+   "org": "Consensys",
+   "description": "\ud83d\ude80 Open-source Ethereum consensus client written in Java",
+   "ai_weight": 0.01624923327847083
+  },
+  {
+   "id": "hyperledger/besu",
+   "name": "besu",
+   "org": "hyperledger",
+   "description": "An enterprise-grade Java-based, Apache 2.0 licensed Ethereum client https://wiki.hyperledger.org/display/besu",
+   "ai_weight": 0.01530231184259325
+  },
+  {
+   "id": "libp2p/libp2p",
+   "name": "libp2p",
+   "org": "libp2p",
+   "description": "A modular and extensible networking stack which solves many challenges of peer-to-peer applications.",
+   "ai_weight": 0.014924065064372983
+  },
+  {
+   "id": "flashbots/mev-boost-relay",
+   "name": "mev-boost-relay",
+   "org": "flashbots",
+   "description": "MEV-Boost Relay for Ethereum proposer/builder separation (PBS)",
+   "ai_weight": 0.014666544723665128
+  },
+  {
+   "id": "wevm/viem",
+   "name": "viem",
+   "org": "wevm",
+   "description": "TypeScript Interface for Ethereum",
+   "ai_weight": 0.014614950613016734
+  },
+  {
+   "id": "argotorg/sourcify",
+   "name": "sourcify",
+   "org": "argotorg",
+   "description": "Source code verification service for Ethereum smart contracts",
+   "ai_weight": 0.013935588051271704
+  },
+  {
+   "id": "ChainSafe/lodestar",
+   "name": "lodestar",
+   "org": "ChainSafe",
+   "description": "\ud83c\udf1f Ethereum Consensus client for the Zig and TypeScript ecosystem",
+   "ai_weight": 0.01376172123600788
+  },
+  {
+   "id": "wighawag/hardhat-deploy",
+   "name": "hardhat-deploy",
+   "org": "wighawag",
+   "description": "hardhat deployment plugin",
+   "ai_weight": 0.013634521191388057
+  },
+  {
+   "id": "ethereum/js-ethereum-cryptography",
+   "name": "js-ethereum-cryptography",
+   "org": "ethereum",
+   "description": "Audited pure JS library containing all Ethereum-related cryptographic primitives",
+   "ai_weight": 0.013551854474447695
+  },
+  {
+   "id": "paradigmxyz/reth",
+   "name": "reth",
+   "org": "paradigmxyz",
+   "description": "Modular, contributor-friendly and blazing-fast implementation of the Ethereum protocol, in Rust",
+   "ai_weight": 0.013551788994570784
+  },
+  {
+   "id": "safe-global/safe-smart-account",
+   "name": "safe-smart-account",
+   "org": "safe-global",
+   "description": "Safe allows secure management of blockchain assets.",
+   "ai_weight": 0.013540219221336799
+  },
+  {
+   "id": "ethereum/py_ecc",
+   "name": "py_ecc",
+   "org": "ethereum",
+   "description": "Python implementation of ECC pairing and bn_128 and bls12_381 curve operations",
+   "ai_weight": 0.013455719914969511
+  },
+  {
+   "id": "paulmillr/noble-curves",
+   "name": "noble-curves",
+   "org": "paulmillr",
+   "description": "Audited & minimal JS implementation of elliptic curve cryptography.",
+   "ai_weight": 0.013143355123743674
+  },
+  {
+   "id": "vyperlang/vyper",
+   "name": "vyper",
+   "org": "vyperlang",
+   "description": "Pythonic Smart Contract Language for the EVM",
+   "ai_weight": 0.012812922338118342
+  },
+  {
+   "id": "herumi/mcl",
+   "name": "mcl",
+   "org": "herumi",
+   "description": "a portable and fast pairing-based cryptography library",
+   "ai_weight": 0.012740687202378123
+  },
+  {
+   "id": "blockscout/blockscout",
+   "name": "blockscout",
+   "org": "blockscout",
+   "description": "Blockchain explorer for Ethereum based network and a tool for inspecting and analyzing EVM based blockchains.",
+   "ai_weight": 0.0126799027143789
+  },
+  {
+   "id": "ipsilon/evmone",
+   "name": "evmone",
+   "org": "ipsilon",
+   "description": "Fast Ethereum Virtual Machine implementation",
+   "ai_weight": 0.012459217949075988
+  },
+  {
+   "id": "LFDT-web3j/web3j",
+   "name": "web3j",
+   "org": "LFDT-web3j",
+   "description": "Lightweight Java and Android library for integration with Ethereum clients",
+   "ai_weight": 0.011998929100013194
+  },
+  {
+   "id": "l2beat/l2beat",
+   "name": "l2beat",
+   "org": "l2beat",
+   "description": "L2BEAT is an analytics and research website about Ethereum layer two (L2) scaling solutions.",
+   "ai_weight": 0.011224651786617622
+  },
+  {
+   "id": "ethereum-lists/chains",
+   "name": "chains",
+   "org": "ethereum-lists",
+   "description": "provides metadata for chains",
+   "ai_weight": 0.011222936956345256
+  },
+  {
+   "id": "eth-infinitism/account-abstraction",
+   "name": "account-abstraction",
+   "org": "eth-infinitism",
+   "description": "",
+   "ai_weight": 0.011070447051761552
+  },
+  {
+   "id": "scaffold-eth/scaffold-eth-2",
+   "name": "scaffold-eth-2",
+   "org": "scaffold-eth",
+   "description": "Open source forkable Ethereum dev stack",
+   "ai_weight": 0.011016666601635404
+  },
+  {
+   "id": "arkworks-rs/algebra",
+   "name": "algebra",
+   "org": "arkworks-rs",
+   "description": "Libraries for finite field, elliptic curve, and polynomial arithmetic",
+   "ai_weight": 0.01057630862216762
+  },
+  {
+   "id": "Vectorized/solady",
+   "name": "solady",
+   "org": "Vectorized",
+   "description": "Optimized Solidity snippets.",
+   "ai_weight": 0.010210018740969225
+  },
+  {
+   "id": "status-im/nimbus-eth2",
+   "name": "nimbus-eth2",
+   "org": "status-im",
+   "description": "Nim implementation of the Ethereum Beacon Chain",
+   "ai_weight": 0.009764284574865752
+  },
+  {
+   "id": "taikoxyz/taiko-mono",
+   "name": "taiko-mono",
+   "org": "taikoxyz",
+   "description": "Taiko Alethia based rollup protocol \ud83e\udd41",
+   "ai_weight": 0.00974599659221929
+  },
+  {
+   "id": "protofire/solhint",
+   "name": "solhint",
+   "org": "protofire",
+   "description": "Solhint is an open-source project to provide a linting utility for Solidity code.",
+   "ai_weight": 0.009734677962474967
+  },
+  {
+   "id": "erigontech/silkworm",
+   "name": "silkworm",
+   "org": "erigontech",
+   "description": "C++ implementation of the Ethereum protocol",
+   "ai_weight": 0.009711738549191051
+  },
+  {
+   "id": "Consensys/gnark-crypto",
+   "name": "gnark-crypto",
+   "org": "Consensys",
+   "description": "gnark-crypto provides elliptic curve and pairing-based cryptography on BN, BLS12, BLS24 and BW6 curves. It also provides various algorithms (algebra, crypto) of particular interest to zero knowledge p",
+   "ai_weight": 0.00964820313951275
+  },
+  {
+   "id": "Nethereum/Nethereum",
+   "name": "Nethereum",
+   "org": "Nethereum",
+   "description": "Ethereum .Net cross platform integration library",
+   "ai_weight": 0.009601960589059691
+  },
+  {
+   "id": "flashbots/rbuilder",
+   "name": "rbuilder",
+   "org": "flashbots",
+   "description": "rbuilder is a blazingly fast, state of the art Ethereum MEV-Boost block builder written in Rust",
+   "ai_weight": 0.009585397052622444
+  },
+  {
+   "id": "argotorg/hevm",
+   "name": "hevm",
+   "org": "argotorg",
+   "description": "Symbolic and concrete EVM execution engine",
+   "ai_weight": 0.00893242199163647
+  },
+  {
+   "id": "DefiLlama/DefiLlama-Adapters",
+   "name": "DefiLlama-Adapters",
+   "org": "DefiLlama",
+   "description": "",
+   "ai_weight": 0.008735441144917809
+  },
+  {
+   "id": "Plonky3/Plonky3",
+   "name": "Plonky3",
+   "org": "Plonky3",
+   "description": "A toolkit for polynomial IOPs (PIOPs)",
+   "ai_weight": 0.008399554729935596
+  },
+  {
+   "id": "ChainSafe/bls",
+   "name": "bls",
+   "org": "ChainSafe",
+   "description": "\ud83d\udcbb Javascript Implementation of Boneh-Lynn-Shacham Signatures",
+   "ai_weight": 0.008216765142719646
+  },
+  {
+   "id": "ApeWorX/ape",
+   "name": "ape",
+   "org": "ApeWorX",
+   "description": "Build and explore on-chain w/ Python",
+   "ai_weight": 0.0080504640723651
+  },
+  {
+   "id": "ethstaker/eth-docker",
+   "name": "eth-docker",
+   "org": "ethstaker",
+   "description": "Docker automation for Ethereum nodes",
+   "ai_weight": 0.007965913369755693
+  },
+  {
+   "id": "Certora/CertoraProver",
+   "name": "CertoraProver",
+   "org": "Certora",
+   "description": "The Certora Prover is the state-of-the-art security tool for automated formal verification of smart contracts running on EVM-based chains, Solana and Stellar",
+   "ai_weight": 0.00784693405142468
+  },
+  {
+   "id": "DefiLlama/chainlist",
+   "name": "chainlist",
+   "org": "DefiLlama",
+   "description": "",
+   "ai_weight": 0.007767420619279925
+  },
+  {
+   "id": "dappnode/DAppNode",
+   "name": "DAppNode",
+   "org": "dappnode",
+   "description": "General repository of the project dappnode",
+   "ai_weight": 0.007284078181116639
+  },
+  {
+   "id": "intellij-solidity/intellij-solidity",
+   "name": "intellij-solidity",
+   "org": "intellij-solidity",
+   "description": "Solidity plugin for IntelliJ",
+   "ai_weight": 0.007199298994907783
+  },
+  {
+   "id": "wealdtech/ethdo",
+   "name": "ethdo",
+   "org": "wealdtech",
+   "description": "",
+   "ai_weight": 0.00690378927705747
+  },
+  {
+   "id": "succinctlabs/sp1",
+   "name": "sp1",
+   "org": "succinctlabs",
+   "description": "SP1 is a zero-knowledge virtual machine that proves the correct execution of programs compiled for the RISC-V architecture.",
+   "ai_weight": 0.006695361441165386
+  },
+  {
+   "id": "lambdaclass/lambdaworks",
+   "name": "lambdaworks",
+   "org": "lambdaclass",
+   "description": "lambdaworks offers implementations for both SNARKs and STARKs provers, along with the flexibility to leverage their individual components for constructing customized SNARKs.",
+   "ai_weight": 0.00657476095027094
+  },
+  {
+   "id": "a16z/helios",
+   "name": "helios",
+   "org": "a16z",
+   "description": "A fast, secure, and portable multichain light client for Ethereum",
+   "ai_weight": 0.00652279709962205
+  },
+  {
+   "id": "TrueBlocks/trueblocks-core",
+   "name": "trueblocks-core",
+   "org": "TrueBlocks",
+   "description": "The main repository for the TrueBlocks system",
+   "ai_weight": 0.006220953174116217
+  },
+  {
+   "id": "shazow/whatsabi",
+   "name": "whatsabi",
+   "org": "shazow",
+   "description": "Extract the ABI (and resolve proxies, and get other metadata) from Ethereum bytecode, even without source code.",
+   "ai_weight": 0.006133041214067261
+  },
+  {
+   "id": "ethpandaops/ethereum-helm-charts",
+   "name": "ethereum-helm-charts",
+   "org": "ethpandaops",
+   "description": "A set of Helm charts to run multiple components of the Ethereum blockchain on Kubernetes.",
+   "ai_weight": 0.0061219038067769575
+  },
+  {
+   "id": "succinctlabs/op-succinct",
+   "name": "op-succinct",
+   "org": "succinctlabs",
+   "description": "Succinct's Production-Grade Proving Engine for the OP Stack",
+   "ai_weight": 0.0060648901558480895
+  },
+  {
+   "id": "skalenetwork/libBLS",
+   "name": "libBLS",
+   "org": "skalenetwork",
+   "description": "If you like this project, please \u2b50\u2b50\u2b50 it on GitHub!! Solidity-compatible BLS signatures, threshold encryption, distributed key generation library in modern C++. Actively maintained and used by SKALE fo",
+   "ai_weight": 0.005864255166674287
+  },
+  {
+   "id": "smartcontracts/simple-optimism-node",
+   "name": "simple-optimism-node",
+   "org": "smartcontracts",
+   "description": "The easiest way to run an Optimism node",
+   "ai_weight": 0.005859940317469079
+  },
+  {
+   "id": "EspressoSystems/jellyfish",
+   "name": "jellyfish",
+   "org": "EspressoSystems",
+   "description": "A Rust Implementation of the PLONK ZKP System and Extensions",
+   "ai_weight": 0.0057061250774278205
+  },
+  {
+   "id": "0xMiden/miden-vm",
+   "name": "miden-vm",
+   "org": "0xMiden",
+   "description": "STARK-based virtual machine",
+   "ai_weight": 0.005445418206236006
+  },
+  {
+   "id": "alloy-rs/alloy",
+   "name": "alloy",
+   "org": "alloy-rs",
+   "description": "Transports, Middleware, and Networks for the Alloy project",
+   "ai_weight": 0.005330339401997754
+  },
+  {
+   "id": "argotorg/fe",
+   "name": "fe",
+   "org": "argotorg",
+   "description": "Emerging smart contract language for the Ethereum blockchain.",
+   "ai_weight": 0.00520166422656872
+  },
+  {
+   "id": "lambdaclass/ethrex",
+   "name": "ethrex",
+   "org": "lambdaclass",
+   "description": "Minimalist, fast and modular implementation of the Ethereum protocol in Rust. L1 and L2 execution client.",
+   "ai_weight": 0.0051173677466343935
+  },
+  {
+   "id": "ethpandaops/ethereum-package",
+   "name": "ethereum-package",
+   "org": "ethpandaops",
+   "description": "A Kurtosis package that deploys a private, portable, and modular Ethereum devnet",
+   "ai_weight": 0.0050719906508384155
+  },
+  {
+   "id": "a16z/halmos",
+   "name": "halmos",
+   "org": "a16z",
+   "description": "A symbolic testing tool for EVM smart contracts",
+   "ai_weight": 0.005062807337728616
+  },
+  {
+   "id": "NethermindEth/juno",
+   "name": "juno",
+   "org": "NethermindEth",
+   "description": "Starknet client implementation.",
+   "ai_weight": 0.0050586672485261885
+  },
+  {
+   "id": "grandinetech/grandine",
+   "name": "grandine",
+   "org": "grandinetech",
+   "description": "High performance Ethereum consensus client",
+   "ai_weight": 0.004975965991401015
+  },
+  {
+   "id": "otterscan/otterscan",
+   "name": "otterscan",
+   "org": "otterscan",
+   "description": "A blazingly fast, local, Ethereum block explorer built on top of Erigon",
+   "ai_weight": 0.004963315716730428
+  },
+  {
+   "id": "holiman/goevmlab",
+   "name": "goevmlab",
+   "org": "holiman",
+   "description": "Evm laboratory",
+   "ai_weight": 0.004956495750514617
+  },
+  {
+   "id": "Cyfrin/aderyn",
+   "name": "aderyn",
+   "org": "Cyfrin",
+   "description": "Solidity Static Analyzer that easily integrates into your editor",
+   "ai_weight": 0.004916378713981332
+  },
+  {
+   "id": "Commit-Boost/commit-boost-client",
+   "name": "commit-boost-client",
+   "org": "Commit-Boost",
+   "description": "Commit-Boost allows Ethereum validators to safely run MEV-Boost and community-built commitment protocols",
+   "ai_weight": 0.004901122263880146
+  },
+  {
+   "id": "succinctlabs/rsp",
+   "name": "rsp",
+   "org": "succinctlabs",
+   "description": "A minimal implementation of ZKPs of Ethereum block execution using Reth. Supports both Ethereum and OP Stack.",
+   "ai_weight": 0.004621542731549712
+  },
+  {
+   "id": "edb-rs/edb",
+   "name": "edb",
+   "org": "edb-rs",
+   "description": "EDB: The Ethereum Project Debugger",
+   "ai_weight": 0.004572305006272578
+  },
+  {
+   "id": "OffchainLabs/stylus-sdk-rs",
+   "name": "stylus-sdk-rs",
+   "org": "OffchainLabs",
+   "description": "Rust Smart Contracts on Arbitrum",
+   "ai_weight": 0.004571183816720092
+  },
+  {
+   "id": "evmts/tevm-monorepo",
+   "name": "tevm-monorepo",
+   "org": "evmts",
+   "description": "An Ethereum Node built to run in Browser, Bun, Deno, and Node.js",
+   "ai_weight": 0.004257597441310378
+  },
+  {
+   "id": "risc0/risc0-ethereum",
+   "name": "risc0-ethereum",
+   "org": "risc0",
+   "description": "Integration of the RISC Zero verifiable compute platform with Ethereum and EVM chains.",
+   "ai_weight": 0.004159162157222551
+  },
+  {
+   "id": "vyperlang/titanoboa",
+   "name": "titanoboa",
+   "org": "vyperlang",
+   "description": "a vyper interpreter",
+   "ai_weight": 0.004149739777059327
+  },
+  {
+   "id": "aestus-relay/mev-boost-relay",
+   "name": "mev-boost-relay",
+   "org": "aestus-relay",
+   "description": "Flashbots mev-boost relay for proposer/builder separation in Ethereum",
+   "ai_weight": 0.004104030511235224
+  },
+  {
+   "id": "ethstaker/ethstaker-deposit-cli",
+   "name": "ethstaker-deposit-cli",
+   "org": "ethstaker",
+   "description": "Secure key generation for deposits",
+   "ai_weight": 0.004100024735335518
+  },
+  {
+   "id": "ethpandaops/checkpointz",
+   "name": "checkpointz",
+   "org": "ethpandaops",
+   "description": "An Ethereum beacon chain checkpoint sync provider",
+   "ai_weight": 0.00398364266191017
+  },
+  {
+   "id": "powdr-labs/powdr",
+   "name": "powdr",
+   "org": "powdr-labs",
+   "description": "Performance and security acceleration for zkVMs.",
+   "ai_weight": 0.003927884705421981
+  },
+  {
+   "id": "dl-solarity/solidity-lib",
+   "name": "solidity-lib",
+   "org": "dl-solarity",
+   "description": "Solarity Solidity Library",
+   "ai_weight": 0.0038227873019517525
+  },
+  {
+   "id": "swiss-knife-xyz/swiss-knife",
+   "name": "swiss-knife",
+   "org": "swiss-knife-xyz",
+   "description": "All your EVM tools in one place!",
+   "ai_weight": 0.0038175861850079725
+  },
+  {
+   "id": "axiom-crypto/snark-verifier",
+   "name": "snark-verifier",
+   "org": "axiom-crypto",
+   "description": "",
+   "ai_weight": 0.0037635586869488435
+  },
+  {
+   "id": "deepfunding/dependency-graph",
+   "name": "dependency-graph",
+   "org": "deepfunding",
+   "description": "Data and docs for Deep Funding's dependency graph",
+   "ai_weight": 0.0037036888644558165
+  },
+  {
+   "id": "ethdebug/format",
+   "name": "format",
+   "org": "ethdebug",
+   "description": "Smart contract debugging data format - Standards development working group",
+   "ai_weight": 0.0035680251790875927
+  },
+  {
+   "id": "lambdaclass/lambda_ethereum_consensus",
+   "name": "lambda_ethereum_consensus",
+   "org": "lambdaclass",
+   "description": "Elixir implementation of an Ethereum consensus client, which offers high reliance & fault tolerance",
+   "ai_weight": 0.003483482894595603
+  },
+  {
+   "id": "argotorg/act",
+   "name": "act",
+   "org": "argotorg",
+   "description": "Smart contract specification language",
+   "ai_weight": 0.003296779489381349
+  }
+ ]
+}

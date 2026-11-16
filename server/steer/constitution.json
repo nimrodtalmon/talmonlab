@@ -1,0 +1,12 @@
+{
+  "fund": 350000,
+  "step": 0.1,
+  "daily_cap": 10,
+  "flag_mix": 0.5,
+  "self_flag_weight": 0.5,
+  "verdict_cooling": 0.7,
+  "escalate_at": 3.0,
+  "escalation_panel": 5,
+  "sim_members": 60,
+  "sim_answers_per_hour": 12
+}
