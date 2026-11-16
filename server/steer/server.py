@@ -57,6 +57,10 @@ def init():
             member text, a integer, b integer, value real, note text, simulated integer default 0);
         create table if not exists answers(member text, day text, n integer, primary key(member, day));
         """)
+        try:
+            c.execute("alter table members add column fmt text default 'nudge'")
+        except sqlite3.OperationalError:
+            pass
         if c.execute("select count(*) from items").fetchone()[0] == 0:
             for k, it in enumerate(SEED["items"]):
                 x = math.log(it["ai_weight"])
@@ -261,8 +265,8 @@ class H(BaseHTTPRequestHandler):
                     e["a_name"] = names.get(e["a"]); e["b_name"] = names.get(e["b"])
                     e["member"] = None if not e["member"] else ("simulated" if e["simulated"] else "member")
                 stats = dict(
-                    answers=CON.execute("select count(*) from events where kind='answer'").fetchone()[0],
-                    answers_people=CON.execute("select count(*) from events where kind='answer' and simulated=0").fetchone()[0],
+                    answers=CON.execute("select count(*) from events where kind in ('answer','multiplier')").fetchone()[0],
+                    answers_people=CON.execute("select count(*) from events where kind in ('answer','multiplier') and simulated=0").fetchone()[0],
                     flags=CON.execute("select count(*) from flags").fetchone()[0],
                     escalations=CON.execute("select count(*) from events where kind='escalation'").fetchone()[0],
                     members=CON.execute("select count(*) from members where simulated=0").fetchone()[0],
@@ -277,7 +281,14 @@ class H(BaseHTTPRequestHandler):
                 if used >= CONST["daily_cap"]:
                     return self._send(200, dict(done=True, used=used, cap=CONST["daily_cap"]))
                 a, b = pick_card(mem)
-                return self._send(200, dict(card=card_json(a, b), used=used, cap=CONST["daily_cap"]))
+                return self._send(200, dict(card=card_json(a, b), used=used, cap=CONST["daily_cap"],
+                                            fmt=mem.get("fmt") or "nudge"))
+            if p == "/api/export":
+                ev = [dict(r) for r in CON.execute(
+                    "select e.id, e.ts, e.kind, e.a, e.b, e.value, e.note, e.simulated, m.role, m.item, m.fmt "
+                    "from events e left join members m on m.token = e.member order by e.id")]
+                return self._send(200, dict(items=[dict(k=it["k"], id=it["id"], ai_weight=it["ai_weight"], x=it["x"]) for it in items()],
+                                            events=ev, constitution=CONST))
             if p == "/api/me":
                 mem = self.member(q.get("token"))
                 return self._send(200, dict(member=mem and dict(name=mem["name"], role=mem["role"], item=mem["item"])))
@@ -299,24 +310,41 @@ class H(BaseHTTPRequestHandler):
                 item = body.get("item")
                 item = int(item) if item not in (None, "", -1, "-1") else None
                 tok = secrets.token_urlsafe(16)
-                CON.execute("insert into members(token,name,role,item,created) values(?,?,?,?,?)",
-                            (tok, name, "maintainer" if item is not None else "member", item, time.time()))
+                fmt = "multiplier" if random.random() < CONST.get("multiplier_share", 0) else "nudge"
+                CON.execute("insert into members(token,name,role,item,created,fmt) values(?,?,?,?,?,?)",
+                            (tok, name, "maintainer" if item is not None else "member", item, time.time(), fmt))
                 log("join", tok, item, None, None, "maintainer" if item is not None else "member")
                 CON.commit()
                 return self._send(200, dict(token=tok))
             mem = self.member(body.get("token"))
             if not mem:
                 return self._send(401, dict(error="join first"))
-            if p == "/api/answer":
-                a, b, ans = int(body["a"]), int(body["b"]), int(body["answer"])
-                if ans not in (-1, 0, 1) or a == b or mem["item"] in (a, b):
-                    return self._send(400, dict(error="invalid answer"))
+            if p in ("/api/answer", "/api/multiplier", "/api/skip"):
+                a, b = int(body["a"]), int(body["b"])
+                if a == b or mem["item"] in (a, b):
+                    return self._send(400, dict(error="invalid question"))
+                its = items(); sh = shares(its); ratio = sh[a] / sh[b]
+                if p == "/api/skip":
+                    log("skip", mem["token"], a, b, None, json.dumps({"ratio": ratio}))
+                    CON.commit()
+                    return self._send(200, dict(ok=True))
                 r = CON.execute("select n from answers where member=? and day=?", (mem["token"], today())).fetchone()
                 used = r["n"] if r else 0
                 if used >= CONST["daily_cap"]:
                     return self._send(200, dict(done=True))
+                if p == "/api/answer":
+                    ans = int(body["answer"])
+                    if ans not in (-1, 0, 1):
+                        return self._send(400, dict(error="invalid answer"))
+                    apply_answer(mem["token"], a, b, ans)
+                    CON.execute("update events set note=? where id=(select max(id) from events)", (json.dumps({"ratio": ratio}),))
+                else:  # study of question formats: recorded, never moves money
+                    winner, mult = int(body["winner"]), float(body["mult"])
+                    if winner not in (a, b) or not (1 <= mult <= 1024):
+                        return self._send(400, dict(error="invalid answer"))
+                    signed = math.log(mult) * (1 if winner == a else -1)
+                    log("multiplier", mem["token"], a, b, signed, json.dumps({"ratio": ratio, "mult": mult, "winner": winner}))
                 CON.execute("insert or replace into answers(member,day,n) values(?,?,?)", (mem["token"], today(), used + 1))
-                apply_answer(mem["token"], a, b, ans)
                 CON.commit()
                 return self._send(200, dict(ok=True, used=used + 1))
             if p == "/api/flag":

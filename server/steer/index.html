@@ -133,6 +133,8 @@ function renderLog(ev) {
     else if (e.kind === 'escalation') t = `<b>escalated ${esc(e.a_name)}</b>: ${esc(e.note)}`;
     else if (e.kind === 'join') t = `a ${esc(e.note)} joined`;
     else if (e.kind === 'proposal') t = `proposed: ${esc(e.note)}`;
+    else if (e.kind === 'multiplier') t = `answered a format-study question on ${esc(e.a_name)} vs ${esc(e.b_name)}`;
+    else if (e.kind === 'skip') return '';
     return `<div class="ev"><span class="tiny">${when(e.ts)}</span> ${e.simulated ? '<span class="tag">sim</span>' : ''} ${t}</div>`;
   }).join('') || '<div class="tiny">Nothing yet.</div>';
 }
@@ -183,18 +185,40 @@ async function nextCard() {
     $('used').textContent = `${j.used} of ${j.cap} today`;
     if (j.done) { $('card').innerHTML = '<p class="muted">That’s all for today. Thanks — come back tomorrow, or flag anything that looks off.</p>'; return; }
     CARD = j.card; const a = CARD.a, b = CARD.b;
-    const proj = p => `<div class="proj"><b>${esc(p.name)}</b><span class="tiny">${esc(p.org)}</span><div class="small muted" style="margin:6px 0;min-height:42px">${esc(p.description)}</div><div class="small">${money(p.amount)} <span class="tiny">(${pct(p.share)})</span></div></div>`;
+    const proj = (p, amt) => `<div class="proj"><b>${esc(p.name)}</b><span class="tiny">${esc(p.org)}</span><div class="small muted" style="margin:6px 0;min-height:42px">${esc(p.description)}</div>${amt ? `<div class="small">${money(p.amount)} <span class="tiny">(${pct(p.share)})</span></div>` : ''}</div>`;
     const r = CARD.ratio;
+    const skip = `<p class="tiny" style="margin-bottom:0">Not sure? <a href="#" onclick="skipCard();return false">Skip this one</a>.</p>`;
+    if (j.fmt === 'multiplier') {
+      PICK = null; MULT = null;
+      $('card').innerHTML = `<p class="small muted" style="margin-top:0">Judged by impact on Ethereum, which of the two had more impact, and how many times more?</p>
+        <div class="row" style="align-items:stretch">${proj(a, false)}${proj(b, false)}</div>
+        <div class="answers" style="grid-template-columns:1fr 1fr"><button id="pa" onclick="pick(${a.k})">${esc(a.name)}</button><button id="pb" onclick="pick(${b.k})">${esc(b.name)}</button></div>
+        <div class="row" style="flex-wrap:wrap;margin-top:8px" id="mults">${[1.5, 2, 3, 5, 10, 30, 100].map(m => `<button class="fl" style="padding:5px 10px" onclick="mult(${m}, this)">${m}\u00d7</button>`).join('')}</div>
+        <div class="row" style="margin-top:10px"><button class="pri" onclick="sendMult()">Send</button><span class="tiny">This question is part of a study of question formats. It does not move money.</span></div>${skip}`;
+      return;
+    }
     const now = Math.abs(r - 1) < 0.05 ? `${esc(a.name)} and ${esc(b.name)} get about the same`
-      : r > 1 ? `${esc(a.name)} gets ${r.toFixed(1)}× what ${esc(b.name)} gets` : `${esc(b.name)} gets ${(1 / r).toFixed(1)}× what ${esc(a.name)} gets`;
+      : r > 1 ? `${esc(a.name)} gets ${r.toFixed(1)}\u00d7 what ${esc(b.name)} gets` : `${esc(b.name)} gets ${(1 / r).toFixed(1)}\u00d7 what ${esc(a.name)} gets`;
     $('card').innerHTML = `<p class="small muted" style="margin-top:0">Right now ${now}. Judged by impact on Ethereum, should that change?</p>
-      <div class="row" style="align-items:stretch">${proj(a)}${proj(b)}</div>
-      <div class="answers"><button onclick="answer(1)" title="More to ${esc(a.name)}">&#9664; More here</button><button onclick="answer(0)">About right</button><button onclick="answer(-1)" title="More to ${esc(b.name)}">More here &#9654;</button></div>
-      <p class="tiny" style="margin-bottom:0">Not sure? <a href="#" onclick="nextCard();return false">Skip this one</a>.</p>`;
+      <div class="row" style="align-items:stretch">${proj(a, true)}${proj(b, true)}</div>
+      <div class="answers"><button onclick="answer(1)" title="More to ${esc(a.name)}">&#9664; More here</button><button onclick="answer(0)">About right</button><button onclick="answer(-1)" title="More to ${esc(b.name)}">More here &#9654;</button></div>${skip}`;
   } catch (e) {
     if (/join/.test(e.message)) { TOKEN = null; try { localStorage.removeItem('steer-token'); } catch (x) {} $('join').style.display = ''; $('cardbox').style.display = 'none'; return; }
     $('carderr').textContent = e.message;
   }
+}
+let PICK = null, MULT = null;
+function pick(k) { PICK = k; $('pa').classList.toggle('pri', k === CARD.a.k); $('pb').classList.toggle('pri', k === CARD.b.k); $('carderr').textContent = ''; }
+function mult(m, el) { MULT = m; document.querySelectorAll('#mults button').forEach(b => b.classList.remove('on')); el.classList.add('on'); $('carderr').textContent = ''; }
+async function sendMult() {
+  if (PICK === null) { $('carderr').textContent = 'Pick the project with more impact first'; return; }
+  if (MULT === null) { $('carderr').textContent = 'Pick how many times more'; return; }
+  try { await api('api/multiplier', {token: TOKEN, a: CARD.a.k, b: CARD.b.k, winner: PICK, mult: MULT}); nextCard(); refresh(); }
+  catch (e) { $('carderr').textContent = e.message; }
+}
+async function skipCard() {
+  try { await api('api/skip', {token: TOKEN, a: CARD.a.k, b: CARD.b.k}); } catch (e) {}
+  nextCard();
 }
 async function answer(v) {
   try { await api('api/answer', {token: TOKEN, a: CARD.a.k, b: CARD.b.k, answer: v}); nextCard(); refresh(); }

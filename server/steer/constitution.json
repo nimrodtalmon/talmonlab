@@ -8,5 +8,6 @@
   "escalate_at": 3.0,
   "escalation_panel": 5,
   "sim_members": 60,
-  "sim_answers_per_hour": 12
+  "sim_answers_per_hour": 12,
+  "multiplier_share": 0.3
 }
