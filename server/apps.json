@@ -66,5 +66,11 @@
       "DATA": "C:\\sites\\ben-data"
     },
     "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 5301"
+  },
+  {
+    "name": "agora",
+    "repo": "https://github.com/nimrodtalmon/aiagora.git",
+    "port": 5401,
+    "start": ".\\.venv\\Scripts\\python.exe web\\server.py 5401"
   }
 ]
