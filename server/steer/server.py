@@ -222,6 +222,12 @@ def sim_loop():
 
 
 # ---------------------------------------------------------------- http
+# research brief (slides): in the deployed copy it sits next to this file; in the aisteer repo, under web/
+WEB = HERE if os.path.exists(os.path.join(HERE, "brief", "index.html")) else os.path.join(HERE, "..", "web")
+STATIC = {"/brief/": ("brief/index.html", "text/html"),
+          "/assets/deck.css": ("assets/deck.css", "text/css"),
+          "/assets/deck.js": ("assets/deck.js", "application/javascript")}
+
 class H(BaseHTTPRequestHandler):
     def _send(self, code, body, ctype="application/json"):
         if isinstance(body, (dict, list)):
@@ -247,6 +253,11 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urlparse(self.path)
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
+        if u.path == "/brief":                      # relative links need the slash
+            self.send_response(301); self.send_header("Location", "brief/"); self.end_headers(); return
+        if u.path in STATIC:
+            f, ctype = STATIC[u.path]
+            return self._send(200, open(os.path.join(WEB, f), "rb").read(), ctype)
         p = u.path.rstrip("/") or "/"
         if p in ("/", "/index.html"):
             return self._send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html")

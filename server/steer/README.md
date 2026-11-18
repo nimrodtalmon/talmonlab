@@ -14,3 +14,7 @@ A share of new members (`multiplier_share`) gets the multiplier question format
 instead (pick a winner and a multiplier, without seeing amounts); those answers are
 recorded for a study of question formats and never move money. `/api/export` returns
 all events (no names) for analysis. Data: davidgasquez/gg24-deepfunding-market-weights (MIT).
+
+`/steer/brief/` is the research brief (conference-style slides on the zutot deck
+engine). Source: github.com/nimrodtalmon/aisteer, `web/brief/src/build.py`; after a
+rebuild, copy `web/brief/index.html` and `web/assets/` here.
