@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 <style>
+.lean { font-size: 28px; font-weight: 600; color: #2e7d4f; border: 2px solid #2e7d4f; border-radius: 10px; padding: 2px 12px; margin-left: 16px; vertical-align: middle; }
 .sub { font-size: 42px; color: var(--gray); margin-top: -20px; }
 .split { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 56px; align-items: center; margin-block: auto; }
 .stack { display: flex; flex-direction: column; gap: 10px; margin-top: -10px; }
@@ -149,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
   <table class="mt grid"><colgroup><col style="width:30%"><col style="width:24%"><col style="width:23%"><col style="width:23%"></colgroup><tr><th>which pairs are asked</th><th>who answers</th><th class="c">nudge</th><th class="c">multiplier</th></tr><tr><td>chosen by volunteers</td><td>volunteers</td><td class="c cell">Open forum, nudges</td><td class="c cell">Open forum, multipliers</td></tr><tr><td>uniform</td><td>random non-maintainers</td><td class="c cell">Random pairs</td><td class="c cell empty">·</td></tr><tr><td>by share</td><td>random non-maintainers</td><td class="c cell">Share-weighted</td><td class="c cell">Share-weighted, multipliers</td></tr><tr><td>½ by flags, ½ by share</td><td>random non-maintainers</td><td class="c cell">Flag and sample</td><td class="c cell empty">·</td></tr></table>
 </section>
 <!-- 11 --><section class="slide light">
-  <p class="eyebrow">Theorem 1</p>
+  <p class="eyebrow">Theorem 1 <span class="lean">Lean ✓</span></p>
   <h2>Nudges are bounded, typing-proof, agenda-free</h2>
   <div class="split">
     <div><div class="box"><p>Under nudges, with small steps:</p>
@@ -160,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </section>
 <!-- 12 --><section class="slide light">
-  <p class="eyebrow">Theorem 2</p>
+  <p class="eyebrow">Theorem 2 <span class="lean">Lean ✓</span></p>
   <h2>Open forums are captured; recusal fixes it</h2>
   <div class="split">
     <div><div class="box"><p>Suppose a fraction \(\mathrm{frac}_j\) of the answers about project \(j\) come from its maintainers, who want \(j\) higher by a factor \(e^{\mathrm{bias}}\).</p>
@@ -169,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </section>
 <!-- 13 --><section class="slide light">
-  <p class="eyebrow">Theorem 3</p>
+  <p class="eyebrow">Theorem 3 <span class="lean">Lean ✓ optimum</span></p>
   <h2>Accuracy for attention</h2>
   <div class="split">
     <div><div class="box"><p>One pair, questions at rate \(q\); the median drifts with volatility \(\mathrm{vol}\); answer noise has density \(\mathrm{dens}\) at zero. Nudges’ mean-square error is about</p>
@@ -179,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </section>
 <!-- 14 --><section class="slide light">
-  <p class="eyebrow">Theorem 4</p>
+  <p class="eyebrow">Theorem 4 <span class="lean">Lean ✓</span></p>
   <h2>Let noticing pick the questions</h2>
   <div class="split">
     <div><div class="box"><p>A project becomes off. With uniform pairs (\(A\) answers a day, \(m\) projects), it is first asked about after \(\tfrac{m}{2A}\) days on average; if flags pick the questions, after \(1/\mathrm{notice}\).</p>
@@ -188,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </section>
 <!-- 15 --><section class="slide light">
-  <p class="eyebrow">Theorem 5</p>
+  <p class="eyebrow">Theorem 5 <span class="lean">Lean ✓</span></p>
   <h2>Our requirements force nudges and recusal</h2>
   <div class="split">
     <div><div class="box"><p>A rule maps the current log-ratio \(g\) and a report \(r\) to a new one. <b>Typing-proof:</b> stretching \(r\) away from \(g\) changes nothing. <b>Neutral:</b> swapping \(a, b\) mirrors it. <b>Level-free:</b> only \(r - g\) matters.</p>
@@ -198,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </section>
 <!-- 16 --><section class="slide light">
-  <p class="eyebrow">Theorem 6</p>
+  <p class="eyebrow">Theorem 6 <span class="lean">Lean ✓ optimum</span></p>
   <h2>Ask about money and movement</h2>
   <div class="split">
     <div><div class="box"><p>Projects tracked separately, questions about \(j\) at rate \(q_j\), total \(A\), best steps. To first order, misallocated funding is smallest for</p>
@@ -208,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </section>
 <!-- 17 --><section class="slide light">
-  <p class="eyebrow">Theorem 7</p>
+  <p class="eyebrow">Theorem 7 <span class="lean">Lean ✓</span></p>
   <h2>Ask first where flags point</h2>
   <div class="split">
     <div><div class="box"><p>One question about project \(j\): share \(\mathrm{split}_j\), log error \(e_j\) with \(|e_j| \ge \mathrm{step}\), symmetric answer noise with distribution \(F\). To first order, it cuts misallocated funding by</p>
@@ -263,6 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
     <div class="row"><span class="n">4</span><p>Avoid open forums and typed multipliers</p></div>
     <div class="row"><span class="n">5</span><p>Caveat: first check that beliefs are not too exaggerated</p></div>
   </div>
+  <p class="muted" style="margin-top:12px">Lean ✓: proved in Lean 4 with Mathlib, no sorry. Theorems 3, 6: the optimum only.</p>
 </section>
 <!-- 23 --><section class="slide dark center">
   <p class="eyebrow">aisteer</p>
