@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grassroots UI · prototype</title>
+<style>
+:root { --bg:#f4f4f2; --ink:#1f2328; --mute:#6b7075; --line:#e4e4e0; --card:#fff; --acc:#16917f; --acc2:#e8f5f2;
+  --alice:#f07a5a; --bob:#2fae9b; --carol:#9b6bd6; --dave:#e9a93a; }
+* { box-sizing: border-box; }
+body { margin:0; font: 15px/1.4 -apple-system, "Segoe UI", Roboto, Heebo, sans-serif; background: var(--bg); color: var(--ink); }
+header { display:flex; align-items:center; gap:16px; padding:14px 24px; border-bottom:1px solid var(--line); background:#fff; }
+header b { font-size:17px; }
+header .sub { color: var(--mute); }
+header .sp { flex:1; }
+.status { padding:4px 12px; border-radius:99px; background:#e9f6ee; color:#1d7a3e; font-size:13px; }
+.status.busy { background:#fff4e0; color:#9a6200; }
+button { font: inherit; cursor: pointer; }
+.hb { border:0; background:#eceae6; padding:6px 14px; border-radius:99px; }
+#banner { max-width:1200px; margin:14px auto 0; padding:0 24px; color: var(--mute); }
+main { display:grid; grid-template-columns: repeat(4, 290px); gap:22px; justify-content:center; padding:18px 24px 40px; }
+.phone { width:290px; height:600px; background:#111; border-radius:38px; padding:10px; }
+.scr { position:relative; width:100%; height:100%; background:#fafaf8; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; }
+.top { display:flex; align-items:center; gap:10px; padding:26px 16px 10px; background:#fff; border-bottom:1px solid var(--line); }
+.av { width:34px; height:34px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex:none; }
+.av.big { width:64px; height:64px; font-size:28px; }
+.top .nm { font-weight:700; }
+.top .st { font-size:12px; color: var(--mute); }
+.body { flex:1; overflow-y:auto; padding:12px; }
+.card { background: var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; margin-bottom:10px; }
+.ask { border-color: var(--acc); }
+.ask .btns, .row2 { display:flex; gap:8px; margin-top:10px; }
+.pri { background: var(--acc); color:#fff; border:0; border-radius:99px; padding:8px 16px; font-weight:600; }
+.sec { background: var(--acc2); color: var(--acc); border:0; border-radius:99px; padding:8px 16px; font-weight:600; }
+.ghost { background:none; border:0; color: var(--mute); padding:8px 6px; }
+.pri:disabled, .sec:disabled { opacity:.4; cursor: default; }
+.h { font-size:12px; color: var(--mute); text-transform:uppercase; letter-spacing:.05em; margin:6px 2px 8px; }
+.person { display:flex; align-items:center; gap:10px; padding:10px; border-radius:14px; background:#fff; border:1px solid var(--line); margin-bottom:8px; width:100%; text-align:left; }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { font-size:12px; background:#f0efeb; color: var(--mute); padding:2px 8px; border-radius:99px; }
+.chip.on { background: var(--acc2); color: var(--acc); }
+.empty { color: var(--mute); text-align:center; padding:24px 8px; }
+.pend { color: var(--mute); font-size:13px; display:flex; gap:8px; align-items:center; margin:0 2px 10px; }
+.note { font-size:13px; color:#9a3a1a; margin:0 2px 10px; }
+.spin { width:12px; height:12px; border:2px solid #ccc; border-top-color: var(--acc); border-radius:50%; animation: s 1s linear infinite; flex:none; }
+@keyframes s { to { transform: rotate(360deg); } }
+.act { margin-bottom:10px; }
+.act .cap { font-size:12px; color: var(--mute); margin-top:4px; }
+.nav { display:flex; border-top:1px solid var(--line); background:#fff; }
+.nav button { flex:1; border:0; background:none; padding:10px 0 16px; color: var(--mute); font-size:13px; }
+.nav button.on { color: var(--acc); font-weight:700; }
+.sheet { position:absolute; inset:auto 0 0 0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.15); padding:16px; max-height:70%; overflow-y:auto; }
+.shade { position:absolute; inset:0; background:rgba(0,0,0,.25); }
+.back { border:0; background:none; color: var(--acc); padding:0; margin-bottom:8px; }
+.ph { text-align:center; margin:6px 0 14px; }
+.ph .nm { font-size:20px; font-weight:700; margin-top:6px; }
+.ph .chips { justify-content:center; margin-top:6px; }
+footer { text-align:center; color: var(--mute); font-size:13px; padding-bottom:30px; }
+</style>
+</head>
+<body>
+<header>
+  <b>Grassroots UI</b><span class="sub">prototype · person-first · <span id="cname">…</span>, live</span>
+  <span class="sp"></span>
+  <span class="status busy" id="status">connecting…</span>
+  <button class="hb" id="reset">Start over</button>
+</header>
+<div id="banner"></div>
+<main id="phones"></main>
+<footer>Four people, each with their own agent, running the compiled contract on peoplesweb.org. Every button and word comes from the contract.</footer>
+<script>
+const API = 'https://peoplesweb.org/api/';
+const W = new URLSearchParams(location.search).get('c') || 'friendship';
+const PERSONS = ['alice', 'bob', 'carol', 'dave'];
+const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
+let SPEC = null, ST = null, VER = -1;
+const used = {};
+const ui = {}; PERSONS.forEach(p => ui[p] = {tab: 'people', person: null, sheet: null});
+const $ = s => document.querySelector(s);
+const S = (f, ...a) => ({f, a});
+const isS = (t, f) => t && typeof t === 'object' && !Array.isArray(t) && t.f === f;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const cap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+const fn = a => typeof a === 'string' ? a : a.f;
+const argsOf = a => typeof a === 'string' ? [] : a.a;
+const av = (p, big) => `<span class="av${big ? ' big' : ''}" style="background:${COL[p] || '#888'}">${cap(p)[0]}</span>`;
+const sing = w => w.replace(/s$/, '');
+
+/* the person's screen data, from the live state: the last view, the open menu, the questions */
+function screen(p) {
+  const cs = (ST && ST.persons[p]) || {};
+  let view = null, notes = [], menu = null, asks = [];
+  for (const [id, v] of Object.entries(cs)) {
+    if (isS(v, 'output')) { for (const x of v.a[0]) { if (isS(x, 'view')) { view = x; notes = []; } else if (x && x.f) notes.push(x); } }
+    else if (isS(v, 'request_r')) { if (!used[p + ':' + id]) menu = {id: +id, path: v.a[0].a[0]}; }
+    else if (isS(v, 'approval_w')) { const ap = v.a[0]; if (!used[p + ':' + id]) asks.push({id: +id, path: ap.a[ap.a.length - 1].a[0], words: ap.a[1]}); }
+  }
+  const atoms = view ? view.a[1] : [], pending = view ? view.a[3] : [], tabs = view ? view.a[4].map(t => ({label: t.a[0], pred: t.a[1]})) : [];
+  return {view, notes, menu, asks, atoms, pending, tabs};
+}
+
+/* does the person's state satisfy the act's precondition under the values given to places? */
+function holds(atoms, pred, places, val) {
+  return atoms.some(a => fn(a) === pred && places.every((k, j) => k === null || argsOf(a)[j] === val[k]));
+}
+function enabled(act, s, val) {
+  for (const [p, ks] of act.req) if (!holds(s.atoms, p, ks, val)) return false;
+  for (const [p, ks] of act.forb) if (ks.every(k => k === null || val[k] !== undefined) && holds(s.atoms, p, ks, val)) return false;
+  const ps = act.roles.map(k => val[k]).filter(Boolean);
+  return new Set(ps).size === ps.length;
+}
+/* the persons the viewer's state names */
+function known(s, me) {
+  const out = [];
+  for (const a of s.atoms) for (const x of argsOf(a)) if (PERSONS.includes(x) && x !== me && !out.includes(x)) out.push(x);
+  return out;
+}
+/* the act's caption: its clause sentence with the contract's names replaced by the persons of this binding */
+function sentence(act, val) {
+  if (!act.sentence) return '';
+  const map = {}; act.names.forEach((n, j) => { map[n] = val[j + 1] ? cap(val[j + 1]) : '…'; });
+  return act.sentence.replace(/\b[A-Z][a-z]+\b/g, w => w in map ? `<b>${esc(map[w])}</b>` : w);
+}
+function request(act, val) { return S('propose', S(act.name, ...act.args.map((_, k) => val[k + 1]))); }
+async function send(p, id, path, value) {
+  used[p + ':' + id] = true; ui[p].sheet = null; if (ST) ST.status = 'working'; render();
+  await fetch(API + W + '/act', {method: 'POST', body: JSON.stringify({person: p, id, path, value})});
+}
+function words(ws) {
+  return (ws || []).map(w => isS(w, 'text') ? esc(w.a[0]) : isS(w, 'person') ? '<b>' + esc(cap(w.a[0])) + '</b>'
+    : isS(w, 'named') ? ' · ' + esc(w.a[0]) + ': <b>' + esc(cap(w.a[1])) + '</b>' : isS(w, 'valued') ? ' · ' + esc(w.a[0]) + ': ' + esc(w.a[1]) : '').join('');
+}
+function relations(s, q) {
+  return s.tabs.filter(t => s.atoms.some(a => fn(a) === t.pred && argsOf(a).includes(q))).map(t => sing(t.label));
+}
+
+/* the ways an act can be taken with person q at one of its places; the other bound places to pick */
+function waysWith(act, s, me, q) {
+  const out = [];
+  for (const k of act.binds) {
+    const others = act.binds.filter(j => j !== k);
+    const val = {[act.me]: me, [k]: q};
+    if (!others.length) { if (enabled(act, s, val)) out.push({act, val, pick: null}); continue; }
+    const j = others[0];
+    const cands = known(s, me).filter(x => x !== q && enabled(act, s, {...val, [j]: x}));
+    if (cands.length) out.push({act, val, pick: {place: j, cands}});
+  }
+  return out;
+}
+
+function phone(p) {
+  const s = screen(p), u = ui[p], d = document.createElement('div');
+  d.className = 'phone';
+  const identity = s.atoms.includes('identity');
+  let h = `<div class="scr"><div class="top">${av(p)}<div><div class="nm">${cap(p)}</div><div class="st">${s.view ? (identity ? 'identity established' : 'no identity yet') : 'starting…'}</div></div></div><div class="body">`;
+  for (const a of s.asks) h += `<div class="card ask">${words(a.words)}<div class="btns"><button class="pri" data-ans="yes" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'>Accept</button><button class="ghost" data-ans="no" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'>Decline</button></div></div>`;
+  for (const c of s.pending) h += `<div class="pend"><span class="spin"></span>${esc(((SPEC.acts.find(x => x.name === (c.f || c)) || {}).button) || c.f || c)}: waiting for the others</div>`;
+  for (const n of s.notes) if (isS(n, 'refused')) h += `<div class="note">Not done: ${esc(fn(n.a[0]))}</div>`;
+  // acts that bind no person and ask for nothing: offered on their own (Establish)
+  const solo = SPEC.acts.filter(a => !a.binds.length && !a.fields.length && enabled(a, s, {[a.me]: p}));
+  if (!identity && s.view) {
+    h += `<div class="card"><div style="font-weight:700;margin-bottom:4px">Welcome</div><div class="cap" style="color:var(--mute)">You have no identity yet.</div>`;
+    for (const a of solo) h += `<div class="row2"><button class="pri" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button></div>`;
+    h += `</div>`;
+  } else if (u.tab === 'people' && u.person) {
+    const q = u.person, rel = relations(s, q);
+    h += `<button class="back" data-back="1">‹ People</button><div class="ph">${av(q, true)}<div class="nm">${cap(q)}</div><div class="chips">${rel.map(r => `<span class="chip on">${esc(r)}</span>`).join('')}</div></div>`;
+    const ways = SPEC.acts.flatMap(a => waysWith(a, s, p, q));
+    h += ways.length ? '' : `<div class="empty">Nothing to do with ${cap(q)} now.</div>`;
+    ways.forEach((w, i) => {
+      h += `<div class="act"><button class="sec" data-way="${i}" ${s.menu ? '' : 'disabled'}>${esc(w.act.button)}${w.pick ? '…' : ''}</button><div class="cap">${sentence(w.act, w.val)}</div></div>`;
+    });
+    u.ways = ways;
+  } else if (u.tab === 'people') {
+    const ps = known(s, p);
+    h += `<div class="h">People</div>`;
+    h += ps.length ? ps.map(q => `<button class="person" data-person="${q}">${av(q)}<div><div style="font-weight:600">${cap(q)}</div><div class="chips">${relations(s, q).map(r => `<span class="chip">${esc(r)}</span>`).join('')}</div></div></button>`).join('') : `<div class="empty">No one yet.</div>`;
+    const adders = SPEC.acts.filter(a => a.fields.some(f => f.type === 'key' || f.type === 'person') && enabled(a, s, {[a.me]: p}));
+    for (const a of adders) h += `<button class="sec" style="width:100%;margin-top:6px" data-add="${a.name}" ${s.menu ? '' : 'disabled'}>+ ${esc(a.button)}</button>`;
+  } else {
+    h += `<div class="h">Me</div><div class="card">${s.atoms.filter(a => !argsOf(a).length).map(a => `<span class="chip on">${esc(fn(a))}</span> `).join('') || 'Nothing yet.'}</div>`;
+    for (const a of solo) h += `<div class="act"><button class="sec" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button><div class="cap">${sentence(a, {[a.me]: p})}</div></div>`;
+  }
+  h += `</div>`;
+  if (identity) h += `<div class="nav"><button data-tab="people" class="${u.tab === 'people' ? 'on' : ''}">People</button><button data-tab="me" class="${u.tab === 'me' ? 'on' : ''}">Me</button></div>`;
+  if (u.sheet) {
+    const sh = u.sheet;
+    h += `<div class="shade" data-close="1"></div><div class="sheet"><div style="font-weight:700;margin-bottom:6px">${esc(sh.title)}</div>`;
+    h += sh.opts.length ? sh.opts.map((o, i) => `<button class="person" data-opt="${i}">${av(o.who)}<div><div style="font-weight:600">${cap(o.who)}</div><div class="cap" style="font-size:12px;color:var(--mute)">${o.cap || ''}</div></div></button>`).join('') : `<div class="empty">No one to choose.</div>`;
+    h += `<button class="ghost" data-close="1">Cancel</button></div>`;
+  }
+  h += `</div>`;
+  d.innerHTML = h;
+  const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => f(b));
+  on('[data-ans]', b => send(p, +b.dataset.id, JSON.parse(b.dataset.path), b.dataset.ans));
+  on('[data-tab]', b => { u.tab = b.dataset.tab; u.person = null; render(); });
+  on('[data-person]', b => { u.person = b.dataset.person; render(); });
+  on('[data-back]', () => { u.person = null; render(); });
+  on('[data-close]', () => { u.sheet = null; render(); });
+  on('[data-solo]', b => { const a = SPEC.acts.find(x => x.name === b.dataset.solo); send(p, s.menu.id, s.menu.path, request(a, {[a.me]: p})); });
+  on('[data-way]', b => {
+    const w = u.ways[+b.dataset.way];
+    if (!w.pick) return send(p, s.menu.id, s.menu.path, request(w.act, w.val));
+    u.sheet = {title: w.act.button, opts: w.pick.cands.map(x => { const v = {...w.val, [w.pick.place]: x}; return {who: x, cap: sentence(w.act, v), go: () => send(p, s.menu.id, s.menu.path, request(w.act, v))}; })};
+    render();
+  });
+  on('[data-add]', b => {
+    const a = SPEC.acts.find(x => x.name === b.dataset.add), f = a.fields[0];
+    const cands = PERSONS.filter(x => x !== p && !known(s, p).includes(x));
+    u.sheet = {title: a.button, opts: cands.map(x => { const v = {[a.me]: p, [f.i]: x}; return {who: x, cap: sentence(a, v), go: () => send(p, s.menu.id, s.menu.path, request(a, v))}; })};
+    render();
+  });
+  on('[data-opt]', b => u.sheet.opts[+b.dataset.opt].go());
+  return d;
+}
+
+function render() {
+  if (!ST || !SPEC) return;
+  const ready = ST.status === 'ready';
+  $('#status').className = 'status' + (ready ? '' : ' busy');
+  $('#status').textContent = ready ? 'Ready' : ST.status === 'working' ? 'Agents working…' : ST.status === 'starting' ? 'Starting… (a minute or two)' : ST.status;
+  $('#phones').innerHTML = '';
+  PERSONS.forEach(p => $('#phones').appendChild(phone(p)));
+}
+async function poll() {
+  for (;;) {
+    try {
+      const r = await fetch(API + W + '/state?since=' + VER);
+      const st = await r.json();
+      if (st.version !== VER || st.status !== (ST && ST.status)) { ST = st; VER = st.version; render(); }
+    } catch (e) { $('#status').textContent = 'Reaching the server…'; await new Promise(r => setTimeout(r, 3000)); }
+  }
+}
+$('#reset').onclick = async () => { await fetch(API + W + '/reset', {method: 'POST'}); VER = -1; for (const k in used) delete used[k]; PERSONS.forEach(p => ui[p] = {tab: 'people', person: null, sheet: null}); };
+fetch(W + '.json').then(r => r.json()).then(s => { SPEC = s; $('#cname').textContent = s.contract; poll(); });
+</script>
+</body>
+</html>
