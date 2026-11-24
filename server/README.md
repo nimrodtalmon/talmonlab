@@ -25,6 +25,11 @@ and then makes the server match it:
   stripped, so an app sees `/` but must link with its prefix (BGULAB: `BASE_PATH`;
   the GLP pages use relative links). The Caddyfile is generated from `apps.json`
   and checked before Caddy is restarted.
+- **Private pages** (`/p/<folder>/`): static pages from a private repo, cloned to
+  `C:\sites\privroot\p` and kept at its GitHub version; no directory listing, not on
+  the status page, so a page is reachable only by its address. The repo's address and a
+  read-only token are in `C:\sites\secrets\private.ps1` (`$env:PRIVATE_REPO`,
+  `$env:PRIVATE_TOKEN`); without that file nothing happens. The folder `p` is reserved.
 - **Logs**: `C:\sites\logs\reconcile.log` and `C:\sites\logs\<name>.log`.
 - **Secrets** never enter this repo: `C:\sites\secrets\<name>.ps1` (lines like
   `$env:KEY = '...'`), readable only by Administrators and SYSTEM. An app lists the

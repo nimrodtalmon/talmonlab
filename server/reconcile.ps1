@@ -153,6 +153,13 @@ function Caddyfile($apps) {
     $b += "`t`troot * C:/sites/status"
     $b += "`t`tfile_server"
     $b += "`t}"
+    # Private pages (see 1b): /p/<folder>/ from C:\sites\privroot\p, no directory listing.
+    $b += "`thandle /p/* {"
+    $b += "`t`troot * C:/sites/privroot"
+    $b += "`t`tfile_server {"
+    $b += "`t`t`thide .git"
+    $b += "`t`t}"
+    $b += "`t}"
     $b += "`thandle {"
     $b += "`t`troot * C:/sites/root"
     $b += "`t`tfile_server {"
@@ -178,6 +185,34 @@ if (Test-Path $StateF) {
 
 # 1. this repo
 if (Sync-Repo $Root $null) { Log 'home repo updated' }
+
+# 1b. private pages: a private repo, cloned to C:\sites\privroot\p and served as
+#     static files at /p/... (no listing, not on the status page). Its address and a
+#     read-only token come from C:\sites\secrets\private.ps1:
+#       $env:PRIVATE_REPO = 'https://github.com/<owner>/<repo>.git'   (no token in it)
+#       $env:PRIVATE_TOKEN = '<fine-grained token, Contents: read, that repo only>'
+#     The token goes in a one-off header, so it never lands in the clone or the log.
+$PrivDir = "$Sites\privroot\p"
+if (Test-Path "$Sites\secrets\private.ps1") {
+    try {
+        . "$Sites\secrets\private.ps1"
+        $basic = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("nimrodtalmon:$($env:PRIVATE_TOKEN)"))
+        $hdr = "http.extraheader=AUTHORIZATION: basic $basic"
+        if (!(Test-Path "$PrivDir\.git")) {
+            New-Item "$Sites\privroot" -ItemType Directory -Force | Out-Null
+            & $GitExe -c $hdr clone -q $env:PRIVATE_REPO $PrivDir 2>&1 | Out-Null
+            if ($LASTEXITCODE -eq 0) { Log 'private pages: cloned' } else { Log 'private pages: clone failed' }
+        } else {
+            $before = "$(& $GitExe -C $PrivDir rev-parse HEAD 2>$null)"
+            & $GitExe -C $PrivDir -c $hdr fetch -q origin 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) { Log 'private pages: fetch failed' }
+            else {
+                & $GitExe -C $PrivDir reset -q --hard '@{u}' 2>&1 | Out-Null
+                if ("$(& $GitExe -C $PrivDir rev-parse HEAD 2>$null)" -ne $before) { Log 'private pages: updated' }
+            }
+        }
+    } catch { Log 'private pages: error' }
+}
 
 try {
     # Windows PowerShell 5.1 emits a JSON array as ONE object; ForEach-Object unrolls it.
