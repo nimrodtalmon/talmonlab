@@ -104,7 +104,7 @@ def main(glp, name, slug):
         for root, _, files in os.walk(os.path.join(glp, 'programs')):
             if n.replace(' ', '-') + '.txt' in files:
                 return os.path.join(root, n.replace(' ', '-') + '.txt')
-    chain, todo = [], [name]
+    chain, todo, vocab = [], [name], {}
     while todo:
         n = todo.pop()
         f = txt_of(n)
@@ -124,7 +124,19 @@ def main(glp, name, slug):
             if on and l.strip():
                 prag.append(l.rstrip())
         chain.insert(0, {'contract': n, 'lines': prag})
-    out = {'contract': name, 'world': slug, 'acts': acts, 'pragmas': chain}
+        # the vocabulary of its Logic pragmas: an English phrase for each basic fact
+        for l in lines:
+            if l.startswith('Vocabulary:'):
+                for part in l[len('Vocabulary:'):].strip().rstrip('.').split(';'):
+                    if '=' not in part:
+                        continue
+                    phrase, atom = [x.strip() for x in part.rsplit('=', 1)]
+                    m2 = re.match(r'(\w+)\(([^)]*)\)', atom)
+                    if m2 and ', for ' not in phrase:
+                        vocab[m2.group(1)] = {'phrase': phrase, 'vars': [v.strip() for v in m2.group(2).split(',')]}
+    # the definitions the contract states, before its names
+    defs = [l.strip() for l in full.split('\n') if '*' in l and not re.match(r'\w+:\d', l)]
+    out = {'contract': name, 'world': slug, 'acts': acts, 'pragmas': chain, 'vocab': vocab, 'definitions': defs}
     json.dump(out, open(os.path.join(HERE, '..', slug + '.json'), 'w'), indent=1)
     print(len(acts), 'acts')
 

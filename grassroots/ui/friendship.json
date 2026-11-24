@@ -219,5 +219,38 @@
     "Unfriend: Alice [Unfriend]"
    ]
   }
+ ],
+ "vocab": {
+  "friend": {
+   "phrase": "x counts y as a friend",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "identity": {
+   "phrase": "x has an identity",
+   "vars": [
+    "x"
+   ]
+  },
+  "person": {
+   "phrase": "x is a person",
+   "vars": [
+    "x"
+   ]
+  },
+  "knows": {
+   "phrase": "x knows y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  }
+ },
+ "definitions": [
+  "An *identity* is a unique cryptographic key pair.",
+  "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+  "Alice *trusts* Bob when she knows Bob personally and believes him to keep the undertakings he signs under grassroots contracts."
  ]
 }
