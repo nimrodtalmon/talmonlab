@@ -18,7 +18,18 @@ header .sp { flex:1; }
 button { font: inherit; cursor: pointer; }
 .hb { border:0; background:#eceae6; padding:6px 14px; border-radius:99px; }
 #banner { max-width:1200px; margin:14px auto 0; padding:0 24px; color: var(--mute); }
-main { display:grid; grid-template-columns: repeat(4, 290px); gap:22px; justify-content:center; padding:18px 24px 40px; }
+.wrap { display:flex; gap:24px; justify-content:center; align-items:flex-start; padding:18px 24px 40px; }
+main { display:grid; grid-template-columns: repeat(2, 290px); gap:22px; }
+@media (min-width:1700px) { main { grid-template-columns: repeat(4, 290px); } }
+aside { width:400px; position:sticky; top:12px; background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px 18px; max-height:calc(100vh - 30px); overflow-y:auto; }
+aside h3 { margin:0 0 4px; font-size:15px; }
+aside .lg { font-size:12.5px; color: var(--mute); margin:0 0 12px; }
+aside .ct { font-size:12px; color: var(--mute); text-transform:uppercase; letter-spacing:.05em; margin:14px 0 4px; }
+.pl { font: 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace; white-space:pre-wrap; padding:2px 6px; border-radius:6px; }
+.pl.hit { background:#fff1c7; }
+[data-src]:hover { outline:2px solid #f2c94c; outline-offset:2px; }
+.sys { text-decoration: underline dotted #c0392b; text-underline-offset:3px; }
+.cl { font-style: italic; }
 .phone { width:290px; height:600px; background:#111; border-radius:38px; padding:10px; }
 .scr { position:relative; width:100%; height:100%; background:#fafaf8; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; }
 .top { display:flex; align-items:center; gap:10px; padding:26px 16px 10px; background:#fff; border-bottom:1px solid var(--line); }
@@ -66,7 +77,7 @@ footer { text-align:center; color: var(--mute); font-size:13px; padding-bottom:3
   <button class="hb" id="reset">Start over</button>
 </header>
 <div id="banner"></div>
-<main id="phones"></main>
+<div class="wrap"><main id="phones"></main><aside id="lang"></aside></div>
 <footer>Four people, each with their own agent, running the compiled contract on peoplesweb.org. Every button and word comes from the contract.</footer>
 <script>
 const API = 'https://peoplesweb.org/api/';
@@ -130,8 +141,29 @@ function words(ws) {
   return (ws || []).map(w => isS(w, 'text') ? esc(w.a[0]) : isS(w, 'person') ? '<b>' + esc(cap(w.a[0])) + '</b>'
     : isS(w, 'named') ? ' · ' + esc(w.a[0]) + ': <b>' + esc(cap(w.a[1])) + '</b>' : isS(w, 'valued') ? ' · ' + esc(w.a[0]) + ': ' + esc(w.a[1]) : '').join('');
 }
+/* a question's words with each person a star, to find its pragma line */
+function skel(ws) { return (ws || []).map(w => isS(w, 'person') ? '*' : isS(w, 'text') ? w.a[0] : '').join('').replace(/\s+/g, ' ').trim(); }
+/* the keys of a pragma line: the tab it names, the buttons it writes, or the question it puts */
+function keys(line) {
+  const t = line.trim();
+  if (/^\s/.test(line) && !t.includes('[')) return ['q:' + t.replace(/^[A-Z][a-z]+:\s*/, '').replace(/\b[A-Z][a-z]+\b/g, '*').replace(/\s+/g, ' ')];
+  if (t.includes('[')) return [...t.matchAll(/\[([^\]]+)\]/g)].map(m => 'act:' + m[1]);
+  return ['tab:' + t.split(':')[0]];
+}
+function panel() {
+  let h = `<h3>The UI language of this app</h3><p class="lg">The interface pragmas of the contract, and of the contract it extends. Point at anything on a phone to see the line it comes from. <i>Italic</i>: a clause of the contract, its names filled in. <span class="sys">Dotted</span>: words of this prototype, from no contract.</p>`;
+  for (const c of SPEC.pragmas) {
+    h += `<div class="ct">${esc(c.contract)}</div>`;
+    for (const l of c.lines) h += `<div class="pl" data-keys="${esc(JSON.stringify(keys(l)))}">${esc(l)}</div>`;
+  }
+  $('#lang').innerHTML = h;
+}
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('[data-src]'), k = el && el.dataset.src;
+  document.querySelectorAll('.pl').forEach(x => x.classList.toggle('hit', !!k && JSON.parse(x.dataset.keys).includes(k)));
+});
 function relations(s, q) {
-  return s.tabs.filter(t => s.atoms.some(a => fn(a) === t.pred && argsOf(a).includes(q))).map(t => sing(t.label));
+  return s.tabs.filter(t => s.atoms.some(a => fn(a) === t.pred && argsOf(a).includes(q))).map(t => ({tab: t.label, label: sing(t.label)}));
 }
 
 /* the ways an act can be taken with person q at one of its places; the other bound places to pick */
@@ -152,42 +184,42 @@ function phone(p) {
   const s = screen(p), u = ui[p], d = document.createElement('div');
   d.className = 'phone';
   const identity = s.atoms.includes('identity');
-  let h = `<div class="scr"><div class="top">${av(p)}<div><div class="nm">${cap(p)}</div><div class="st">${s.view ? (identity ? 'identity established' : 'no identity yet') : 'starting…'}</div></div></div><div class="body">`;
-  for (const a of s.asks) h += `<div class="card ask">${words(a.words)}<div class="btns"><button class="pri" data-ans="yes" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'>Accept</button><button class="ghost" data-ans="no" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'>Decline</button></div></div>`;
-  for (const c of s.pending) h += `<div class="pend"><span class="spin"></span>${esc(((SPEC.acts.find(x => x.name === (c.f || c)) || {}).button) || c.f || c)}: waiting for the others</div>`;
-  for (const n of s.notes) if (isS(n, 'refused')) h += `<div class="note">Not done: ${esc(fn(n.a[0]))}</div>`;
+  let h = `<div class="scr"><div class="top">${av(p)}<div><div class="nm">${cap(p)}</div><div class="st"><span class="sys">${s.view ? (identity ? 'identity established' : 'no identity yet') : 'starting…'}</span></div></div></div><div class="body">`;
+  for (const a of s.asks) h += `<div class="card ask" data-src="q:${esc(skel(a.words))}">${words(a.words)}<div class="btns"><button class="pri" data-ans="yes" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'><span class="sys">Accept</span></button><button class="ghost" data-ans="no" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'><span class="sys">Decline</span></button></div></div>`;
+  for (const c of s.pending) h += `<div class="pend"><span class="spin"></span>${esc(((SPEC.acts.find(x => x.name === (c.f || c)) || {}).button) || c.f || c)}<span class="sys">, waiting for the others</span></div>`;
+  for (const n of s.notes) if (isS(n, 'refused')) h += `<div class="note"><span class="sys">Not done:</span> ${esc(fn(n.a[0]))}</div>`;
   // acts that bind no person and ask for nothing: offered on their own (Establish)
   const solo = SPEC.acts.filter(a => !a.binds.length && !a.fields.length && enabled(a, s, {[a.me]: p}));
   if (!identity && s.view) {
-    h += `<div class="card"><div style="font-weight:700;margin-bottom:4px">Welcome</div><div class="cap" style="color:var(--mute)">You have no identity yet.</div>`;
-    for (const a of solo) h += `<div class="row2"><button class="pri" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button></div>`;
+    h += `<div class="card"><div style="font-weight:700;margin-bottom:4px" class="sys">Welcome</div><div class="cap sys" style="color:var(--mute)">You have no identity yet.</div>`;
+    for (const a of solo) h += `<div class="row2"><button class="pri" data-src="act:${esc(a.button)}" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button></div>`;
     h += `</div>`;
   } else if (u.tab === 'people' && u.person) {
     const q = u.person, rel = relations(s, q);
-    h += `<button class="back" data-back="1">‹ People</button><div class="ph">${av(q, true)}<div class="nm">${cap(q)}</div><div class="chips">${rel.map(r => `<span class="chip on">${esc(r)}</span>`).join('')}</div></div>`;
+    h += `<button class="back sys" data-back="1">‹ People</button><div class="ph">${av(q, true)}<div class="nm">${cap(q)}</div><div class="chips">${rel.map(r => `<span class="chip on" data-src="tab:${esc(r.tab)}">${esc(r.label)}</span>`).join('')}</div></div>`;
     const ways = SPEC.acts.flatMap(a => waysWith(a, s, p, q));
-    h += ways.length ? '' : `<div class="empty">Nothing to do with ${cap(q)} now.</div>`;
+    h += ways.length ? '' : `<div class="empty sys">Nothing to do with ${cap(q)} now.</div>`;
     ways.forEach((w, i) => {
-      h += `<div class="act"><button class="sec" data-way="${i}" ${s.menu ? '' : 'disabled'}>${esc(w.act.button)}${w.pick ? '…' : ''}</button><div class="cap">${sentence(w.act, w.val)}</div></div>`;
+      h += `<div class="act"><button class="sec" data-src="act:${esc(w.act.button)}" data-way="${i}" ${s.menu ? '' : 'disabled'}>${esc(w.act.button)}${w.pick ? '…' : ''}</button><div class="cap cl">${sentence(w.act, w.val)}</div></div>`;
     });
     u.ways = ways;
   } else if (u.tab === 'people') {
     const ps = known(s, p);
-    h += `<div class="h">People</div>`;
-    h += ps.length ? ps.map(q => `<button class="person" data-person="${q}">${av(q)}<div><div style="font-weight:600">${cap(q)}</div><div class="chips">${relations(s, q).map(r => `<span class="chip">${esc(r)}</span>`).join('')}</div></div></button>`).join('') : `<div class="empty">No one yet.</div>`;
+    h += `<div class="h sys">People</div>`;
+    h += ps.length ? ps.map(q => `<button class="person" data-person="${q}">${av(q)}<div><div style="font-weight:600">${cap(q)}</div><div class="chips">${relations(s, q).map(r => `<span class="chip" data-src="tab:${esc(r.tab)}">${esc(r.label)}</span>`).join('')}</div></div></button>`).join('') : `<div class="empty sys">No one yet.</div>`;
     const adders = SPEC.acts.filter(a => a.fields.some(f => f.type === 'key' || f.type === 'person') && enabled(a, s, {[a.me]: p}));
-    for (const a of adders) h += `<button class="sec" style="width:100%;margin-top:6px" data-add="${a.name}" ${s.menu ? '' : 'disabled'}>+ ${esc(a.button)}</button>`;
+    for (const a of adders) h += `<button class="sec" style="width:100%;margin-top:6px" data-add="${a.name}" data-src="act:${esc(a.button)}" ${s.menu ? '' : 'disabled'}><span class="sys">+</span> ${esc(a.button)}</button>`;
   } else {
-    h += `<div class="h">Me</div><div class="card">${s.atoms.filter(a => !argsOf(a).length).map(a => `<span class="chip on">${esc(fn(a))}</span> `).join('') || 'Nothing yet.'}</div>`;
-    for (const a of solo) h += `<div class="act"><button class="sec" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button><div class="cap">${sentence(a, {[a.me]: p})}</div></div>`;
+    h += `<div class="h sys">Me</div><div class="card">${s.atoms.filter(a => !argsOf(a).length).map(a => `<span class="chip on">${esc(fn(a))}</span> `).join('') || 'Nothing yet.'}</div>`;
+    for (const a of solo) h += `<div class="act"><button class="sec" data-src="act:${esc(a.button)}" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button><div class="cap cl">${sentence(a, {[a.me]: p})}</div></div>`;
   }
   h += `</div>`;
-  if (identity) h += `<div class="nav"><button data-tab="people" class="${u.tab === 'people' ? 'on' : ''}">People</button><button data-tab="me" class="${u.tab === 'me' ? 'on' : ''}">Me</button></div>`;
+  if (identity) h += `<div class="nav"><button data-tab="people" class="${u.tab === 'people' ? 'on' : ''}"><span class="sys">People</span></button><button data-tab="me" class="${u.tab === 'me' ? 'on' : ''}"><span class="sys">Me</span></button></div>`;
   if (u.sheet) {
     const sh = u.sheet;
     h += `<div class="shade" data-close="1"></div><div class="sheet"><div style="font-weight:700;margin-bottom:6px">${esc(sh.title)}</div>`;
-    h += sh.opts.length ? sh.opts.map((o, i) => `<button class="person" data-opt="${i}">${av(o.who)}<div><div style="font-weight:600">${cap(o.who)}</div><div class="cap" style="font-size:12px;color:var(--mute)">${o.cap || ''}</div></div></button>`).join('') : `<div class="empty">No one to choose.</div>`;
-    h += `<button class="ghost" data-close="1">Cancel</button></div>`;
+    h += sh.opts.length ? sh.opts.map((o, i) => `<button class="person" data-opt="${i}">${av(o.who)}<div><div style="font-weight:600">${cap(o.who)}</div><div class="cap cl" style="font-size:12px;color:var(--mute)">${o.cap || ''}</div></div></button>`).join('') : `<div class="empty sys">No one to choose.</div>`;
+    h += `<button class="ghost sys" data-close="1">Cancel</button></div>`;
   }
   h += `</div>`;
   d.innerHTML = h;
@@ -232,7 +264,7 @@ async function poll() {
   }
 }
 $('#reset').onclick = async () => { await fetch(API + W + '/reset', {method: 'POST'}); VER = -1; for (const k in used) delete used[k]; PERSONS.forEach(p => ui[p] = {tab: 'people', person: null, sheet: null}); };
-fetch(W + '.json').then(r => r.json()).then(s => { SPEC = s; $('#cname').textContent = s.contract; poll(); });
+fetch(W + '.json').then(r => r.json()).then(s => { SPEC = s; $('#cname').textContent = s.contract; panel(); poll(); });
 </script>
 </body>
 </html>

@@ -197,5 +197,27 @@
    ],
    "sentence": "Alice may end her friendship with Bob"
   }
+ ],
+ "pragmas": [
+  {
+   "contract": "Knowledge",
+   "lines": [
+    "Contacts: those Alice knows.",
+    "Establish: Alice [Establish]",
+    "Acquaint: Alice [Acquaint] <person>",
+    "  Bob: Alice wishes that you know each other.",
+    "Introduce: Alice [Introduce]",
+    "  Bob: Alice asks to introduce Carol to you."
+   ]
+  },
+  {
+   "contract": "Friendship",
+   "lines": [
+    "Friends: the friends of Alice.",
+    "Befriend: Alice [Befriend]",
+    "  Bob: Alice asks to be your friend.",
+    "Unfriend: Alice [Unfriend]"
+   ]
+  }
  ]
 }

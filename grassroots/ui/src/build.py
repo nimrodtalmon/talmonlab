@@ -99,7 +99,32 @@ def main(glp, name, slug):
             t = re.sub(r', who [^,]*,', '', m.group(1))
             t = re.split(r' with the consent|, provided| provided', t)[0]
             a['sentence'] = re.sub(r' once$', '', t.strip())
-    out = {'contract': name, 'world': slug, 'acts': acts}
+    # the interface pragmas the app is drawn from: the contract's own and those of the contracts it is written from
+    def txt_of(n):
+        for root, _, files in os.walk(os.path.join(glp, 'programs')):
+            if n.replace(' ', '-') + '.txt' in files:
+                return os.path.join(root, n.replace(' ', '-') + '.txt')
+    chain, todo = [], [name]
+    while todo:
+        n = todo.pop()
+        f = txt_of(n)
+        if not f or n in [c['contract'] for c in chain]:
+            continue
+        lines = open(f).read().split('\n')
+        body = [l for l in lines if not l.startswith('%')]
+        m = re.match(r'(.+?) (?:extends|strengthens|restricts|relaxes|weakens|augments|instantiates) (.+?)[.(,]', body[1] if len(body) > 1 else '')
+        if m:
+            todo += [x.strip() for x in re.split(r',| and ', m.group(2)) if x.strip() and x.strip() != 'it']
+        prag, on = [], False
+        for l in lines:
+            if l.strip() in ('Interface pragmas', 'Pragmas'):
+                on = True; continue
+            if l.strip() == 'Implementation pragmas':
+                on = False; continue
+            if on and l.strip():
+                prag.append(l.rstrip())
+        chain.insert(0, {'contract': n, 'lines': prag})
+    out = {'contract': name, 'world': slug, 'acts': acts, 'pragmas': chain}
     json.dump(out, open(os.path.join(HERE, '..', slug + '.json'), 'w'), indent=1)
     print(len(acts), 'acts')
 
