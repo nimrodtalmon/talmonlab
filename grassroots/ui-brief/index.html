@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Good-Looking Grassroots Apps · brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300..900&display=swap">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+.sub { font-size: 40px; color: var(--gray); margin-top: -16px; }
+.split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; margin-block: auto; }
+.split.wide { grid-template-columns: 1.15fr 0.85fr; }
+.box { background: var(--card); border-left: 10px solid var(--orange); border-radius: 0 18px 18px 0;
+  padding: 24px 32px; font-size: 32px; line-height: 1.33; }
+.box p { margin: 0 0 14px; } .box p:last-child { margin: 0; }
+.mono { font-family: ui-monospace, Menlo, Consolas, monospace; white-space: pre; font-size: 26px; line-height: 1.5; }
+.box.mono { font-size: 26px; }
+.why { font-size: 30px; color: var(--gray); line-height: 1.33; margin-top: 22px; }
+.why p { margin: 0 0 12px; }
+.pic { display: flex; flex-direction: column; align-items: center; }
+.pic svg { width: 100%; height: auto; max-height: 700px; }
+.cap { font-size: 26px; color: var(--gray); text-align: center; margin-top: 10px; }
+.vis { margin-block: auto; display: flex; justify-content: center; }
+.vis svg { width: 100%; height: auto; max-height: 470px; }
+.shot { display: block; margin: 16px auto 0; height: 560px; }
+.phones { height: 600px; }
+.rw { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 36px; margin-top: 10px; }
+.rw .box { background: var(--card); border: 3px solid var(--gray-light); border-radius: 24px; padding: 24px 32px; }
+.rw h3 { font-size: 40px; margin: 0 0 6px; }
+.rw .who { font-size: 28px; color: var(--gray); margin: 0 0 10px; }
+.rw .diff { font-size: 31px; margin: 0; line-height: 1.3; }
+.rows .row p { font-size: 40px; margin: 0; }
+table.wt { border-collapse: collapse; font-size: 27px; width: 100%; }
+table.wt th { text-align: left; color: var(--gray); font-weight: 700; padding: 8px 16px; border-bottom: 3px solid var(--orange); }
+table.wt td { padding: 9px 14px; border-bottom: 1px solid var(--gray-light); }
+table.wt td:first-child { font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="stage">
+<!-- 1 --><section class="slide dark center">
+  <p class="eyebrow">Grassroots</p>
+  <h1 style="font-size:104px">Good-Looking Grassroots Apps</h1>
+  <p class="big">The UI layer: how it works, what others did, what we could do</p>
+  <p class="muted">Nimrod Talmon · Ben-Gurion University · draft, November 24, 2026</p>
+</section>
+<!-- 2 --><section class="slide light">
+  <p class="eyebrow">Motivation</p>
+  <h2>Correct by construction, not yet pleasant</h2>
+  
+  <p class="sub">Every screen is derived from a contract. Today the screens look like admin forms.</p>
+  <img class="shot" src="img/now.jpg" alt="four compiled apps">
+  <p class="cap">Recorded screens of four compiled apps: Knowledge, Groups, Bonds, and Groups with feeds.</p>
+</section>
+<!-- 3 --><section class="slide light">
+  <p class="eyebrow">Model</p>
+  <h2>One program, three kinds of answerer</h2>
+  
+  <div class="vis"><svg viewBox="0 0 1720 560" width="1720" height="560" font-family="Heebo, sans-serif"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5F6368"/></marker></defs><rect x="10" y="60" width="330" height="150" rx="22" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="3"/><text x="175.0" y="126" font-size="38" fill="#26282C" text-anchor="middle" font-weight="800" >Contract</text><text x="175.0" y="172" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" >clauses + pragmas</text><line x1="346" y1="135.0" x2="392" y2="135.0" stroke="#5F6368" stroke-width="4" marker-end="url(#ah)"/><rect x="400" y="60" width="330" height="150" rx="22" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="3"/><text x="565.0" y="126" font-size="38" fill="#26282C" text-anchor="middle" font-weight="800" >Speech-act</text><text x="565.0" y="172" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" >schemas</text><line x1="736" y1="135.0" x2="782" y2="135.0" stroke="#5F6368" stroke-width="4" marker-end="url(#ah)"/><rect x="790" y="60" width="330" height="150" rx="22" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="3"/><text x="955.0" y="126" font-size="38" fill="#26282C" text-anchor="middle" font-weight="800" >CVA</text><text x="955.0" y="172" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" >platform</text><line x1="1126" y1="135.0" x2="1172" y2="135.0" stroke="#5F6368" stroke-width="4" marker-end="url(#ah)"/><rect x="1180" y="60" width="330" height="150" rx="22" fill="#FCE8D2" stroke="#F7941D" stroke-width="4"/><text x="1345.0" y="126" font-size="38" fill="#26282C" text-anchor="middle" font-weight="800" >vGLP program</text><text x="1345.0" y="172" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" >asks questions</text><line x1="1345.0" y1="214" x2="1345.0" y2="300" stroke="#5F6368" stroke-width="4"/><line x1="280" y1="300" x2="1440" y2="300" stroke="#5F6368" stroke-width="4"/><line x1="280" y1="300" x2="280" y2="358" stroke="#5F6368" stroke-width="4" marker-end="url(#ah)"/><rect x="30" y="365" width="500" height="140" rx="22" fill="#FDFDFB" stroke="#26282C" stroke-width="4"/><text x="280" y="425" font-size="36" fill="#26282C" text-anchor="middle" font-weight="800" >a person</text><text x="280" y="472" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" >widgets → the app</text><line x1="860" y1="300" x2="860" y2="358" stroke="#5F6368" stroke-width="4" marker-end="url(#ah)"/><rect x="610" y="365" width="500" height="140" rx="22" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="3"/><text x="860" y="425" font-size="36" fill="#26282C" text-anchor="middle" font-weight="800" >a simulated person</text><text x="860" y="472" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" >sGLP → simulation</text><line x1="1440" y1="300" x2="1440" y2="358" stroke="#5F6368" stroke-width="4" marker-end="url(#ah)"/><rect x="1190" y="365" width="500" height="140" rx="22" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="3"/><text x="1440" y="425" font-size="36" fill="#26282C" text-anchor="middle" font-weight="800" >a scripted person</text><text x="1440" y="472" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" >plays → tests</text><text x="860" y="285" font-size="28" fill="#5F6368" text-anchor="middle" font-weight="400" font-style="italic">each question is answered by</text></svg></div>
+  <div class="why"><p>vGLP is GLP plus <b>questions</b> to the person, each with an interactive type.</p><p>The type fixes which answers are allowed, not who answers.</p></div>
+</section>
+<!-- 4 --><section class="slide light">
+  <p class="eyebrow">Model</p>
+  <h2>The UI language today: interface pragmas</h2>
+  <div class="split wide"><div><div class="box mono">Contacts: those Alice knows.
+Establish: Alice [Establish]
+Acquaint: Alice [Acquaint] &lt;person&gt;
+  Bob: Alice wishes that you know each other.
+Introduce: Alice [Introduce]
+  Bob: Alice asks to introduce Carol to you.</div>
+<div class="why"><p>A <b>tab</b> lists one predicate's atoms. A <b>[button]</b> is an act, offered only where it is possible; a <b>&lt;field&gt;</b> is typed in.</p>
+<p>An indented line is a <b>question</b> to another person: a yes/no card. Optional <b>Look</b> line: an icon and a color.</p></div></div><div class="pic"><img class="phones" src="img/gkk.jpg" alt="Knowledge app"></div></div>
+</section>
+<!-- 5 --><section class="slide light">
+  <p class="eyebrow">Model</p>
+  <h2>The type fixes content; the family, layout</h2>
+  <div class="split"><div><div class="box"><p>A <b>construct family</b> is a way of drawing questions that keeps their content: it decides layout, rendering and labels.</p>
+<p>Where no widget is declared, the <b>default widget</b> is built from the type (right).</p></div>
+<div class="why"><p>The theorems hold for every family with complete widgets, so a person may pick one.</p><p>Today: one family (vGLP, Remark 6.4).</p></div></div><div class="pic"><table class="wt"><tr><th>type</th><th>default widget</th></tr><tr><td>a constant</td><td>a button</td></tr><tr><td>a union of constants</td><td>a row of buttons</td></tr><tr><td>a tuple</td><td>a form with fields</td></tr><tr><td>any other union</td><td>a menu</td></tr><tr><td>String · number · Key</td><td>a text · number · person field</td></tr><tr><td>the program's stream</td><td>a thread</td></tr><tr><td>the person's stream</td><td>an open input</td></tr></table></div></div>
+</section>
+<!-- 6 --><section class="slide light">
+  <p class="eyebrow">Observation</p>
+  <h2>Why the screens feel weak</h2>
+  <div class="split wide"><div><div class="rows ruled"><div class="row"><span class="n">1</span><p>One tab per predicate: six or more tabs</p></div><div class="row"><span class="n">2</span><p>A person is split over three tabs</p></div><div class="row"><span class="n">3</span><p>Every act is a button: five for Carol</p></div><div class="row"><span class="n">4</span><p>Forms show raw names: “person”, “amount”</p></div><div class="row"><span class="n">5</span><p>A conversation is a list in another tab</p></div></div></div><div class="pic"><img class="phones" src="img/weak.jpg" alt="Bonds and Groups with feeds"></div></div>
+</section>
+<!-- 7 --><section class="slide light">
+  <p class="eyebrow">Related work I</p>
+  <h2>Generating a UI from a model</h2>
+  <div class="rw"><div class="box"><h3>Cameleon, model-based UI</h3><p class="who">Calvary et al. 2003; W3C MBUI Notes 2014</p><p class="diff">Tasks → abstract UI → concrete UI → final UI. Our cascade is the same idea, starting from a contract.</p></div><div class="box"><h3>Naked Objects</h3><p class="who">Pawson, PhD thesis 2004</p><p class="diff">UI generated entirely from domain objects. Its generic UI was the main limit; custom views came later.</p></div><div class="box"><h3>iTasks</h3><p class="who">Plasmeijer et al. 2007; Lijnse, Plasmeijer 2009</p><p class="diff">Editors generated from types. Their quality is “crucial”; libraries add special editors, e.g. a map for a location.</p></div><div class="box"><h3>JSON Forms</h3><p class="who">EclipseSource, open source</p><p class="diff">A data schema plus an optional UI schema for layout; without one, a default layout.</p></div></div><p class="why" style="margin-top:26px">Survey: “the usability of automatically generated UIs is rather low” (Meixner, Paternò, Vanderdonckt 2011).</p>
+</section>
+<!-- 8 --><section class="slide light">
+  <p class="eyebrow">Related work II</p>
+  <h2>One host, many small apps</h2>
+  <div class="rw"><div class="box"><h3>WeChat mini programs</h3><p class="who">Tencent; W3C MiniApps white paper</p><p class="diff">The host fixes the frame (menu, launch page) and offers a design system, WeUI; apps own the pages.</p></div><div class="box"><h3>webxdc</h3><p class="who">Delta Chat, open spec</p><p class="diff">Web apps shared in a chat, state sent peer to peer; the chat shows each app’s latest summary line.</p></div><div class="box"><h3>Adaptive Cards</h3><p class="who">Microsoft, open spec</p><p class="diff">The author owns the content, the host owns the look; a card carries no code.</p></div><div class="box"><h3>A2UI</h3><p class="who">Google, 2025</p><p class="diff">Agents send declarative UI built from a catalog of trusted components; the client renders it natively.</p></div></div><p class="why" style="margin-top:26px">In all four, the host cannot read what a small app means: it shows a card or runs code, but cannot merge two apps’ data.</p>
+</section>
+<!-- 9 --><section class="slide light">
+  <p class="eyebrow">Lessons</p>
+  <h2>Three lessons for us</h2>
+  <div class="rows ruled"><div class="row"><span class="n">1</span><p>Fully automatic UIs look generic; lasting systems add presentation hints</p></div><div class="row"><span class="n">2</span><p>Split content from look: the author says what, the host how. We have this</p></div><div class="row"><span class="n">3</span><p>Super-apps give a strong common frame; the small apps fill it</p></div></div>
+</section>
+<!-- 10 --><section class="slide light">
+  <p class="eyebrow">Proposal 1 · not implemented</p>
+  <h2>Presentation patterns, chosen by shape</h2>
+  <div class="split wide"><div><div class="box"><p><b>Patterns:</b> people, conversation, holdings, items, places, times.</p>
+<p>Chosen by a predicate's <b>shape</b> (who, what, when), never by the contract.</p><p>A tab may name its pattern:</p>
+<p class="mono" style="font-size:24px;white-space:normal">Messages: those Alice received, as a conversation.</p>
+<p>Unnamed: inferred from the shape.</p></div>
+<div class="why">Like iTasks' special editors, but from a fixed list.</div></div><div class="pic"><svg viewBox="0 0 860 700" width="860" height="700" font-family="Heebo, sans-serif"><rect x="15" y="40" width="380" height="600" rx="34" fill="#fff" stroke="#B9BCC1" stroke-width="3"/><text x="205" y="680" font-size="30" fill="#26282C" text-anchor="middle" font-weight="800" >today: a list</text><text x="205" y="100" font-size="26" fill="#16917F" text-anchor="middle" font-weight="700" >Messages</text><rect x="40" y="140" width="330" height="100" rx="16" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="2"/><text x="60" y="180" font-size="24" fill="#26282C" text-anchor="start" font-weight="700" >Alice</text><text x="60" y="218" font-size="24" fill="#5F6368" text-anchor="start" font-weight="400" >Hi Bob</text><rect x="40" y="260" width="330" height="100" rx="16" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="2"/><text x="60" y="300" font-size="24" fill="#26282C" text-anchor="start" font-weight="700" >Alice</text><text x="60" y="338" font-size="24" fill="#5F6368" text-anchor="start" font-weight="400" >Lunch?</text><rect x="40" y="380" width="330" height="100" rx="16" fill="#FDFDFB" stroke="#B9BCC1" stroke-width="2"/><text x="60" y="420" font-size="24" fill="#26282C" text-anchor="start" font-weight="700" >Carol</text><text x="60" y="458" font-size="24" fill="#5F6368" text-anchor="start" font-weight="400" >Ride at 8?</text><text x="205" y="560" font-size="22" fill="#5F6368" text-anchor="middle" font-weight="400" >Message: in the Friends tab</text><rect x="465" y="40" width="380" height="600" rx="34" fill="#fff" stroke="#B9BCC1" stroke-width="3"/><text x="655" y="680" font-size="30" fill="#26282C" text-anchor="middle" font-weight="800" >as a conversation</text><text x="655" y="100" font-size="28" fill="#26282C" text-anchor="middle" font-weight="800" >Alice</text><rect x="490" y="140" width="130" height="62" rx="26" fill="#F3F3F1" stroke="none" stroke-width="0"/><text x="555.0" y="181" font-size="24" fill="#26282C" text-anchor="middle" font-weight="400" >Hi Bob</text><rect x="735" y="230" width="85" height="62" rx="26" fill="#FCE8D2" stroke="none" stroke-width="0"/><text x="777.5" y="271" font-size="24" fill="#26282C" text-anchor="middle" font-weight="400" >Hi!</text><rect x="490" y="320" width="130" height="62" rx="26" fill="#F3F3F1" stroke="none" stroke-width="0"/><text x="555.0" y="361" font-size="24" fill="#26282C" text-anchor="middle" font-weight="400" >Lunch?</text><rect x="720" y="410" width="100" height="62" rx="26" fill="#FCE8D2" stroke="none" stroke-width="0"/><text x="770.0" y="451" font-size="24" fill="#26282C" text-anchor="middle" font-weight="400" >Sure</text><rect x="490" y="540" width="230" height="56" rx="28" fill="#fff" stroke="#B9BCC1" stroke-width="2"/><text x="510" y="576" font-size="22" fill="#B9BCC1" text-anchor="start" font-weight="400" >text</text><rect x="735" y="540" width="85" height="56" rx="28" fill="#16917F" stroke="none" stroke-width="0"/><text x="777" y="576" font-size="22" fill="#fff" text-anchor="middle" font-weight="700" >Send</text></svg><p class="cap">Sketch.</p></div></div>
+</section>
+<!-- 11 --><section class="slide light">
+  <p class="eyebrow">Proposal 2 · not implemented</p>
+  <h2>Grassroots World: one app, by person</h2>
+  <div class="split wide"><div><div class="box"><p>Contracts all speak of persons, atoms and acts; a host can merge them:</p>
+<p><b>A page per person:</b> Bob's atoms from all contracts, with every act possible with him.</p>
+<p><b>One inbox</b> for every yes/no question.</p></div>
+<div class="why">Opaque mini-apps (WeChat, webxdc) cannot merge.</div></div><div class="pic"><svg viewBox="0 0 900 760" width="900" height="760" font-family="Heebo, sans-serif"><rect x="20" y="10" width="860" height="740" rx="36" fill="#fff" stroke="#B9BCC1" stroke-width="3"/><circle cx="100" cy="85" r="42" fill="#FCE8D2"/><text x="100" y="99" font-size="40" fill="#26282C" text-anchor="middle" font-weight="800" >B</text><text x="165" y="80" font-size="44" fill="#26282C" text-anchor="start" font-weight="800" >Bob</text><text x="165" y="118" font-size="26" fill="#5F6368" text-anchor="start" font-weight="400" >you know each other · friends</text><line x1="50" y1="160" x2="850" y2="160" stroke="#F3F3F1" stroke-width="3"/><text x="60" y="198" font-size="22" fill="#5F6368" text-anchor="start" font-weight="700" letter-spacing="1">Knowledge</text><text x="60" y="238" font-size="28" fill="#26282C" text-anchor="start" font-weight="400" >knows Carol</text><rect x="707.04" y="198" width="143" height="41" rx="20" fill="none" stroke="#16917F" stroke-width="2.5"/><text x="778.52" y="226.07999999999998" font-size="24" fill="#16917F" text-anchor="middle" font-weight="600" >Introduce</text><line x1="50" y1="258" x2="850" y2="258" stroke="#F3F3F1" stroke-width="3"/><text x="60" y="296" font-size="22" fill="#5F6368" text-anchor="start" font-weight="700" letter-spacing="1">Friendship</text><text x="60" y="336" font-size="28" fill="#26282C" text-anchor="start" font-weight="400" >friend since the 3rd</text><rect x="720.48" y="296" width="130" height="41" rx="20" fill="none" stroke="#16917F" stroke-width="2.5"/><text x="785.24" y="324.08" font-size="24" fill="#16917F" text-anchor="middle" font-weight="600" >Unfriend</text><line x1="50" y1="356" x2="850" y2="356" stroke="#F3F3F1" stroke-width="3"/><text x="60" y="394" font-size="22" fill="#5F6368" text-anchor="start" font-weight="700" letter-spacing="1">Groups</text><text x="60" y="434" font-size="28" fill="#26282C" text-anchor="start" font-weight="400" >“Lunch?” · 2 new</text><rect x="733.92" y="394" width="116" height="41" rx="20" fill="none" stroke="#16917F" stroke-width="2.5"/><text x="791.9599999999999" y="422.08" font-size="24" fill="#16917F" text-anchor="middle" font-weight="600" >Message</text><line x1="50" y1="454" x2="850" y2="454" stroke="#F3F3F1" stroke-width="3"/><text x="60" y="492" font-size="22" fill="#5F6368" text-anchor="start" font-weight="700" letter-spacing="1">Coins</text><text x="60" y="532" font-size="28" fill="#26282C" text-anchor="start" font-weight="400" >you hold 3 of Bob’s coins</text><rect x="774.24" y="492" width="76" height="41" rx="20" fill="none" stroke="#16917F" stroke-width="2.5"/><text x="812.12" y="520.08" font-size="24" fill="#16917F" text-anchor="middle" font-weight="600" >Swap</text><rect x="697.92" y="492" width="62" height="41" rx="20" fill="none" stroke="#16917F" stroke-width="2.5"/><text x="729.0799999999999" y="520.08" font-size="24" fill="#16917F" text-anchor="middle" font-weight="600" >Pay</text><line x1="50" y1="552" x2="850" y2="552" stroke="#F3F3F1" stroke-width="3"/><text x="60" y="590" font-size="22" fill="#5F6368" text-anchor="start" font-weight="700" letter-spacing="1">Agora</text><text x="60" y="630" font-size="28" fill="#26282C" text-anchor="start" font-weight="400" >Bob offers: a bike</text><rect x="693.6" y="590" width="156" height="41" rx="20" fill="none" stroke="#16917F" stroke-width="2.5"/><text x="771.8000000000001" y="618.08" font-size="24" fill="#16917F" text-anchor="middle" font-weight="600" >Swap items</text><line x1="50" y1="650" x2="850" y2="650" stroke="#F3F3F1" stroke-width="3"/><text x="60" y="688" font-size="22" fill="#5F6368" text-anchor="start" font-weight="700" letter-spacing="1">Auction</text><text x="60" y="728" font-size="28" fill="#26282C" text-anchor="start" font-weight="400" >rides with you</text></svg><p class="cap">Sketch; buttons named as in the contracts.</p></div></div>
+</section>
+<!-- 12 --><section class="slide light">
+  <p class="eyebrow">Summary</p>
+  <h2>Content is derived; the look is still open</h2>
+  <div class="rows ruled"><div class="row"><span class="n">1</span><p>Our cascade is model-based UI with proofs; the look is left to families</p></div><div class="row"><span class="n">2</span><p>The weak look: one family, and pragmas carry no presentation</p></div><div class="row"><span class="n">3</span><p>Next: issue on patterns; person-first family on four contracts; user try</p></div><div class="row"><span class="n">4</span><p>Open: what belongs in the contract, what in the family, what to the person</p></div></div>
+</section>
+<!-- 13 --><section class="slide dark center">
+  <p class="eyebrow">Grassroots</p>
+  <h1 style="font-size:104px">Good-Looking Grassroots Apps</h1>
+  <p class="big">The UI layer: how it works, what others did, what we could do</p>
+  <p class="muted">Nimrod Talmon · Ben-Gurion University · draft, November 24, 2026</p>
+</section>
+</div>
+<script src="assets/deck.js"></script>
+</body>
+</html>
