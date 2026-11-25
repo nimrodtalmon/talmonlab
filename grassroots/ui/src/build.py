@@ -147,7 +147,23 @@ def schemas(text):
                 ps.append(p)
         TYPES.clear()
         eff_, pre_ = conds(eff), conds(pre)
-        out.append({'name': name, 'persons': ps, 'one': one, 'types': dict(TYPES), 'sizes': sizes(guard, {}), 'values': [v for v in values if v not in one],
+        szs = sizes(guard, {})
+        inatoms = set()
+        def walk(cs):
+            for c in cs:
+                if 'p' in c:
+                    for x in c['args']:
+                        if isinstance(x, str): inatoms.add(x)
+                        elif isinstance(x, dict) and 'a' in x: inatoms.update(y for y in x['a'] if isinstance(y, str))
+                for k in ('then', 'body', 'and'):
+                    if k in c: walk(c[k])
+                if 'over' in c: walk([c['over']])
+                if 'or' in c:
+                    for y in c['or']: walk(y)
+                if 'not' in c: walk([c['not']])
+        walk(eff_); walk(pre_)
+        derived = [v for v in values if isinstance(v, str) and v not in inatoms and v not in szs.values()]
+        out.append({'name': name, 'persons': ps, 'one': one, 'types': dict(TYPES), 'sizes': szs, 'guard': guard, 'derived': derived, 'values': [v for v in values if v not in one],
                     'effects': eff_, 'pre': pre_, 'by': by})
     w = lambda xs: [r['w'] if isinstance(r, dict) else r for r in xs]
     return w(refl), w(env), w(param), out

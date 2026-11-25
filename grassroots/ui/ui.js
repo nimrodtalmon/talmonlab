@@ -99,11 +99,12 @@
       const env = new Set();
       for (const c of s.pre) if (c.p === 'today') env.add(c.args[1]);
       const sets = new Set(Object.keys(s.types || {}).filter(x => s.types[x] === 'set'));
-      const names = [...new Set(s.persons.concat(Object.keys(s.one), s.values))].filter(x => !env.has(x) && !sets.has(x));
+      const derived = new Set(s.derived || []);
+      const names = [...new Set(s.persons.concat(Object.keys(s.one), s.values))].filter(x => !env.has(x) && !sets.has(x) && !derived.has(x));
       const me = s.by[0], loc = (c) => [c.p, c.args.slice(1).map(x => names.includes(x) ? names.indexOf(x) + 1 : null)];
       const mine = s.pre.filter(c => c.p && c.args[0] === me && !sim.env.includes(c.p));
       return {name: s.name, button: s.button, names, me: names.indexOf(me) + 1, args: names, roles: s.persons.map(x => names.indexOf(x) + 1), people: s.persons.concat(Object.keys(s.one)).map(x => names.indexOf(x) + 1),
-        values: s.values.filter(x => !env.has(x) && !s.persons.includes(x) && !sets.has(x)), types: s.types || {}, field: s.field, sentence: s.sentence, questions: s.questions,
+        values: s.values.filter(x => !env.has(x) && !s.persons.includes(x) && !sets.has(x) && !derived.has(x)), types: s.types || {}, field: s.field, sentence: s.sentence, questions: s.questions,
         req: mine.filter(c => !c.neg).map(loc), forb: mine.filter(c => c.neg).map(loc)};
     });
   }

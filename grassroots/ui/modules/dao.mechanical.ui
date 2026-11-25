@@ -1,0 +1,28 @@
+# Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
+screen Home
+  inbox
+  me: identity, person
+  list People: everyone; shows knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision; opens Person
+  list steward: atoms of steward
+  list proposal: atoms of proposal
+  list decided: atoms of decided
+  list voted: atoms of voted
+  list passed: atoms of passed
+  list rejected: atoms of rejected
+  Establish
+  Acquaint: Bob = field
+  Introduce: Bob = pick of knows, Carol = pick of knows
+  Found: Delos = field
+  Join: Bob = pick of knows, Delos = pick of steward
+  Propose: Alice = pick of member, Prop = field, Delos = pick of member
+  Propose own: Prop = field, Delos = pick of member
+  Vote for: Alice = pick of member, Prop = pick of proposal, Delos = pick of member
+  Vote own for: Prop = pick of proposal, Delos = pick of member
+  Vote against: Alice = pick of member, Prop = pick of proposal, Delos = pick of member
+  Vote own against: Prop = pick of proposal, Delos = pick of member
+  Pass: Prop = pick of proposal, Delos = pick of steward
+  Reject: Prop = pick of proposal, Delos = pick of steward
+
+screen Person(p)
+  inbox
+  p: knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision

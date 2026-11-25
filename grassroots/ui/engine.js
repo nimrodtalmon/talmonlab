@@ -107,7 +107,41 @@
     for (const c of s.pre) if (c.p && !c.neg && this.setVar(c) >= 0 && !Array.isArray(b[c.args[this.setVar(c)]])) {
       const ms = this.match(c, b); if (!ms.length) return false; Object.assign(b, ms[0]);
     }
-    return s.pre.every(c => this.holds(c, b));
+    return s.pre.every(c => this.holds(c, b)) && this.guard(s.guard, b);
+  };
+  /* the guard: comparisons of numbers, counts of atoms, sizes of sets; a number that no one gives is
+     the one the comparison needs, as a witness: Votes in "at least Votes voted for it" is the count */
+  World.prototype.num = function (t, b) {
+    if (typeof t === 'number') return t;
+    if (typeof t === 'string') return t in b ? +b[t] : (isNaN(+t) ? undefined : +t);
+    if (!t || typeof t !== 'object') return undefined;
+    const f = t.f, a = t.a || [];
+    if (f === 'num' || f === 'const') return this.num(a[0], b);
+    if (f === 'size') return Array.isArray(b[a[0]]) ? b[a[0]].length : undefined;
+    if (f === 'cardinality') {
+      const pat = lits(a[1]);
+      const c = {p: pat.a[0].w || pat.a[0], args: pat.a[1].map(x => x && typeof x === 'object' && x.f && x.a && x.a.length === 1 && typeof x.a[0] === 'string' ? x.a[0] : x)};
+      return new Set(this.match(c, {...b}).map(m => JSON.stringify(a[0].map(v => m[v])))).size;
+    }
+    const xs = a.map(x => this.num(x, b));
+    if (xs.some(x => x === undefined)) return undefined;
+    if (f === 'mul' || f === 'times') return xs[0] * xs[1];
+    if (f === 'plus' || f === 'add') return xs[0] + xs[1];
+    if (f === 'minus' || f === 'sub') return xs[0] - xs[1];
+    return undefined;
+  };
+  const free = (t, b) => t && typeof t === 'object' && (t.f === 'num' || t.f === 'const') && typeof t.a[0] === 'string' && !(t.a[0] in b) && isNaN(+t.a[0]) ? t.a[0] : null;
+  World.prototype.guard = function (g, b) {
+    if (!g || (g.w === 'true')) return true;
+    if (g.f === 'and') return g.a.every(x => this.guard(x, b));
+    const [l, r] = g.a || [], ops = {eq: (x, y) => x === y, ge: (x, y) => x >= y, gt: (x, y) => x > y, le: (x, y) => x <= y, lt: (x, y) => x < y};
+    if (!(g.f in ops)) return true;
+    if (l && l.f === 'size') return true;
+    const fl = free(l, b), fr = free(r, b);
+    if (fr && !fl) { const v = this.num(l, b); if (v === undefined) return false; b[fr] = g.f === 'gt' ? v - 1 : g.f === 'lt' ? v + 1 : v; return true; }
+    if (fl && !fr) { const v = this.num(r, b); if (v === undefined) return false; b[fl] = g.f === 'gt' ? v + 1 : g.f === 'lt' ? v - 1 : v; return true; }
+    const x = this.num(l, b), y = this.num(r, b);
+    return x !== undefined && y !== undefined && ops[g.f](x, y);
   };
   World.prototype.apply = function (s, b) {
     this.cur = s;

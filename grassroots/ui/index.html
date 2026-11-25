@@ -103,6 +103,9 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .opt { display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:1px solid var(--line); background:#fff; border-radius:12px; padding:8px 10px; margin-bottom:6px; font-size:13.5px; }
 .sheet input { width:100%; border:1px solid var(--line); border-radius:10px; padding:8px 10px; margin-bottom:8px; }
 .expl { font-size:11.5px; color:var(--mute); }
+.facts.card { background:var(--p-card, #fff); border:1px solid var(--p-line, #e5e5e1); border-radius:var(--p-r, 14px); padding:8px 10px; margin-bottom:10px; gap:6px; }
+.frow { display:flex; align-items:center; gap:6px; font-size:13px; flex-wrap:wrap; }
+.frow .fl { min-width:84px; }
 .fl { font-size:12px; color:var(--mute); }
 .sent { font-size:14px; line-height:2.1; margin:4px 0 8px; }
 .sent select, .sent input { width:auto !important; display:inline-block; margin:0 2px !important; padding:3px 6px !important; border-radius:8px !important; font-size:13.5px; }
@@ -200,6 +203,7 @@ const CONTRACTS = {
   chat: {title: 'Chat (proposed)', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
   groups: {title: 'Groups', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
   agora: {title: 'Agora (barter market)', modules: {market: 'Market', mechanical: 'Mechanical'}},
+  dao: {title: 'DAO', modules: {assembly: 'Assembly', mechanical: 'Mechanical'}},
   friendship: {title: 'Friendship', modules: {people: 'People', mechanical: 'Mechanical', pages: 'Pages only (not complete)'}},
 };
 /* the look: modules that change how the app is drawn and nothing of what it lets a person do */
@@ -237,7 +241,7 @@ function fact(a, holder, me) {
   if (!v) return esc(a.p);
   const val = {[v.vars[0]]: holder}; v.vars.slice(1).forEach((x, j) => val[x] = a.args[j]);
   return v.phrase.split(/\b/).map(w => w in val ? `<b>${esc(val[w] === me ? 'you' : show(val[w]))}</b>` : esc(w)).join('')
-    .replace(/^<b>you<\/b> has /, '<b>you</b> have ').replace(/^<b>you<\/b> is /, '<b>you</b> are ').replace(/^<b>you<\/b> counts /, '<b>you</b> count ').replace(/^<b>you<\/b> knows /, '<b>you</b> know ');
+    .replace(/^<b>you<\/b> has /, '<b>you</b> have ').replace(/^<b>you<\/b> is /, '<b>you</b> are ').replace(/^<b>you<\/b> counts /, '<b>you</b> count ').replace(/^<b>you<\/b> knows /, '<b>you</b> know ').replace(/^<b>you<\/b> (holds|sees|sends|keeps) /, (m, v) => '<b>you</b> ' + v.slice(0, -1) + ' ');
 }
 function sentence(act, val) {
   const map = {}; act.names.forEach((n, j) => { map[n] = val[j + 1] !== undefined ? show(val[j + 1]) : '…'; });
@@ -252,7 +256,14 @@ function enabled(act, atoms, val) {
   for (const [p, ks] of act.req) if (!holdsL(atoms, p, ks, val)) return false;
   for (const [p, ks] of act.forb) if (ks.every(k => k === null || val[k] !== undefined) && holdsL(atoms, p, ks, val)) return false;
   const ps = act.roles.map(k => val[k]).filter(x => x !== undefined);
-  return new Set(ps).size === ps.length;
+  if (new Set(ps).size !== ps.length) return false;
+  /* the guard, on the person's own facts: counts and sums, such as a majority of votes */
+  const s = SIM.schemas.find(x => x.name === act.name);
+  if (s && s.guard && s.guard.f && act.names.every((n, j) => val[j + 1] !== undefined)) {
+    const b = {}; act.names.forEach((n, j) => b[n] = val[j + 1]); W.cur = s;
+    if (!W.guard(s.guard, b)) return false;
+  }
+  return true;
 }
 const named = (atoms, me) => [...new Set(atoms.flatMap(a => a.args).filter(x => isP(x) && x !== me))];
 /* coins: atoms that differ only in a coin are one item, with how many there are */
@@ -327,7 +338,18 @@ function phone(p) {
       const who = c.about === 'me' ? null : c.pos ? env[c.about][c.pos - 1] : env[c.about];
       const fs = v.atoms.filter(a => c.shows.includes(a.p) && (c.about === 'me' ? !a.args.length : mentions(a, who)));
       if (c.about === 'me') info = info || {title: cap(p), fs, lk};
-      else { title = show(lead(who)); avatar = av(lead(who)); info = {title, fs, lk}; }
+      else {
+        title = show(lead(who)); avatar = av(lead(who)); info = {title, fs, lk};
+        /* with no thread on the screen, the facts are its content: by predicate, with the people they name */
+        if (!comps.some(x => x.kind === 'thread') && fs.length) {
+          const subj = Array.isArray(who) ? who : [who];
+          zone[c.zone] += `<div class="facts card">` + c.shows.filter(pr => tabOf(pr)).map(pr => {
+            const xs = fs.filter(a => a.p === pr); if (!xs.length) return '';
+            const ppl = [...new Set(xs.flatMap(a => a.args.filter(y => isP(y) && !subj.some(z => same(z, y)))))];
+            return `<div class="frow" ${K(lk, 'pred:' + pr)}><span class="fl">${esc(chipName(pr))}</span>${ppl.length ? ppl.map(y => av(y, 'sm')).join('') + ' ' + ppl.map(y => y === p ? 'you' : cap(y)).join(', ') : fact(xs[0], p, p)}</div>`;
+          }).join('') + `</div>`;
+        }
+      }
     } else if (c.kind === 'thread') {
       const ts = [], seen = new Set(), par = env[C.params[0]];
       const mine = v.atoms.filter(a => c.shows.includes(a.p) && mentions(a, par)).sort((x, y) => x.seq - y.seq);
@@ -407,6 +429,8 @@ function phone(p) {
   const zm = d.querySelector('.zm'); if (zm.querySelector('.thread')) zm.scrollTop = zm.scrollHeight;
   return d;
 }
+/* a predicate that the contract names a tab for is one a person looks at; the rest stay behind the i */
+function tabOf(pr) { return Object.entries(SIM.tabs || {}).find(([, v]) => v.includes(pr.replace(/_/g, ' ')) || new RegExp('\\b' + pr + '\\b').test(v) || (pr === 'vote_for' && /vote for/.test(v)) || (pr === 'vote_against' && /vote against/.test(v))); }
 function chipName(pr) { const t = Object.entries(SIM.tabs).find(([, v]) => v.includes(pr.replace(/_/g, ' ')) || new RegExp('\\b' + pr + '\\b').test(v)); return t ? t[0].replace(/s$/, '') : pr.replace(/_/g, ' '); }
 function lastText(atoms, x, p) {
   const ts = atoms.filter(a => mentions(a, x)).map(a => ({a, t: a.args.find(isT)})).filter(o => o.t).sort((m, n) => n.a.seq - m.a.seq);

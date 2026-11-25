@@ -1,0 +1,2109 @@
+{
+ "contract": "DAO",
+ "chain": [
+  {
+   "contract": "Knowledge",
+   "text": [
+    "Knowledge",
+    "An *identity* is a unique cryptographic key pair.",
+    "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+    "Alice, Bob and Carol are persons.",
+    "1. ○ Establish: Alice may establish an identity once. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it.",
+    "2. ■ Acquaint: Alice and Bob may jointly come to know each other, provided Alice does not know Bob.",
+    "3. ■ Introduce: Alice may introduce Carol to Bob with the consent of Bob, provided Alice and Bob know each other, Alice knows Carol and Bob does not know Carol."
+   ],
+   "changed": [
+    "2",
+    "3"
+   ]
+  },
+  {
+   "contract": "DAO",
+   "text": [
+    "DAO",
+    "DAO extends Knowledge.",
+    "Alice and Bob are persons.",
+    "1. ■ Found: Alice may found a DAO under a new name of hers; Alice is then its steward and first member.",
+    "2. ■ Join: Alice, the steward of a DAO, may admit Bob, whom she knows and who is not yet a member, with the consent of Bob.",
+    "3. ■ Proposing. Propose: A member of a DAO may make a proposal to it, each proposal once; its steward records it. Deliver proposal: The steward delivers it to every member but the steward, the proposer included.",
+    "4. ■ Voting. Vote for, Vote against: A member who holds a proposal of their DAO may vote for or against it, once and before the steward decides it; the steward records the vote. Deliver vote: The steward delivers the vote to every member but the steward.",
+    "5. ■ Deciding. Pass, Reject: The steward may decide a proposal, passed or rejected, once. Deliver decision: The steward delivers the decision to every member but the steward.",
+    "6. ■ Majority. The steward may pass a proposal only if more than half of the DAO's members at that time have voted for it, and reject it only if more than half have voted against it."
+   ],
+   "changed": []
+  }
+ ],
+ "vocab": {
+  "identity": {
+   "phrase": "x has an identity",
+   "vars": [
+    "x"
+   ]
+  },
+  "person": {
+   "phrase": "x is a person",
+   "vars": [
+    "x"
+   ]
+  },
+  "knows": {
+   "phrase": "x knows y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "steward": {
+   "phrase": "x is the steward of d",
+   "vars": [
+    "x",
+    "d"
+   ]
+  },
+  "member": {
+   "phrase": "x is a member of y's d",
+   "vars": [
+    "x",
+    "d",
+    "y"
+   ]
+  },
+  "listed": {
+   "phrase": "x has y as a member of d",
+   "vars": [
+    "x",
+    "y",
+    "d"
+   ]
+  },
+  "proposed": {
+   "phrase": "x has proposed p to y's d",
+   "vars": [
+    "x",
+    "p",
+    "d",
+    "y"
+   ]
+  },
+  "proposal": {
+   "phrase": "x holds p of d",
+   "vars": [
+    "x",
+    "p",
+    "d"
+   ]
+  },
+  "delivered": {
+   "phrase": "x has delivered p of d to y",
+   "vars": [
+    "x",
+    "p",
+    "d",
+    "y"
+   ]
+  },
+  "voted": {
+   "phrase": "x has voted on p of d",
+   "vars": [
+    "x",
+    "p",
+    "d"
+   ]
+  },
+  "vote_for": {
+   "phrase": "x holds y's vote for p of d",
+   "vars": [
+    "x",
+    "y",
+    "p",
+    "d"
+   ]
+  },
+  "vote_against": {
+   "phrase": "x holds y's vote against p of d",
+   "vars": [
+    "x",
+    "y",
+    "p",
+    "d"
+   ]
+  },
+  "delivered_vote": {
+   "phrase": "x has delivered y's vote on p of d to z",
+   "vars": [
+    "x",
+    "y",
+    "p",
+    "d",
+    "z"
+   ]
+  },
+  "decided": {
+   "phrase": "x has decided p of d",
+   "vars": [
+    "x",
+    "p",
+    "d"
+   ]
+  },
+  "passed": {
+   "phrase": "x holds p of d as passed",
+   "vars": [
+    "x",
+    "p",
+    "d"
+   ]
+  },
+  "rejected": {
+   "phrase": "x holds p of d as rejected",
+   "vars": [
+    "x",
+    "p",
+    "d"
+   ]
+  },
+  "delivered_decision": {
+   "phrase": "x has delivered the decision on p of d to y",
+   "vars": [
+    "x",
+    "p",
+    "d",
+    "y"
+   ]
+  }
+ },
+ "reflexive": [
+  "knows"
+ ],
+ "schemas": [
+  {
+   "name": "establish",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Establish",
+   "sentence": "Alice may establish an identity. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "acquaint",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Acquaint",
+   "sentence": "Alice and Bob may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "introduce",
+   "persons": [
+    "Bob",
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Introduce",
+   "sentence": "Alice may introduce Carol to Bob",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to introduce Carol to you."
+   },
+   "field": null
+  },
+  {
+   "name": "found",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Found",
+   "sentence": "Alice may found Delos under a new name of hers",
+   "auto": false,
+   "questions": {},
+   "field": "delos"
+  },
+  {
+   "name": "join",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Delos",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Join",
+   "sentence": "Alice may admit Bob to Delos",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice invites you to their DAO."
+   },
+   "field": null
+  },
+  {
+   "name": "propose",
+   "persons": [
+    "Carol",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "proposed",
+     "args": [
+      "Carol",
+      "Prop",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Carol",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Propose",
+   "sentence": "Carol may make the proposal Prop to Alice's Delos",
+   "auto": false,
+   "questions": {},
+   "field": "prop"
+  },
+  {
+   "name": "propose_own",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "proposed",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Propose own",
+   "sentence": "Alice may make the proposal Prop to Alice's Delos",
+   "auto": false,
+   "questions": {},
+   "field": "prop"
+  },
+  {
+   "name": "deliver_proposal",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "delivered",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Bob",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "delivered",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver proposal",
+   "sentence": "Alice delivers Prop of Delos to Bob",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "vote_for",
+   "persons": [
+    "Carol",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "voted",
+     "args": [
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_for",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Carol",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    },
+    {
+     "p": "voted",
+     "args": [
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Vote for",
+   "sentence": "Carol may vote for Prop of Alice's Delos",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "vote_own_for",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "voted",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_for",
+     "args": [
+      "Alice",
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    },
+    {
+     "p": "voted",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Vote own for",
+   "sentence": "Alice may vote for Prop of Alice's Delos",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "vote_against",
+   "persons": [
+    "Carol",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "voted",
+     "args": [
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_against",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Carol",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    },
+    {
+     "p": "voted",
+     "args": [
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Vote against",
+   "sentence": "Carol may vote against Prop of Alice's Delos",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "vote_own_against",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "voted",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_against",
+     "args": [
+      "Alice",
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    },
+    {
+     "p": "voted",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Vote own against",
+   "sentence": "Alice may vote against Prop of Alice's Delos",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "deliver_vote_for",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "delivered_vote",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_for",
+     "args": [
+      "Bob",
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_for",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "delivered_vote",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver vote for",
+   "sentence": "Alice delivers Carol's vote for Prop of Delos to Bob",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "deliver_vote_against",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "delivered_vote",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_against",
+     "args": [
+      "Bob",
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "vote_against",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "delivered_vote",
+     "args": [
+      "Alice",
+      "Carol",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver vote against",
+   "sentence": "Alice delivers Carol's vote against Prop of Delos to Bob",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "pass",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "ge",
+      "a": [
+       {
+        "f": "cardinality",
+        "a": [
+         [
+          "X1"
+         ],
+         {
+          "f": "atom",
+          "a": [
+           {
+            "w": "vote_for"
+           },
+           [
+            "Alice",
+            "X1",
+            "Prop",
+            {
+             "f": "const",
+             "a": [
+              "Delos"
+             ]
+            }
+           ]
+          ]
+         },
+         {
+          "w": "true"
+         }
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         "Votes"
+        ]
+       }
+      ]
+     },
+     {
+      "f": "and",
+      "a": [
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "num",
+          "a": [
+           "Double"
+          ]
+         },
+         {
+          "f": "mul",
+          "a": [
+           {
+            "f": "num",
+            "a": [
+             "Votes"
+            ]
+           },
+           {
+            "f": "num",
+            "a": [
+             2
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "f": "lt",
+        "a": [
+         {
+          "f": "cardinality",
+          "a": [
+           [
+            "X2"
+           ],
+           {
+            "f": "atom",
+            "a": [
+             {
+              "w": "listed"
+             },
+             [
+              "Alice",
+              "X2",
+              {
+               "f": "const",
+               "a": [
+                "Delos"
+               ]
+              }
+             ]
+            ]
+           },
+           {
+            "w": "true"
+           }
+          ]
+         },
+         {
+          "f": "num",
+          "a": [
+           "Double"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [
+    "Votes",
+    "Double"
+   ],
+   "values": [
+    "Prop",
+    "Delos",
+    "Votes",
+    "Double"
+   ],
+   "effects": [
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "passed",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Pass",
+   "sentence": "Alice may pass Prop of Delos",
+   "auto": false,
+   "questions": {},
+   "field": "votes"
+  },
+  {
+   "name": "reject",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "ge",
+      "a": [
+       {
+        "f": "cardinality",
+        "a": [
+         [
+          "X1"
+         ],
+         {
+          "f": "atom",
+          "a": [
+           {
+            "w": "vote_against"
+           },
+           [
+            "Alice",
+            "X1",
+            "Prop",
+            {
+             "f": "const",
+             "a": [
+              "Delos"
+             ]
+            }
+           ]
+          ]
+         },
+         {
+          "w": "true"
+         }
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         "Votes"
+        ]
+       }
+      ]
+     },
+     {
+      "f": "and",
+      "a": [
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "num",
+          "a": [
+           "Double"
+          ]
+         },
+         {
+          "f": "mul",
+          "a": [
+           {
+            "f": "num",
+            "a": [
+             "Votes"
+            ]
+           },
+           {
+            "f": "num",
+            "a": [
+             2
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "f": "lt",
+        "a": [
+         {
+          "f": "cardinality",
+          "a": [
+           [
+            "X2"
+           ],
+           {
+            "f": "atom",
+            "a": [
+             {
+              "w": "listed"
+             },
+             [
+              "Alice",
+              "X2",
+              {
+               "f": "const",
+               "a": [
+                "Delos"
+               ]
+              }
+             ]
+            ]
+           },
+           {
+            "w": "true"
+           }
+          ]
+         },
+         {
+          "f": "num",
+          "a": [
+           "Double"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [
+    "Votes",
+    "Double"
+   ],
+   "values": [
+    "Prop",
+    "Delos",
+    "Votes",
+    "Double"
+   ],
+   "effects": [
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "rejected",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "proposal",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "decided",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Reject",
+   "sentence": "Alice may reject Prop of Delos",
+   "auto": false,
+   "questions": {},
+   "field": "votes"
+  },
+  {
+   "name": "deliver_pass",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "delivered_decision",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "passed",
+     "args": [
+      "Bob",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "passed",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "delivered_decision",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver pass",
+   "sentence": "Alice delivers to Bob the decision that Prop of Delos is passed",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "deliver_reject",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Delos": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prop",
+    "Delos"
+   ],
+   "effects": [
+    {
+     "p": "delivered_decision",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "rejected",
+     "args": [
+      "Bob",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "steward",
+     "args": [
+      "Alice",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "rejected",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "delivered_decision",
+     "args": [
+      "Alice",
+      "Prop",
+      "Delos",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver reject",
+   "sentence": "Alice delivers to Bob the decision that Prop of Delos is rejected",
+   "auto": true,
+   "questions": {},
+   "field": null
+  }
+ ],
+ "tabs": {
+  "Contacts": "those Alice knows",
+  "DAOs": "the DAOs Alice is a member of",
+  "Proposals": "the proposals Alice sees",
+  "For": "each vote for a proposal Alice has seen",
+  "Against": "each vote against a proposal Alice has seen",
+  "Passed": "what Alice holds as passed"
+ },
+ "env": [
+  "today"
+ ],
+ "parametric": []
+}

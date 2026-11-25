@@ -1,0 +1,33 @@
+# Assembly: one's DAOs, their proposals, a screen for each proposal to vote and decide on.
+screen Home
+  inbox
+  me: identity, person
+  list DAOs: atoms of member; opens Dao
+  list Proposals: atoms of proposal; shows passed, rejected; opens Proposal
+  list People: everyone; shows knows, listed; opens Person
+  Establish
+  Acquaint: Bob = field
+  Found: Delos = field
+
+screen Dao(d)
+  inbox
+  d.1: steward, listed
+  Propose: Delos = d.1, Alice = d.2, Prop = field
+  Propose own: Delos = d.1, Prop = field
+
+screen Proposal(q)
+  inbox
+  q: proposed, vote_for, vote_against, voted, decided, passed, rejected, delivered, delivered_vote, delivered_decision
+  Vote for: Prop = q.1, Delos = q.2, Alice = pick of member
+  Vote against: Prop = q.1, Delos = q.2, Alice = pick of member
+  Vote own for: Prop = q.1, Delos = q.2
+  Vote own against: Prop = q.1, Delos = q.2
+  Pass: Prop = q.1, Delos = q.2
+  Reject: Prop = q.1, Delos = q.2
+
+screen Person(p)
+  inbox
+  p: knows, listed
+  Introduce: Bob = p, Carol = pick of knows
+  Introduce: Carol = p, Bob = pick of knows
+  Join: Bob = p, Delos = pick of steward
