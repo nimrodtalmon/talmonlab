@@ -12,8 +12,18 @@
 
   /* literal words of the schemas, {lit: w}, are the values w */
   const lits = x => Array.isArray(x) ? x.map(lits) : x && typeof x === 'object' ? ('lit' in x ? x.lit : Object.fromEntries(Object.entries(x).map(([k, v]) => [k, lits(v)]))) : x;
+  /* a number or a constant an atom of a schema names, {f: num, a: [1]}, is that value */
+  const PLAIN = ['then', 'body', 'and', 'or', 'over', 'not'];
+  const plain = c => {
+    if (Array.isArray(c)) return c.map(plain);
+    if (!c || typeof c !== 'object') return c;
+    const o = {...c};
+    if (c.args) o.args = c.args.map(x => x && typeof x === 'object' && (x.f === 'num' || x.f === 'const') && x.a && x.a.length === 1 && typeof x.a[0] !== 'object' ? x.a[0] : x);
+    for (const k of PLAIN) if (k in c) o[k] = plain(c[k]);
+    return o;
+  };
   function World(spec, persons) {
-    spec.schemas = lits(spec.schemas);
+    spec.schemas = lits(spec.schemas).map(s => ({...s, effects: plain(s.effects), pre: plain(s.pre)}));
     this.spec = spec; this.persons = persons; this.cur = null; this.coin = 0;
     this.atoms = new Map(); this.seq = 0; this.props = []; this.notes = {}; this.day = 1; this.nid = 0;
     persons.forEach(p => this.notes[p] = []);
@@ -107,7 +117,8 @@
     for (const c of s.pre) if (c.p && !c.neg && this.setVar(c) >= 0 && !Array.isArray(b[c.args[this.setVar(c)]])) {
       const ms = this.match(c, b); if (!ms.length) return false; Object.assign(b, ms[0]);
     }
-    return s.pre.every(c => this.holds(c, b)) && this.guard(s.guard, b);
+    /* the guard first: a value it computes, as the side to move, is then checked against the facts */
+    return this.guard(s.guard, b) && s.pre.every(c => this.holds(c, b)) && this.guard(s.guard, b);
   };
   /* the guard: comparisons of numbers, counts of atoms, sizes of sets; a number that no one gives is
      the one the comparison needs, as a witness: Votes in "at least Votes voted for it" is the count */
@@ -130,6 +141,16 @@
     if (f === 'minus' || f === 'sub') return xs[0] - xs[1];
     return undefined;
   };
+  /* a value: a number, or a value of another kind, as a position; a declared function is computed by the
+     library of functions the page loads (GRASSROOTS_FNS), as the app compiler's library would */
+  World.prototype.val = function (t, b) {
+    if (t && typeof t === 'object' && t.f === 'fn') {
+      const lib = typeof GRASSROOTS_FNS !== 'undefined' ? GRASSROOTS_FNS : {}, F = lib[t.a[0].w || t.a[0]], xs = (t.a[1] || []).map(x => this.val(x, b));
+      return F && !xs.some(x => x === undefined) ? F(...xs) : undefined;
+    }
+    if (t && typeof t === 'object' && t.f === 'const' && typeof t.a[0] === 'string' && t.a[0] in b && typeof b[t.a[0]] === 'string' && isNaN(+b[t.a[0]])) return b[t.a[0]];
+    return this.num(t, b);
+  };
   const free = (t, b) => t && typeof t === 'object' && (t.f === 'num' || t.f === 'const') && typeof t.a[0] === 'string' && !(t.a[0] in b) && isNaN(+t.a[0]) ? t.a[0] : null;
   World.prototype.guard = function (g, b) {
     if (!g || (g.w === 'true')) return true;
@@ -138,9 +159,9 @@
     if (!(g.f in ops)) return true;
     if (l && l.f === 'size') return true;
     const fl = free(l, b), fr = free(r, b);
-    if (fr && !fl) { const v = this.num(l, b); if (v === undefined) return false; b[fr] = g.f === 'gt' ? v - 1 : g.f === 'lt' ? v + 1 : v; return true; }
-    if (fl && !fr) { const v = this.num(r, b); if (v === undefined) return false; b[fl] = g.f === 'gt' ? v + 1 : g.f === 'lt' ? v - 1 : v; return true; }
-    const x = this.num(l, b), y = this.num(r, b);
+    if (fr && !fl) { const v = this.val(l, b); if (v === undefined) return false; b[fr] = g.f === 'gt' ? v - 1 : g.f === 'lt' ? v + 1 : v; return true; }
+    if (fl && !fr) { const v = this.val(r, b); if (v === undefined) return false; b[fl] = g.f === 'gt' ? v + 1 : g.f === 'lt' ? v - 1 : v; return true; }
+    const x = this.val(l, b), y = this.val(r, b);
     return x !== undefined && y !== undefined && ops[g.f](x, y);
   };
   World.prototype.apply = function (s, b) {

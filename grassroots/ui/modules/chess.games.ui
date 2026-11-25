@@ -1,0 +1,27 @@
+# Games: one's games on the start screen, a screen for each game, and a screen for each friend to start one.
+
+SCREEN Home ABOUT Alice:
+    QUESTIONS
+    SHOW Alice: identity, person
+    LIST Games: "Alice plays Game against Bob at Board" OPENS Game
+    LIST Friends: EVERYONE WITH knows, friend, won, drawn OPENS Person
+    LIST Moves: "Alice has made Move in Game at Board"
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+
+SCREEN Person ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, friend, won, drawn, started
+    Introduce: Alice may introduce Carol to Bob, Carol FROM knows
+    Introduce: Alice may introduce Bob to Carol, Carol FROM knows
+    Befriend: Alice and Bob may jointly become friends
+    Unfriend: Alice may end her friendship with Bob
+    Start: Alice and Bob may jointly start Game at Board, Game TYPED
+
+SCREEN Game ABOUT "Alice plays Game against Bob at Board":
+    QUESTIONS
+    SHOW: at, colour, made
+    Move: Alice may make Move in Game against Bob from Board to Next, Move TYPED
+    Win: Alice may claim Game against Bob at Board
+    Resign: Alice may resign Game against Bob at Board
+    Draw: Alice and Bob may jointly draw Game at Board

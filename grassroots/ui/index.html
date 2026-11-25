@@ -107,6 +107,12 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .slide .num { width:5em; }
 .slide output { min-width:2.5em; font-weight:700; }
 .look-ok { color:var(--ok, #1a7f37); }
+.cb { display:grid; grid-template-columns:repeat(8, 1fr); width:100%; max-width:248px; aspect-ratio:1; margin:6px auto 10px; border:2px solid #6b4f36; border-radius:4px; overflow:hidden; }
+.cb span { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:22px; line-height:1; background:#f0d9b5; color:#222; user-select:none; }
+.cb span.d { background:#b58863; }
+.cb span.from { box-shadow:inset 0 0 0 3px #e0a030; }
+.cb.pick span { cursor:pointer; }
+.chip.pos { font-family:var(--mono, monospace); }
 .compose input { flex:1; border:1px solid var(--line); border-radius:99px; padding:7px 12px; outline:none; min-width:0; }
 .compose button { width:36px; height:36px; border-radius:50%; border:0; background:var(--acc); color:#fff; font-size:16px; flex:none; }
 .sheet { z-index:4; position:absolute; inset:auto 0 0 0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.15); padding:14px; max-height:75%; overflow-y:auto; }
@@ -211,6 +217,7 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 </div>
 <script src="ui.js"></script>
 <script src="engine.js"></script>
+<script src="chess.js"></script>
 <script>
 const CONTRACTS = {
   chat: {title: 'Chat (proposed)', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
@@ -218,6 +225,7 @@ const CONTRACTS = {
   agora: {title: 'Agora (barter market)', modules: {market: 'Market', mechanical: 'Mechanical'}},
   dao: {title: 'DAO', modules: {assembly: 'Assembly', mechanical: 'Mechanical'}},
   friendship: {title: 'Friendship', modules: {people: 'People', mechanical: 'Mechanical', pages: 'Pages only (not complete)'}},
+  chess: {title: 'Chess (proposed)', modules: {games: 'Games', mechanical: 'Mechanical'}},
 };
 /* the look: modules that change how the app is drawn and nothing of what it lets a person do */
 const LOOKS = {
@@ -244,7 +252,14 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;',
 const cap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 const isP = x => PERSONS.includes(x);
 const isT = x => x && typeof x === 'object' && 't' in x;
-const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x === 'object' && 'coin' in x ? '#' + x.coin : String(x);
+const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x === 'object' && 'coin' in x ? '#' + x.coin : isBoard(x) ? 'a position' : String(x);
+/* a value the look draws as a chessboard: a position, as the library of functions reads it */
+const isBoard = x => typeof x === 'string' && typeof CHESS !== 'undefined' && Object.values(LK.of).some(r => r.as === 'chessboard') && !!CHESS.board(x);
+const PIECE = {K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙', k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟'};
+function boardHtml(fen, pick) {
+  const b = CHESS.board(fen) || [];
+  return `<div class="cb${pick ? ' pick' : ''}">${b.map((x, i) => `<span class="${((i >> 3) + i % 8) % 2 ? 'd' : ''}" ${pick ? `data-sq="${String.fromCharCode(97 + i % 8) + (8 - (i >> 3))}"` : ''}>${x ? PIECE[x] : ''}</span>`).join('')}</div>`;
+}
 const lead = x => Array.isArray(x) ? (x.find(y => !isP(y) && !(y && typeof y === 'object' && 'coin' in y)) ?? x[0]) : x;
 const av = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc(String(p)[0].toUpperCase())}</span>`;
 const K = (...ks) => `data-k="${ks.filter(Boolean).join(' ')}"`;
@@ -340,6 +355,20 @@ function phone(p) {
   const toasts = v.notes.map(n => `<div class="toast"><span class="sys">${n.refused ? esc(n.refused) + ': not done' : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
   if (v.notes.length) { clearTimeout(u.fade); u.fade = setTimeout(() => { W.notes[p].length = 0; render(); }, 3500); }
   const asks = [];
+  /* a screen about a fact follows it when one of its values changes, as a game's position after a move:
+     the one fact of the same kind that differs from it in one place */
+  if (C.aboutPred && Array.isArray(env.it)) {
+    const same1 = v.atoms.filter(a => a.p === C.aboutPred);
+    if (!same1.some(a => same(a.args, env.it))) {
+      const next = same1.filter(a => a.args.length === env.it.length && a.args.filter((x, i) => !same(x, env.it[i])).length === 1);
+      if (next.length === 1) env.it = next[0].args;
+    }
+  }
+  /* a value of the screen's subject that the look draws as a chessboard */
+  for (const [n, pos] of Object.entries(C.names || {})) if ((LK.of[n] || {}).as === 'chessboard' && env.it) {
+    const v = pos === null ? env.it : Array.isArray(env.it) ? env.it[pos - 1] : undefined;
+    if (isBoard(v)) zone.middle += boardHtml(v, false);
+  }
   for (const c of comps) {
     if (c.hidden) continue;
     const lk = 'line:' + c.line;
@@ -450,6 +479,16 @@ function phone(p) {
   };
   const nf = d.querySelector('[data-name]');
   if (nf) { nf.focus(); const go = () => { const x = fieldValue(nf); if (!x) return; const e = u.sheet.name(x); if (e) d.querySelector('[data-ferr]').textContent = e; }; nf.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); go(); } }; d.querySelector('[data-namego]').onclick = go; }
+  /* tapping a square, then another, writes the move between them in the box below the board */
+  d.querySelectorAll('.cb.pick').forEach(cb => {
+    const inp = cb.parentElement.querySelector('[data-pickboard]');
+    cb.querySelectorAll('[data-sq]').forEach(x => x.onclick = () => {
+      const from = cb.querySelector('.from');
+      if (!from) { x.classList.add('from'); return; }
+      from.classList.remove('from');
+      if (inp) inp.value = from.dataset.sq + x.dataset.sq;
+    });
+  });
   /* a slider and the box beside it show one value */
   d.querySelectorAll('.slide').forEach(sl => { const r = sl.querySelector('input[type=range]'), o = sl.querySelector('output'), n = sl.querySelector('input[type=number]'); r.oninput = () => { o.textContent = r.value; if (n) n.value = r.value; }; if (n) n.oninput = () => { r.value = n.value; o.textContent = n.value; }; });
   const zm = d.querySelector('.zm'); if (zm.querySelector('.thread')) zm.scrollTop = zm.scrollHeight;
@@ -476,7 +515,7 @@ function act(p, w) {
   if (w.open.length) {
     /* an open place: a value is typed; a person is given by her key, as no phone can list everyone */
     const k = w.open[0], person = w.act.people.includes(k);
-    u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"'))}</div>${person ? '<div class="expl">A key is shared in person or by a link; here, type a name.</div>' : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
+    u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"', w.vals[0]))}</div>${person ? '<div class="expl">A key is shared in person or by a link; here, type a name.</div>' : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
       name: x => {
         const v = person ? x.toLowerCase() : x;
         if (person && !PERSONS.includes(v)) return 'No one has this key.';
@@ -491,8 +530,13 @@ function act(p, w) {
 }
 /* the look of a typed place: by the name the description gives it */
 function lookOf(c, act, k) { const r = act.names[k - 1], n = c && c.names ? c.names[r] : r; return LK.of[n] || {}; }
-function field(act, c, k, attr) {
+function field(act, c, k, attr, val) {
   const lv = lookOf(c, act, k), r = act.names[k - 1], ph = act.people.includes(k) ? 'their key' : esc(r.toLowerCase());
+  if (lv.as === 'board-pick') {
+    /* the board the act is on: the value of a place the look draws as a chessboard */
+    const bk = act.names.findIndex(x => lookOf(c, act, act.names.indexOf(x) + 1).as === 'chessboard') + 1, fen = val && bk ? val[bk] : null;
+    return (isBoard(fen) ? boardHtml(fen, true) : '') + `<input ${attr} placeholder="${ph}, as e2e4" data-pickboard="1">`;
+  }
   const num = (act.types || {})[r] === 'num' || /^(Sum|Total|Day|Term|Votes)$/.test(r);
   if (lv.as === 'long') return `<textarea ${attr} rows="3" placeholder="${ph}"></textarea>`;
   if (lv.as === 'slider') return `<span class="slide"><input type="range" ${lv.typed ? '' : attr} min="${lv.from}" max="${lv.to}" value="${lv.from}"><output>${lv.from}</output>${lv.typed ? `<input type="number" ${attr} value="${lv.from}" class="num">` : ''}</span>`;
@@ -509,7 +553,7 @@ function form(p, w, varying) {
   const ctl = k => {
     const o = opts(k);
     return o ? `<select data-f="${k}">${o.map((x, i) => `<option value="${i}">${esc(show(Array.isArray(x) ? lead(x) : x))}</option>`).join('')}</select>`
-      : field(act, w.c, k, `data-f="${k}"`);
+      : field(act, w.c, k, `data-f="${k}"`, w.vals[0]);
   };
   const val = w.vals[0], done = new Set();
   let body = act.sentence.replace(/\b[A-Z][A-Za-z]*\b/g, x => {

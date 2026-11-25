@@ -1,0 +1,1346 @@
+{
+ "contract": "Chess",
+ "chain": [
+  {
+   "contract": "Knowledge",
+   "text": [
+    "Knowledge",
+    "An *identity* is a unique cryptographic key pair.",
+    "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+    "Alice, Bob and Carol are persons.",
+    "1. ○ Establish: Alice may establish an identity once. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it.",
+    "2. ■ Acquaint: Alice and Bob may jointly come to know each other.",
+    "3. ■ Introduce: Alice may introduce Carol to Bob with the consent of Bob, provided Alice and Bob know each other and Alice knows Carol."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Friendship",
+   "text": [
+    "Friendship",
+    "Friendship extends Knowledge.",
+    "Alice *trusts* Bob when she knows Bob personally and believes him to keep the undertakings he signs under grassroots contracts.",
+    "Alice and Bob are persons.",
+    "1. ○ Befriend: Alice and Bob, who trust each other and are not friends, may jointly become friends.",
+    "2. ■ Unfriend: Alice may end her friendship with Bob.",
+    "3. ○ Loss of Trust. Alice will end her friendship with Bob if she ceases to trust him."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Chess",
+   "text": [
+    "Chess",
+    "Chess extends Friendship.",
+    "The *rules of chess* are the Laws of Chess of FIDE, the International Chess Federation.",
+    "Alice and Bob are persons.",
+    "1. ■ Start: Alice and Bob may jointly start a game of chess, provided they are friends; Alice then plays white and Bob black, from the first position.",
+    "2. ■ Move: Alice may move in a game against Bob, provided it is her turn and the move is legal by the rules of chess; the game is then at the position after the move.",
+    "3. ■ Win: Alice may claim a game against Bob, provided Bob is to move and is checkmated; Alice has then won the game.",
+    "4. ■ Resign: Alice may resign a game against Bob; Bob has then won the game.",
+    "5. ■ Draw: Alice and Bob may jointly agree a draw in a game.",
+    "6. ○ Fair play. Alice will choose each of her moves herself, with no help from a chess engine."
+   ],
+   "changed": []
+  }
+ ],
+ "vocab": {
+  "identity": {
+   "phrase": "x has an identity",
+   "vars": [
+    "x"
+   ]
+  },
+  "person": {
+   "phrase": "x is a person",
+   "vars": [
+    "x"
+   ]
+  },
+  "knows": {
+   "phrase": "x knows y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "friend": {
+   "phrase": "x counts y as a friend",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "at": {
+   "phrase": "x plays g against y at b",
+   "vars": [
+    "x",
+    "g",
+    "y",
+    "b"
+   ]
+  },
+  "colour": {
+   "phrase": "x has the colour s in g",
+   "vars": [
+    "x",
+    "g",
+    "s"
+   ]
+  },
+  "started": {
+   "phrase": "x has started g",
+   "vars": [
+    "x",
+    "g"
+   ]
+  },
+  "won": {
+   "phrase": "x has won g against y",
+   "vars": [
+    "x",
+    "g",
+    "y"
+   ]
+  },
+  "drawn": {
+   "phrase": "x has drawn g with y",
+   "vars": [
+    "x",
+    "g",
+    "y"
+   ]
+  },
+  "made": {
+   "phrase": "x has made m in g at b",
+   "vars": [
+    "x",
+    "g",
+    "m",
+    "b"
+   ]
+  },
+  "first": {
+   "phrase": "b is the first position",
+   "vars": [
+    "b"
+   ]
+  },
+  "legal": {
+   "phrase": "v is the legality of m on b",
+   "vars": [
+    "v",
+    "m",
+    "b"
+   ]
+  },
+  "after": {
+   "phrase": "c is the position after m on b",
+   "vars": [
+    "c",
+    "m",
+    "b"
+   ]
+  },
+  "side": {
+   "phrase": "s is the side to move of b",
+   "vars": [
+    "s",
+    "b"
+   ]
+  },
+  "mate": {
+   "phrase": "v is the mate of b",
+   "vars": [
+    "v",
+    "b"
+   ]
+  }
+ },
+ "reflexive": [
+  "knows"
+ ],
+ "schemas": [
+  {
+   "name": "establish",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Establish",
+   "sentence": "Alice may establish an identity. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "acquaint",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Acquaint",
+   "sentence": "Alice and Bob may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "introduce",
+   "persons": [
+    "Bob",
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Introduce",
+   "sentence": "Alice may introduce Carol to Bob",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to introduce Carol to you."
+   },
+   "field": null
+  },
+  {
+   "name": "befriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Befriend",
+   "sentence": "Alice and Bob may jointly become friends",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to be your friend."
+   },
+   "field": null
+  },
+  {
+   "name": "unfriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Unfriend",
+   "sentence": "Alice may end her friendship with Bob",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "start",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Game": "const",
+    "Board": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "const",
+      "a": [
+       "Board"
+      ]
+     },
+     {
+      "f": "fn",
+      "a": [
+       {
+        "w": "first"
+       },
+       []
+      ]
+     }
+    ]
+   },
+   "derived": [
+    "Board"
+   ],
+   "values": [
+    "Game",
+    "Board"
+   ],
+   "effects": [
+    {
+     "p": "started",
+     "args": [
+      "Alice",
+      "Game"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "colour",
+     "args": [
+      "Alice",
+      "Game",
+      {
+       "f": "num",
+       "a": [
+        1
+       ]
+      }
+     ],
+     "neg": false
+    },
+    {
+     "p": "colour",
+     "args": [
+      "Bob",
+      "Game",
+      {
+       "f": "num",
+       "a": [
+        2
+       ]
+      }
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "started",
+     "args": [
+      "Alice",
+      "Game"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Start",
+   "sentence": "Alice and Bob may jointly start Game at Board",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "move",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Game": "const",
+    "Board": "const",
+    "Next": "const",
+    "Move": "const",
+    "Side": "num"
+   },
+   "sizes": {},
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "num",
+        "a": [
+         "Side"
+        ]
+       },
+       {
+        "f": "fn",
+        "a": [
+         {
+          "w": "side"
+         },
+         [
+          {
+           "f": "const",
+           "a": [
+            "Board"
+           ]
+          }
+         ]
+        ]
+       }
+      ]
+     },
+     {
+      "f": "and",
+      "a": [
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "num",
+          "a": [
+           1
+          ]
+         },
+         {
+          "f": "fn",
+          "a": [
+           {
+            "w": "legal"
+           },
+           [
+            {
+             "f": "const",
+             "a": [
+              "Move"
+             ]
+            },
+            {
+             "f": "const",
+             "a": [
+              "Board"
+             ]
+            }
+           ]
+          ]
+         }
+        ]
+       },
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "const",
+          "a": [
+           "Next"
+          ]
+         },
+         {
+          "f": "fn",
+          "a": [
+           {
+            "w": "after"
+           },
+           [
+            {
+             "f": "const",
+             "a": [
+              "Move"
+             ]
+            },
+            {
+             "f": "const",
+             "a": [
+              "Board"
+             ]
+            }
+           ]
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [
+    "Next",
+    "Side"
+   ],
+   "values": [
+    "Game",
+    "Board",
+    "Next",
+    "Move",
+    "Side"
+   ],
+   "effects": [
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Next"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Next"
+     ],
+     "neg": false
+    },
+    {
+     "p": "made",
+     "args": [
+      "Alice",
+      "Game",
+      "Move",
+      "Board"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "colour",
+     "args": [
+      "Alice",
+      "Game",
+      "Side"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Move",
+   "sentence": "Alice may make Move in Game against Bob from Board to Next",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "win",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Game": "const",
+    "Board": "const",
+    "Side": "num"
+   },
+   "sizes": {},
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "num",
+        "a": [
+         "Side"
+        ]
+       },
+       {
+        "f": "fn",
+        "a": [
+         {
+          "w": "side"
+         },
+         [
+          {
+           "f": "const",
+           "a": [
+            "Board"
+           ]
+          }
+         ]
+        ]
+       }
+      ]
+     },
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "num",
+        "a": [
+         1
+        ]
+       },
+       {
+        "f": "fn",
+        "a": [
+         {
+          "w": "mate"
+         },
+         [
+          {
+           "f": "const",
+           "a": [
+            "Board"
+           ]
+          }
+         ]
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [
+    "Side"
+   ],
+   "values": [
+    "Game",
+    "Board",
+    "Side"
+   ],
+   "effects": [
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "won",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "colour",
+     "args": [
+      "Bob",
+      "Game",
+      "Side"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Win",
+   "sentence": "Alice may claim Game against Bob at Board",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "resign",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Game": "const",
+    "Board": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Game",
+    "Board"
+   ],
+   "effects": [
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "won",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Resign",
+   "sentence": "Alice may resign Game against Bob at Board",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "draw",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Game": "const",
+    "Board": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Game",
+    "Board"
+   ],
+   "effects": [
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": true
+    },
+    {
+     "p": "drawn",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "drawn",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Alice",
+      "Game",
+      "Bob",
+      "Board"
+     ],
+     "neg": false
+    },
+    {
+     "p": "at",
+     "args": [
+      "Bob",
+      "Game",
+      "Alice",
+      "Board"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Draw",
+   "sentence": "Alice and Bob may jointly draw Game at Board",
+   "auto": false,
+   "questions": {},
+   "field": null
+  }
+ ],
+ "tabs": {
+  "Contacts": "those Alice knows",
+  "Friends": "the friends of Alice"
+ },
+ "env": [
+  "today",
+  "first",
+  "legal",
+  "after",
+  "side",
+  "mate"
+ ],
+ "parametric": []
+}
