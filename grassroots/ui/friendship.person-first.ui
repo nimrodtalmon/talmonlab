@@ -1,0 +1,19 @@
+# Person-first: one screen of people, one screen per person.
+screen Home
+  top
+    inbox
+  middle
+    me: identity, person
+    list Contacts: everyone; shows knows, friend; opens Person
+  bottom
+    Establish
+    Acquaint: Bob = typed
+
+screen Person(p)
+  middle
+    p: knows, friend
+  bottom
+    Befriend: Bob = p
+    Unfriend: Bob = p
+    Introduce: Bob = p, Carol = pick everyone
+    Introduce: Carol = p, Bob = pick everyone

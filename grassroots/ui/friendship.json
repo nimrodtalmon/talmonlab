@@ -208,6 +208,15 @@
     "  Bob: Alice wishes that you know each other.",
     "Introduce: Alice [Introduce]",
     "  Bob: Alice asks to introduce Carol to you."
+   ],
+   "text": [
+    "Knowledge",
+    "An *identity* is a unique cryptographic key pair.",
+    "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+    "Alice, Bob and Carol are persons.",
+    "1. \u25cb Establish: Alice may establish an identity once. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it.",
+    "2. \u25a0 Acquaint: Alice and Bob may jointly come to know each other.",
+    "3. \u25a0 Introduce: Alice may introduce Carol to Bob with the consent of Bob, provided Alice and Bob know each other and Alice knows Carol."
    ]
   },
   {
@@ -217,6 +226,15 @@
     "Befriend: Alice [Befriend]",
     "  Bob: Alice asks to be your friend.",
     "Unfriend: Alice [Unfriend]"
+   ],
+   "text": [
+    "Friendship",
+    "Friendship extends Knowledge.",
+    "Alice *trusts* Bob when she knows Bob personally and believes him to keep the undertakings he signs under grassroots contracts.",
+    "Alice and Bob are persons.",
+    "1. \u25cb Befriend: Alice and Bob, who trust each other and are not friends, may jointly become friends.",
+    "2. \u25a0 Unfriend: Alice may end her friendship with Bob.",
+    "3. \u25cb Loss of Trust. Alice will end her friendship with Bob if she ceases to trust him."
    ]
   }
  ],

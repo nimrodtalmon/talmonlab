@@ -123,7 +123,14 @@ def main(glp, name, slug):
                 on = False; continue
             if on and l.strip():
                 prag.append(l.rstrip())
-        chain.insert(0, {'contract': n, 'lines': prag})
+        # the contract's own text: from its title to the line "Logic pragmas"
+        text, on = [], False
+        for l in body:
+            if l.strip() == 'Logic pragmas':
+                break
+            if on or l.strip() == n:
+                on = True; text.append(l.rstrip())
+        chain.insert(0, {'contract': n, 'lines': prag, 'text': text})
         # the vocabulary of its Logic pragmas: an English phrase for each basic fact
         for l in lines:
             if l.startswith('Vocabulary:'):
