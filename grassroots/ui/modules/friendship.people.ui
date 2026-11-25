@@ -7,7 +7,7 @@ screen Home
     list Contacts: everyone; shows knows, friend; opens Person
   bottom
     Establish
-    Acquaint: Bob = typed
+    Acquaint: Bob = field
 
 screen Person(p)
   middle

@@ -8,8 +8,8 @@ screen Chats
     list Contacts: everyone; shows knows, friend; opens Chat
   bottom
     Establish
-    Acquaint: Bob = typed
-    Create: Grupo = typed
+    Acquaint: Bob = field
+    Create: Grupo = field
     Close: Grupo = pick of leader
 
 screen Chat(p)
@@ -25,7 +25,7 @@ screen Chat(p)
     Introduce: Carol = p, Bob = pick of knows
     Join: Bob = p, Grupo = pick of leader
     Remove: Bob = p, Grupo = pick of listed
-    Message: Bob = p, Text = typed
+    Message: Bob = p, Text = field
 
 screen Group(g)
   top
@@ -35,5 +35,5 @@ screen Group(g)
     thread: group_message
   bottom
     Leave: Grupo = g.1, Alice = g.2
-    Post: Grupo = g.1, Alice = g.2, Text = typed
-    Post own: Grupo = g.1, Text = typed
+    Post: Grupo = g.1, Alice = g.2, Text = field
+    Post own: Grupo = g.1, Text = field

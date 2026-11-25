@@ -102,30 +102,83 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .why { font:12px/1.4 -apple-system, "Segoe UI", sans-serif; color:var(--bad); padding:0 6px 4px 52px; }
 .ok { color:var(--good); } .badm { color:var(--bad); }
 .sum { display:flex; flex-direction:column; gap:3px; margin:6px 0 10px; font-size:13px; }
+
+/* the page's pickers */
+.pick { width:100%; border:1px solid var(--line); border-radius:10px; padding:7px 10px; margin-bottom:10px; background:#fff; font-weight:600; }
+.tabs { display:flex; gap:4px; margin-bottom:12px; border-bottom:1px solid var(--line); }
+.tabs button { border:0; background:none; padding:6px 10px; color:var(--mute); border-bottom:2px solid transparent; margin-bottom:-1px; }
+.tabs button.on { color:var(--ink); border-bottom-color:var(--acc); font-weight:600; }
+.drow { display:flex; align-items:center; gap:10px; margin:8px 0; }
+.dl { width:96px; flex:none; color:var(--mute); font-size:12.5px; }
+.sw { display:flex; gap:6px; flex-wrap:wrap; }
+.sw button { width:auto; height:auto; padding:6px 8px; border-radius:10px; border:1px solid var(--line); background:#fff; display:flex; align-items:center; gap:3px; box-shadow:none; }
+.sw button.on { border-color:var(--ink); }
+.sw span { width:12px; height:12px; border-radius:50%; border:1px solid rgba(0,0,0,.1); }
+.sw em { font-style:normal; font-size:12px; margin-left:4px; color:var(--ink); }
+/* the look of a phone: themes, shape, density */
+.phone { --p-bg:#f8f8f6; --p-card:#fff; --p-ink:#1c1f23; --p-mute:#6c7177; --p-line:#e5e5e1; --p-acc:#14806f; --p-acc2:#e6f3f0; --p-me:#dcf3ec; --p-r:14px; --p-pill:99px; --p-font:inherit; --p-pad:9px; }
+.phone.night { --p-bg:#0f1418; --p-card:#1a2128; --p-ink:#e9edf0; --p-mute:#8a96a0; --p-line:#27313a; --p-acc:#2fbf9b; --p-acc2:#163a33; --p-me:#14453a; }
+.phone.paper { --p-bg:#f6f1e7; --p-card:#fffdf7; --p-ink:#2b2620; --p-mute:#857a6a; --p-line:#e6dccb; --p-acc:#b5562b; --p-acc2:#f4e2d6; --p-me:#f3e3cf; --p-font:Georgia, "Times New Roman", serif; }
+.phone.candy { --p-bg:#fbf2fb; --p-card:#fff; --p-ink:#2a1b33; --p-mute:#8c6f99; --p-line:#efdcef; --p-acc:#8e44ec; --p-acc2:#f1e4ff; --p-me:#ead9ff; }
+.phone.square { --p-r:4px; --p-pill:6px; }
+.phone.compact { --p-pad:5px; }
+.phone .scr { background:var(--p-bg); color:var(--p-ink); font-family:var(--p-font); }
+.phone .top, .phone .zb { background:var(--p-card); border-color:var(--p-line); }
+.phone .row, .phone .ask, .phone .opt, .phone .sheet, .phone .bub { background:var(--p-card); border-color:var(--p-line); color:var(--p-ink); border-radius:var(--p-r); }
+.phone .sheet { border-radius:var(--p-r) var(--p-r) 0 0; }
+.phone .row { padding:var(--p-pad) 10px; margin-bottom:calc(var(--p-pad) - 3px); }
+.phone .ask { border-color:var(--p-acc); }
+.phone .bub.me { background:var(--p-me); border-color:transparent; }
+.phone .pri, .phone .compose button, .phone .fab { background:var(--p-acc); border-radius:var(--p-pill); }
+.phone .sec { background:var(--p-acc2); color:var(--p-acc); border-radius:var(--p-pill); }
+.phone .back { color:var(--p-acc); }
+.phone .badge { background:var(--p-acc); }
+.phone .h, .phone .s, .phone .fact, .phone .empty, .phone .note, .phone .expl, .phone .when, .phone .ghost { color:var(--p-mute); }
+.phone .fact b, .phone .nm, .phone .row .t { color:var(--p-ink); }
+.phone .chip { background:var(--p-acc2); color:var(--p-mute); }
+.phone .compose input, .phone .sheet input { background:var(--p-bg); color:var(--p-ink); border-color:var(--p-line); border-radius:var(--p-pill); }
+.phone .ib { background:var(--p-card); border-color:var(--p-line); color:var(--p-mute); }
+.phone .av.grp { border-radius:calc(var(--p-r) - 4px); }
+.phone .tbar { display:flex; gap:4px; padding:6px 10px 0; background:var(--p-card); border-bottom:1px solid var(--p-line); }
+.phone .tbar button { border:0; background:none; padding:6px 10px; color:var(--p-mute); border-bottom:2px solid transparent; font-weight:600; font-size:13px; }
+.phone .tbar button.on { color:var(--p-acc); border-bottom-color:var(--p-acc); }
+.phone .fab { position:absolute; right:16px; bottom:84px; width:48px; height:48px; border:0; color:#fff; font-size:24px; box-shadow:0 4px 12px rgba(0,0,0,.2); z-index:2; }
+.phone .acts.col1 { flex-direction:column; align-items:stretch; }
+.phone .line { font-size:13.5px; padding:3px 2px; }
+.phone .line .when { margin-left:6px; font-size:10.5px; }
 </style>
 </head>
 <body>
 <header>
   <b>Grassroots UI</b><span class="sub">prototype, simulated in the page</span>
   <span class="sp"></span>
-  <span class="lbl">Contract</span><span class="seg" id="csel"></span>
-  <span class="lbl">UI</span><span class="seg" id="msel"></span>
   <button class="hb" id="explain">Explain</button>
   <button class="hb" id="reset">Start over</button>
 </header>
 <div class="grid">
-  <section class="panel" id="contract"></section>
+  <section class="panel"><select class="pick" id="csel"></select><div id="contract"></div></section>
   <section class="col"><div class="phones" id="phones"></div><div class="scripts" id="scripts"></div></section>
-  <section class="panel" id="code"></section>
+  <section class="panel"><div class="tabs"><button class="on" data-tab="design">Design</button><button data-tab="code">UI code</button></div><div id="design"></div><div id="code" style="display:none"></div></section>
 </div>
 <script src="ui.js"></script>
 <script src="engine.js"></script>
 <script>
 const CONTRACTS = {
-  chat: {title: 'Chat', modules: {chats: 'Chats', tabs: 'Tabs'}},
-  groups: {title: 'Groups', modules: {chats: 'Chats', tabs: 'Tabs'}},
-  friendship: {title: 'Friendship', modules: {people: 'People', pages: 'Pages only'}},
+  chat: {title: 'Chat (proposed)', modules: {chats: 'Chats'}},
+  groups: {title: 'Groups', modules: {chats: 'Chats'}},
+  friendship: {title: 'Friendship', modules: {people: 'People', pages: 'Pages only (not complete)'}},
 };
+/* the look: modules that change how the app is drawn and nothing of what it lets a person do */
+const LOOKS = {
+  theme: {label: 'Theme', opts: {fresh: 'Fresh', night: 'Night', paper: 'Paper', candy: 'Candy'}},
+  home: {label: 'Lists', opts: {sections: 'Sections', tabs: 'Tabs'}},
+  convo: {label: 'Conversations', opts: {bubbles: 'Bubbles', plain: 'Plain'}},
+  actions: {label: 'Actions', opts: {bar: 'Bar', menu: 'Menu', button: 'Button'}},
+  shape: {label: 'Shape', opts: {round: 'Round', square: 'Square'}},
+  density: {label: 'Density', opts: {cozy: 'Cozy', compact: 'Compact'}},
+};
+const LOOK = {};
+for (const [k, v] of Object.entries(LOOKS)) { const x = new URLSearchParams(location.search).get(k); LOOK[k] = x in v.opts ? x : Object.keys(v.opts)[0]; }
 const PERSONS = ['alice', 'bob', 'carol', 'dave'], PHONES = ['alice', 'bob'], SCRIPTED = ['carol', 'dave'];
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
 const q = new URLSearchParams(location.search);
@@ -204,11 +257,12 @@ function later() { clearTimeout(TN); TN = setTimeout(() => { let n = 0; for (con
 /* ---------- a phone ---------- */
 function phone(p) {
   const v = view(p), u = ui[p], d = document.createElement('div');
-  d.className = 'phone';
+  d.className = ['phone', LOOK.theme, LOOK.shape, LOOK.density].join(' ');
   if (!P.ui.containers[u.at]) { u.at = P.ui.start; u.env = {}; }
   const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: ''}, acts = [];
   let composer = '', title = cap(p), avatar = av(p), info = null;
   const ident = v.atoms.filter(a => !a.args.length);
+  const lists = comps.filter(c => c.kind === 'list' && !c.hidden && c.zone === 'middle'), tabbed = LOOK.home === 'tabs' && lists.length > 1;
   for (const x of v.pending) zone.top += `<div class="note"><span class="spin"></span>${esc(x.s.button)}<span class="sys">: waiting for ${[...x.wait].map(cap).join(', ')}</span></div>`;
   for (const n of v.notes) zone.top += `<div class="note bad"><span class="sys">${n.refused ? 'Not done: ' + esc(n.refused) : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`;
   for (const c of comps) {
@@ -231,12 +285,14 @@ function phone(p) {
       for (const a of mine) {
         const t = a.args.find(isT); if (!t || seen.has(JSON.stringify(t))) continue; seen.add(JSON.stringify(t));
         const when = mine.filter(b => b.args.some(x => same(x, t))).flatMap(b => b.args).find(x => typeof x === 'string' && /^day /.test(x));
+        if (LOOK.convo === 'plain') { ts.push(`<div class="line" ${K(lk, 'pred:' + a.p)}><b style="color:${COL[t.by]}">${t.by === p ? 'You' : cap(t.by)}</b> ${esc(t.t)}${when ? `<span class="when">${esc(when)}</span>` : ''}</div>`); continue; }
         ts.push(`<div class="bub${t.by === p ? ' me' : ''}" ${K(lk, 'pred:' + a.p)}>${t.by !== p && Array.isArray(par) ? `<div class="by" style="color:${COL[t.by]}">${cap(t.by)}</div>` : ''}${esc(t.t)}${when ? `<span class="when">${esc(when)}</span>` : ''}</div>`);
       }
       zone[c.zone] += `<div class="thread">${ts.join('') || `<div class="empty sys">No messages yet.</div>`}</div>`;
     } else if (c.kind === 'list') {
+      if (tabbed && c.zone === 'middle' && lists[u.tab || 0] !== c) continue;
       const it = items(c, v.atoms, p);
-      zone[c.zone] += `<div class="h" ${K(lk)}>${esc(c.title)}</div>` + it.map(x => {
+      zone[c.zone] += (tabbed && c.zone === 'middle' ? '' : `<div class="h" ${K(lk)}>${esc(c.title)}</div>`) + it.map(x => {
         const chips = (c.shows || []).flatMap(pr => v.atoms.filter(a => a.p === pr && mentions(a, x)).slice(0, 1).map(a => `<span class="chip" ${K(lk, 'pred:' + a.p)}>${esc(chipName(a.p))}</span>`)).join('');
         const s = Array.isArray(x) ? x.filter(isP).map(y => y === p ? 'yours' : cap(y)).join(', ') : '';
         const th = c.event ? P.ui.containers[c.event.navigate].components.find(y => y.kind === 'thread') : null;
@@ -258,17 +314,22 @@ function phone(p) {
     }
   }
   if (info && !info.fs.length) info = null;
-  let h = `<div class="scr"><div class="top">${u.at !== P.ui.start ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${info ? '<button class="ib" data-info="1">i</button>' : ''}</div>`;
-  h += `<div class="zt">${zone.top}</div><div class="zm">${zone.middle}</div><div class="zb">${zone.bottom ? `<div class="acts">${zone.bottom}</div>` : ''}${composer}</div>`;
-  if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
+  let h = `<div class="scr"><div class="top">${u.at !== P.ui.start ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${info ? '<button class="ib" data-info="1">i</button>' : ''}${LOOK.actions === 'menu' && zone.bottom ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  const bar = LOOK.actions === 'bar' ? zone.bottom : '';
+  const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
+  h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${LOOK.actions === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
+  if (u.menu && zone.bottom && LOOK.actions !== 'bar') h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${zone.bottom}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
+  else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
   d.innerHTML = h + '</div>';
   const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => f(b));
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
   on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.sheet = null; render(); });
-  on('[data-back]', () => { u.at = P.ui.start; u.env = {}; u.sheet = null; render(); });
-  on('[data-close]', () => { u.sheet = null; render(); });
+  on('[data-back]', () => { u.at = P.ui.start; u.env = {}; u.sheet = null; u.menu = false; render(); });
+  on('[data-close]', () => { u.sheet = null; u.menu = false; render(); });
+  on('[data-menu]', () => { u.menu = true; render(); });
+  on('[data-tabi]', b => { u.tab = +b.dataset.tabi; render(); });
   on('[data-info]', () => { u.sheet = {html: `<div class="sh">${esc(info.title)}</div><div class="facts">${info.fs.map(a => `<div class="fact" ${K(info.lk, 'pred:' + a.p)}>${fact(a, p, p)}</div>`).join('')}</div>`}; render(); });
-  on('[data-act]', b => act(p, acts[+b.dataset.act]));
+  on('[data-act]', b => { u.menu = false; act(p, acts[+b.dataset.act]); });
   d.querySelectorAll('[data-send]').forEach(b => {
     const i = +b.dataset.send, inp = d.querySelector(`[data-compose="${i}"]`), go = () => { if (inp.value.trim()) sendText(p, acts[i], inp.value.trim(), i); };
     b.onclick = go; inp.onkeydown = e => { if (e.key === 'Enter') go(); };
@@ -337,7 +398,7 @@ function contractPanel() {
   h += `<p class="lg" style="margin-top:12px">■ enforced by the app · ◆ attested · ○ undertaken by the person.</p>`;
   $('#contract').innerHTML = h;
 }
-const KW = /\b(screen|top|middle|bottom|inbox|list|shows|opens|everyone|atoms|of|pick|typed|thread)\b/g;
+const KW = /\b(screen|top|middle|bottom|inbox|list|shows|opens|everyone|atoms|of|pick|field|thread)\b/g;
 function codeLine(L) {
   const comp = L.screen && L.id ? P.ui.containers[L.screen].components.find(c => c.id === L.id) : null;
   let keys = ['line:' + L.n], g = '', why = [];
@@ -358,13 +419,13 @@ function codeLine(L) {
   return `<div class="ln" ${K(...keys)}><span class="no">${L.n}</span><span class="g">${g}</span><span>${t}</span></div>` + why.map(w => `<div class="why">${esc(w)}</div>`).join('');
 }
 function codePanel() {
-  let h = `<h3>The UI: ${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Screens in three zones: notifications, the person's state, actions. Each action is an act of the contract; each role gets a source. The checker reads it against the contract.</p>`;
+  let h = `<h3>${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Screens in three zones: notifications, the person's state, actions. Each action is an act of the contract; each role gets a source. The checker reads it against the contract.</p>`;
   const n = Object.values(R.acts).filter(a => a.covered).length, m = Object.keys(R.acts).length;
   h += `<div class="sum"><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}: ${n} of ${m} acts covered${Object.values(R.acts).filter(a => !a.covered).map(a => ' · <span class="badm">' + esc(a.button) + '</span>').join('')}</div>`;
   h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact shown' : '<span class="badm">✗ hidden</span>: ' + R.hidden.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ')}</div>`;
   if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
-  h += `<div class="ct">The language</div><div class="lg"><b>screen</b> Name, or Name(p) opened from a list with the item as p · <b>inbox</b> · <b>me</b>: facts, or <b>p</b>: facts · <b>thread</b>: facts · <b>list</b> Title: <b>everyone</b>, <b>of</b> fact, or <b>atoms of</b> fact; <b>shows</b> facts; <b>opens</b> Screen · Button: Role = p, p.i, <b>typed</b>, <b>pick everyone</b> or <b>pick of</b> fact.</div>`;
+  h += `<div class="ct">The language</div><div class="lg"><b>screen</b> Name, or Name(p) opened from a list with the item as p · <b>inbox</b> · <b>me</b>: facts, or <b>p</b>: facts · <b>thread</b>: facts · <b>list</b> Title: <b>everyone</b>, <b>of</b> fact, or <b>atoms of</b> fact; <b>shows</b> facts; <b>opens</b> Screen · Button: Role = p, p.i, <b>field</b>, <b>pick everyone</b> or <b>pick of</b> fact. The zones top, middle and bottom only place things.</div>`;
   $('#code').innerHTML = h;
 }
 function render() {
@@ -376,11 +437,39 @@ document.addEventListener('mouseover', e => {
   document.querySelectorAll('[data-k]').forEach(x => x.classList.toggle('hit', ks.length > 0 && x.dataset.k.split(' ').some(k => ks.includes(k))));
 });
 function segs() {
-  $('#csel').innerHTML = Object.entries(CONTRACTS).map(([k, v]) => `<button class="${k === CN ? 'on' : ''}" data-c="${k}">${v.title}</button>`).join('');
-  $('#msel').innerHTML = Object.entries(CONTRACTS[CN].modules).map(([k, v]) => `<button class="${k === MN ? 'on' : ''}" data-m="${k}">${v}</button>`).join('');
-  document.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { CN = b.dataset.c; MN = null; start(); });
-  document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { MN = b.dataset.m; module(); });
+  $('#csel').innerHTML = Object.entries(CONTRACTS).map(([k, v]) => `<option value="${k}"${k === CN ? ' selected' : ''}>${esc(v.title)}</option>`).join('');
+  $('#csel').onchange = () => { CN = $('#csel').value; MN = null; start(); };
 }
+/* the design tool: the structure, which the checks read, and the look, which they do not */
+function designPanel() {
+  const ms = Object.entries(CONTRACTS[CN].modules);
+  let h = `<p class="lg">The look is free: nothing here changes what the app lets a person do, so the checks stay as they are. Only the UI code decides that.</p>`;
+  if (ms.length > 1) h += `<div class="drow"><div class="dl">Structure</div><div class="seg">${ms.map(([k, v]) => `<button class="${k === MN ? 'on' : ''}" data-m="${k}">${esc(v)}</button>`).join('')}</div></div>`;
+  h += `<div class="drow"><div class="dl">Checks</div><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'} · ${R.visible ? '<span class="ok">✓ visible</span>' : '<span class="badm">✗ not visible</span>'}</div></div>`;
+  h += `<div class="ct">Look</div>`;
+  for (const [k, v] of Object.entries(LOOKS)) {
+    h += `<div class="drow"><div class="dl">${v.label}</div>`;
+    if (k === 'theme') h += `<div class="sw">${Object.entries(v.opts).map(([o, t]) => `<button class="phone ${o}${o === LOOK.theme ? ' on' : ''}" data-look="theme" data-v="${o}"><span style="background:var(--p-acc)"></span><span style="background:var(--p-me)"></span><span style="background:var(--p-bg)"></span><em>${t}</em></button>`).join('')}</div>`;
+    else h += `<div class="seg">${Object.entries(v.opts).map(([o, t]) => `<button class="${o === LOOK[k] ? 'on' : ''}" data-look="${k}" data-v="${o}">${t}</button>`).join('')}</div>`;
+    h += `</div>`;
+  }
+  h += `<div class="drow"><div class="dl"></div><button class="hb" id="share">Copy a link to this design</button></div>`;
+  $('#design').innerHTML = h;
+  document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { MN = b.dataset.m; module(); });
+  document.querySelectorAll('[data-look]').forEach(b => b.onclick = () => { LOOK[b.dataset.look] = b.dataset.v; designPanel(); render(); });
+  $('#share').onclick = () => {
+    const u = new URL(location.href); u.search = '';
+    u.searchParams.set('c', CN); u.searchParams.set('ui', MN);
+    for (const k in LOOK) u.searchParams.set(k, LOOK[k]);
+    try { navigator.clipboard.writeText(u.toString()); $('#share').textContent = 'Copied'; } catch (e) { $('#share').textContent = u.toString(); }
+    history.replaceState(null, '', u.toString());
+  };
+}
+document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('on', x === b));
+  $('#design').style.display = b.dataset.tab === 'design' ? '' : 'none';
+  $('#code').style.display = b.dataset.tab === 'code' ? '' : 'none';
+});
 const cache = {};
 const get = async u => cache[u] || (cache[u] = await (await fetch(u)).text());
 async function module() {
@@ -388,7 +477,7 @@ async function module() {
   R = GUI.check(SPEC, P.ui);
   B = CN === 'friendship' ? GUI.brute(SPEC, P.ui, PERSONS) : null;
   PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null});
-  segs(); codePanel(); render();
+  segs(); codePanel(); designPanel(); render();
 }
 function newWorld() {
   W = new Engine.World(SIM, PERSONS);
@@ -398,7 +487,8 @@ function newWorld() {
 async function start() {
   SIM = JSON.parse(await get(`sim-${CN}.json`));
   SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env};
-  MN = MN || Object.keys(CONTRACTS[CN].modules)[0];
+  const qm = new URLSearchParams(location.search).get('ui');
+  MN = MN || (qm in CONTRACTS[CN].modules ? qm : Object.keys(CONTRACTS[CN].modules)[0]);
   newWorld(); contractPanel();
   $('#scripts').innerHTML = SCRIPTED.map(p => av(p, 'sm')).join('') + '&nbsp;Carol and Dave have no phone here: a script answers yes to each of their questions.';
   await module();

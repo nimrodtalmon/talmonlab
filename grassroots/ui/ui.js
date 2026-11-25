@@ -6,7 +6,7 @@
  *       me: P, Q                 details: the facts of predicates P, Q about the person, or about the parameter (p: P, Q)
  *       list T: everyone|of P; shows P, Q; opens S     a list of every person named in the state, or of those in P's facts
  *       BUTTON: Role = SOURCE, ...                     an action for the act of that button; SOURCE is the parameter,
- *                                                      typed (an open field), or pick everyone | pick of P
+ *                                                      field (an open field), or pick everyone | pick of P
  */
 (function (G) {
   function read(text) {
@@ -58,9 +58,9 @@
         const c = {...base, kind: 'action', button: m[1].trim(), bind: {}};
         for (const part of (m[2] || '').split(',').map(x => x.trim()).filter(Boolean)) {
           const q = part.match(/^([A-Z]\w*)\s*=\s*(typed|pick everyone|pick of \w+|[a-z]\w*\.\d|[a-z]\w*)$/);
-          if (!q) { err(n, 'expected: Role = typed, pick everyone, pick of P, the parameter, or p.i'); continue; }
+          if (!q) { err(n, 'expected: Role = field, pick everyone, pick of P, the parameter, or p.i'); continue; }
           let v = q[2];
-          if (v === 'typed') v = {field: 'typed'};
+          if (v === 'field') v = {field: true};
           else if (/\.\d$/.test(v)) { const [pp, i] = v.split('.'); if (!C.params.includes(pp)) { err(n, pp + ' is not the parameter of ' + scr); continue; } v = {param: pp, pos: +i}; }
           else if (v.startsWith('pick')) {
             const pid = 'pick' + (++picks);
@@ -138,11 +138,11 @@
     if (v.select) return itemKinds(comps.find(x => x.id === v.select));
     return ['any'];
   }
-  function reaches(kinds, k, anc) {
+  function reaches(kinds, k, anc, roles) {
     if (!kinds.length) return false;
     if (kinds.includes('any')) return true;
     const need = anc[k] || new Set();
-    return kinds.every(kd => (kd === 'named' && need.size > 0) || (kd.startsWith('pred:') && need.has(kd.slice(5))) || kd.startsWith('pos:'));
+    return kinds.every(kd => (kd === 'named' && need.size > 0 && (!roles || roles.includes(k))) || (kd.startsWith('pred:') && need.has(kd.slice(5))) || kd.startsWith('pos:'));
   }
   function check(spec, ui) {
     const src = sources(ui), reach = reachable(ui), acts = {}, comps = {};
@@ -154,7 +154,7 @@
         if (k === a.me) continue;
         const r = a.names[k - 1];
         if (!(k in bind)) why.push(r + ' gets no value');
-        else if (!reaches(kindsOf(bind[k], c, src, ui.containers[c].components), k, anc)) why.push(r + ' may be someone this source does not reach');
+        else if (!reaches(kindsOf(bind[k], c, src, ui.containers[c].components), k, anc, a.roles)) why.push(r + ' may be someone this source does not reach');
       }
       /* places filled from the parameter's atom: all of them the positions of one required atom of its predicate */
       const fromAtom = Object.entries(x.bind).filter(([, v]) => v && v.param);
