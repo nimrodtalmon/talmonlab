@@ -77,6 +77,9 @@ textarea { width:100%; height:420px; font-family:var(--mono); font-size:12px; bo
     <h4>UI code</h4>
     <textarea id="code" spellcheck="false"></textarea>
     <div class="row"><button class="hb" id="dl">Download</button><span class="hint" style="margin:0">Edits here and on the screens are the same.</span></div>
+    <h4 id="lh">Look</h4>
+    <textarea id="look" spellcheck="false" style="height:130px" placeholder="Text IS LONG.&#10;Sum IS A SLIDER FROM 0 TO 100, OR TYPED.&#10;Contacts ARE A GRID.&#10;Unfriend IS IN THE MENU.&#10;COLOR IS NIGHT."></textarea>
+    <div class="box" id="lookcheck"></div>
   </section>
 </div>
 <div class="toast" id="toast"></div>
@@ -98,7 +101,9 @@ const q = new URLSearchParams(location.search);
 let PICKED = null, CN = q.get('c') in CONTRACTS ? q.get('c') : 'chat', SIM = null, SPEC = null, TEXT = '', P = null, R = null;
 const key = c => 'grassroots-ui:' + c;
 const load = c => { try { return localStorage.getItem(key(c)); } catch (e) { return null; } };
-const save = () => { try { localStorage.setItem(key(CN), TEXT); } catch (e) {} };
+const save = () => { try { localStorage.setItem(key(CN), TEXT); localStorage.setItem('grassroots-look:' + CN, LOOK); } catch (e) {} };
+const loadLook = c => { try { return localStorage.getItem('grassroots-look:' + c) || ''; } catch (e) { return ''; } };
+let LOOK = '';
 function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2600); }
 
 /* ---------- the text, and changes to it ---------- */
@@ -180,7 +185,14 @@ function update() {
   R = GUI.check(SPEC, P.ui);
   save();
   if (document.activeElement !== $('#code')) $('#code').value = TEXT;
-  palette(); screens(); goals();
+  palette(); screens(); goals(); lookCheck();
+}
+/* the look, checked as the paper's Proposition 3 says: no look loses an option */
+function lookCheck() {
+  if (document.activeElement !== $('#look')) $('#look').value = LOOK;
+  const r = GUI.checkLook(SPEC, P.ui, GUI.readLook(LOOK));
+  $('#lh').textContent = r.ok ? 'Look' : `Look · ${r.errors.length}`;
+  $('#lookcheck').innerHTML = r.ok ? `<div class="goal qed">${LOOK.trim() ? 'No option lost.' : 'No look: the defaults.'}</div>` : r.errors.map(e => `<div class="goal"><span class="badm">✗</span> line ${e.line}: ${esc(e.msg)}</div>`).join('');
 }
 function palette() {
   $('#acts').innerHTML = SPEC.acts.map(a => {
@@ -251,6 +263,7 @@ document.addEventListener('mouseover', e => {
   document.querySelectorAll('[data-k]').forEach(x => x.classList.toggle('hit', ks.length > 0 && x.dataset.k.split(' ').some(k => ks.includes(k))));
 });
 $('#code').oninput = () => { clearTimeout(update.h); update.h = setTimeout(() => { TEXT = $('#code').value; update(); }, 250); };
+$('#look').oninput = () => { clearTimeout(lookCheck.h); lookCheck.h = setTimeout(() => { LOOK = $('#look').value; save(); lookCheck(); }, 250); };
 $('#dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([TEXT], {type: 'text/plain'})); a.download = CN + '.ui'; a.click(); };
 
 /* ---------- starting ---------- */
@@ -262,6 +275,8 @@ async function start(from) {
   if (from === 'empty') TEXT = EMPTY;
   else if (from) TEXT = await (await fetch(`modules/${CN}.${from}.ui`)).text();
   else TEXT = load(CN) || EMPTY;
+  LOOK = from && from !== 'empty' ? await (await fetch(`modules/${CN}.${from}.look`)).text().catch(() => '') : loadLook(CN);
+  if (/^\s*</.test(LOOK)) LOOK = '';
   $('#try').href = `index.html?c=${CN}&ui=custom`;
   update();
 }
