@@ -550,7 +550,8 @@ function codePanel() {
   let h = `<h3>${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Each screen lists what it shows and which acts it offers. Each action is an act of the contract, with a source for each role. The checker reads it against the contract; where things go on the screen is the look's.</p>`;
   const n = Object.values(R.acts).filter(a => a.covered).length, m = Object.keys(R.acts).length;
   h += `<div class="sum"><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}: ${n} of ${m} acts covered${Object.values(R.acts).filter(a => !a.covered).map(a => ' · <span class="badm">' + esc(a.button) + '</span>').join('')}</div>`;
-  h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact shown' : '<span class="badm">✗ hidden</span>: ' + R.hidden.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ')}</div>`;
+  const prs = xs => xs.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ');
+  h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact found from the start screen' : R.hidden.length ? '<span class="badm">✗ hidden</span>: ' + prs(R.hidden) : '<span class="part">◐ visible not proved</span>: shown only on inner screens: ' + prs(R.inner)}</div>`;
   if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
   h += `<div class="ct">How to read it</div><div class="legend">
@@ -630,7 +631,7 @@ function newWorld() {
 }
 async function start() {
   SIM = JSON.parse(await get(`sim-${CN}.json`));
-  SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env};
+  SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env, personal: GUI.personal(SIM)};
   const qm = new URLSearchParams(location.search).get('ui');
   MN = MN || (qm in CONTRACTS[CN].modules ? qm : Object.keys(CONTRACTS[CN].modules)[0]);
   newWorld(); contractPanel();

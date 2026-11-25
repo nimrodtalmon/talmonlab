@@ -4,8 +4,8 @@
  *       inbox                    the pending questions of the person, with yes and no
  *       me: P, Q                 details: the facts of predicates P, Q about the person, or about the parameter (p: P, Q)
  *       list T: everyone|of P; shows P, Q; opens S     a list of every person named in the state, or of those in P's facts
- *       list T: atoms of P [with p | p.i]; ...           a list of the person's P facts; on a screen with a parameter,
- *                                                      `with` keeps those that name the parameter (or its i-th part)
+ *       list T: atoms of P [with p.i]; ...               a list of the person's P facts; on a screen whose parameter is
+ *                                                      a fact, `with` keeps those that name its argument at position i
  *       BUTTON: Role = SOURCE, ...                     an action for the act of that button; SOURCE is the parameter,
  *                                                      field (an open field), or pick everyone | pick of P
  */
@@ -34,10 +34,10 @@
       if (!scr) { err(n, 'a line before the first screen'); continue; }
       const C = ui.containers[scr], id = 'l' + n, base = {id, line: n};
       if (s === 'inbox') { C.components.push({...base, zone: 'top', kind: 'inbox'}); Object.assign(L, {kind: 'comp', screen: scr, id}); continue; }
-      if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+|atoms\s+of\s+\w+(?:\s+with\s+[a-z]\w*(?:\.\d)?)?)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
-        const w = m[2].match(/^atoms\s+of\s+(\w+)(?:\s+with\s+([a-z]\w*)(?:\.(\d))?)?$/);
+      if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+|atoms\s+of\s+\w+(?:\s+with\s+[a-z]\w*\.\d)?)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
+        const w = m[2].match(/^atoms\s+of\s+(\w+)(?:\s+with\s+([a-z]\w*)\.(\d))?$/);
         const c = {...base, zone: 'middle', kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : w ? {atoms: w[1]} : {pred: m[2].replace(/^of\s+/, '')}};
-        if (w && w[2]) { if (!C.params.includes(w[2])) { err(n, w[2] + ' is not the parameter of ' + scr); continue; } c.items.within = {param: w[2], pos: w[3] ? +w[3] : null}; }
+        if (w && w[2]) { if (!C.params.includes(w[2])) { err(n, w[2] + ' is not the parameter of ' + scr); continue; } c.items.within = {param: w[2], pos: +w[3]}; }
         for (const part of m[3].split(';').map(x => x.trim()).filter(Boolean)) {
           if (part.startsWith('shows')) c.shows = part.slice(5).split(',').map(x => x.trim()).filter(Boolean);
           else c.opens = part.slice(5).trim();
@@ -197,14 +197,26 @@
     for (const d of Object.values(ui.containers)) for (const x of d.components) if (x.kind === 'action' && !(x.id in comps)) comps[x.id] = {ok: false, why: ['no list opens this screen']};
     const preds = new Set(Object.keys(spec.vocab).filter(p => !(spec.env || []).includes(p)));
     for (const a of spec.acts) for (const [p] of a.req.concat(a.forb)) preds.add(p);
-    const shown = new Set();
-    for (const c of reach) for (const x of ui.containers[c].components) {
-      (x.shows || []).forEach(p => shown.add(p));
-      if (x.kind === 'list' && !x.hidden && x.items.atoms) shown.add(x.items.atoms);
+    /* Proposition 2: a predicate with arguments is shown by a list of its atoms on the start screen or, if
+       its atoms each name a person, next to everyone there or by the details of a person whose screen that
+       list opens; one without arguments, by the person's details on the start screen */
+    const st = ui.containers[ui.start].components, shown = new Set(), arity = p => spec.vocab[p] ? spec.vocab[p].vars.length - 1 : 0;
+    const everyone = st.filter(x => x.kind === 'list' && !x.hidden && x.items.named);
+    const opened = new Set(everyone.filter(x => x.event).map(x => x.event.navigate));
+    for (const p of preds) {
+      const ok = arity(p) === 0 ? st.some(x => x.kind === 'details' && x.about === 'me' && x.shows.includes(p))
+        : st.some(x => x.kind === 'list' && !x.hidden && x.items.atoms === p) || (spec.personal || []).includes(p) && (everyone.some(x => (x.shows || []).includes(p)) || [...opened].some(c => ui.containers[c].components.some(x => (x.kind === 'thread' || x.kind === 'details' && x.about !== 'me' && !x.pos) && x.shows.includes(p))));
+      if (ok) shown.add(p);
     }
     const inbox = [...reach].some(c => ui.containers[c].components.some(x => x.kind === 'inbox'));
-    const hidden = [...preds].filter(p => !shown.has(p)).sort();
-    return {acts, comps, hidden, inbox, complete: inbox && Object.values(acts).every(a => a.covered), visible: !hidden.length};
+    const hidden = [...preds].filter(p => !shown.has(p)).sort(), somewhere = new Set();
+    for (const c of reach) for (const x of ui.containers[c].components) {
+      (x.shows || []).forEach(p => somewhere.add(p));
+      if (x.kind === 'list' && !x.hidden && x.items.atoms) somewhere.add(x.items.atoms);
+    }
+    /* inner: shown, but only on screens reached through other facts; that each of them is found there
+       depends on what else the person holds, which Proposition 2 does not check */
+    return {acts, comps, hidden: hidden.filter(p => !somewhere.has(p)), inner: hidden.filter(p => somewhere.has(p)), inbox, complete: inbox && Object.values(acts).every(a => a.covered), visible: !hidden.length};
   }
 
   /* every state of one viewer among the persons, the allowed answers, and those the interface does not offer */
@@ -255,6 +267,15 @@
     return {states, answers, missed, examples};
   }
 
-  const api = {read, resolve, check, brute, actOf, acts};
+  /* the predicates whose atoms each name a person: every atom an act adds names one */
+  function personal(sim) {
+    const out = {};
+    for (const s of sim.schemas) {
+      const ps = new Set(s.persons.concat(Object.keys(s.one)));
+      for (const c of s.effects) if (c.p && !c.neg && !(sim.env || []).includes(c.p)) out[c.p] = (out[c.p] ?? true) && c.args.slice(1).some(x => ps.has(x));
+    }
+    return Object.keys(out).filter(p => out[p]);
+  }
+  const api = {read, resolve, check, brute, actOf, acts, personal};
   if (typeof module !== 'undefined') module.exports = api; else G.GUI = api;
 })(this);
