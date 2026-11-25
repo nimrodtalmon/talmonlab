@@ -1,4 +1,4 @@
-# Pages only: every act on a person's page. Not complete: try it.
+# Pages only: every act on a person's page. Not complete.
 screen Home
   top
     inbox
@@ -13,5 +13,5 @@ screen Person(p)
     Acquaint: Bob = p
     Befriend: Bob = p
     Unfriend: Bob = p
-    Introduce: Bob = p, Carol = pick everyone
-    Introduce: Carol = p, Bob = pick everyone
+    Introduce: Bob = p, Carol = pick of knows
+    Introduce: Carol = p, Bob = pick of knows

@@ -38,13 +38,17 @@
       if (!zone) { err(n, 'a component outside top, middle or bottom'); continue; }
       const C = ui.containers[scr], id = 'l' + n, base = {id, zone, line: n};
       if (s === 'inbox') { C.components.push({...base, kind: 'inbox'}); Object.assign(L, {kind: 'comp', screen: scr, id}); continue; }
-      if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
-        const c = {...base, kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : {pred: m[2].replace(/^of\s+/, '')}};
+      if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+|atoms\s+of\s+\w+)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
+        const c = {...base, kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : m[2].startsWith('atoms') ? {atoms: m[2].replace(/^atoms\s+of\s+/, '')} : {pred: m[2].replace(/^of\s+/, '')}};
         for (const part of m[3].split(';').map(x => x.trim()).filter(Boolean)) {
           if (part.startsWith('shows')) c.shows = part.slice(5).split(',').map(x => x.trim()).filter(Boolean);
           else c.opens = part.slice(5).trim();
         }
         C.components.push(c); Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
+      }
+      if ((m = s.match(/^thread:\s*([\w,\s]+)$/))) {
+        C.components.push({...base, kind: 'thread', shows: m[1].split(',').map(x => x.trim()).filter(Boolean)});
+        Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
       }
       if ((m = s.match(/^(me|[a-z]\w*):\s*([\w,\s]+)$/)) && (m[1] === 'me' || C.params.includes(m[1]))) {
         C.components.push({...base, kind: 'details', about: m[1], shows: m[2].split(',').map(x => x.trim()).filter(Boolean)});
@@ -53,10 +57,11 @@
       if ((m = s.match(/^([A-Z][\w' -]*?)\s*(?::\s*(.*))?$/))) {
         const c = {...base, kind: 'action', button: m[1].trim(), bind: {}};
         for (const part of (m[2] || '').split(',').map(x => x.trim()).filter(Boolean)) {
-          const q = part.match(/^([A-Z]\w*)\s*=\s*(typed|pick everyone|pick of \w+|[a-z]\w*)$/);
-          if (!q) { err(n, 'expected: Role = typed, pick everyone, pick of P, or the parameter'); continue; }
+          const q = part.match(/^([A-Z]\w*)\s*=\s*(typed|pick everyone|pick of \w+|[a-z]\w*\.\d|[a-z]\w*)$/);
+          if (!q) { err(n, 'expected: Role = typed, pick everyone, pick of P, the parameter, or p.i'); continue; }
           let v = q[2];
           if (v === 'typed') v = {field: 'typed'};
+          else if (/\.\d$/.test(v)) { const [pp, i] = v.split('.'); if (!C.params.includes(pp)) { err(n, pp + ' is not the parameter of ' + scr); continue; } v = {param: pp, pos: +i}; }
           else if (v.startsWith('pick')) {
             const pid = 'pick' + (++picks);
             C.components.push({id: pid, zone, line: n, kind: 'list', hidden: true, title: v, items: v === 'pick everyone' ? {named: true} : {pred: v.replace('pick of ', '')}});
@@ -93,13 +98,27 @@
     return parsed;
   }
 
+  /* the acts of a simulated contract, in the checker's terms: places, the proposer's place, and the
+     proposer's local precondition, required and forbidden atoms over places (null: another value) */
+  function acts(sim) {
+    return sim.schemas.filter(s => !s.auto).map(s => {
+      const env = new Set();
+      for (const c of s.pre) if (!c.forall && sim.env.includes(c.p)) env.add(c.args[1]);
+      const names = s.persons.concat(Object.keys(s.one), s.values).filter(x => !env.has(x));
+      const me = s.by[0], loc = (c) => [c.p, c.args.slice(1).map(x => names.includes(x) ? names.indexOf(x) + 1 : null)];
+      const mine = s.pre.filter(c => !c.forall && c.args[0] === me && !sim.env.includes(c.p));
+      return {name: s.name, button: s.button, names, me: names.indexOf(me) + 1, args: names, roles: s.persons.map(x => names.indexOf(x) + 1),
+        values: s.values.filter(x => !env.has(x)), field: s.field, sentence: s.sentence, questions: s.questions,
+        req: mine.filter(c => !c.neg).map(loc), forb: mine.filter(c => c.neg).map(loc)};
+    });
+  }
   const placeOf = (a, r) => a.names.indexOf(r) + 1;
   function anchors(a) {
     const out = {};
     for (const [p, ks] of a.req) for (const k of ks) if (k !== null) (out[k] = out[k] || new Set()).add(p);
     return out;
   }
-  const itemKinds = l => l.items.named ? ['named'] : ['pred:' + l.items.pred];
+  const itemKinds = l => l.items.named ? ['named'] : l.items.atoms ? ['atom:' + l.items.atoms] : ['pred:' + l.items.pred];
   function sources(ui) {
     const src = {};
     for (const [c, d] of Object.entries(ui.containers)) for (const p of d.params) src[c + ':' + p] = new Set();
@@ -114,7 +133,8 @@
   }
   function kindsOf(v, c, src, comps) {
     if (v === 'me') return ['me'];
-    if (typeof v === 'string') return [...(src[c + ':' + v] || [])];
+    if (typeof v === 'string') return [...(src[c + ':' + v] || [])].map(k => k.startsWith('atom:') ? 'whole:' + k : k);
+    if (v.param) return [...(src[c + ':' + v.param] || [])].map(k => k.startsWith('atom:') ? 'pos:' + k.slice(5) + ':' + v.pos : 'bad');
     if (v.select) return itemKinds(comps.find(x => x.id === v.select));
     return ['any'];
   }
@@ -122,7 +142,7 @@
     if (!kinds.length) return false;
     if (kinds.includes('any')) return true;
     const need = anc[k] || new Set();
-    return kinds.every(kd => (kd === 'named' && need.size > 0) || (kd.startsWith('pred:') && need.has(kd.slice(5))));
+    return kinds.every(kd => (kd === 'named' && need.size > 0) || (kd.startsWith('pred:') && need.has(kd.slice(5))) || kd.startsWith('pos:'));
   }
   function check(spec, ui) {
     const src = sources(ui), reach = reachable(ui), acts = {}, comps = {};
@@ -136,13 +156,20 @@
         if (!(k in bind)) why.push(r + ' gets no value');
         else if (!reaches(kindsOf(bind[k], c, src, ui.containers[c].components), k, anc)) why.push(r + ' may be someone this source does not reach');
       }
+      /* places filled from the parameter's atom: all of them the positions of one required atom of its predicate */
+      const fromAtom = Object.entries(x.bind).filter(([, v]) => v && v.param);
+      if (fromAtom.length) {
+        const ks = kindsOf(fromAtom[0][1], c, src, []), pred = ks.length === 1 && ks[0].startsWith('pos:') ? ks[0].split(':')[1] : null;
+        const fits = pred && a.req.some(([p, pl]) => p === pred && fromAtom.every(([r, v]) => pl[v.pos - 1] === placeOf(a, r)));
+        if (!fits) why.push('the places taken from the parameter are not the positions of one required ' + (pred || 'atom') + ' fact');
+      }
       const ps = ui.containers[c].params;
-      if (ps.length && !Object.values(x.bind).some(v => ps.includes(v))) why.push('this screen opens only from a list, and the action does not use its parameter');
+      if (ps.length && !Object.values(x.bind).some(v => ps.includes(v) || (v && ps.includes(v.param)))) why.push('this screen opens only from a list, and the action does not use its parameter');
       comps[x.id] = {ok: !why.length, why};
       if (!why.length) acts[a.name].covered = true;
     }
     for (const d of Object.values(ui.containers)) for (const x of d.components) if (x.kind === 'action' && !(x.id in comps)) comps[x.id] = {ok: false, why: ['no list opens this screen']};
-    const preds = new Set(Object.keys(spec.vocab));
+    const preds = new Set(Object.keys(spec.vocab).filter(p => !(spec.env || []).includes(p)));
     for (const a of spec.acts) for (const [p] of a.req.concat(a.forb)) preds.add(p);
     const shown = new Set();
     for (const c of reach) for (const x of ui.containers[c].components) (x.shows || []).forEach(p => shown.add(p));
@@ -199,6 +226,6 @@
     return {states, answers, missed, examples};
   }
 
-  const api = {read, resolve, check, brute, actOf};
+  const api = {read, resolve, check, brute, actOf, acts};
   if (typeof module !== 'undefined') module.exports = api; else G.GUI = api;
 })(this);

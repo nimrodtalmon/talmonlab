@@ -1,0 +1,1448 @@
+{
+ "contract": "Chat",
+ "chain": [
+  {
+   "contract": "Knowledge",
+   "text": [
+    "Knowledge",
+    "An *identity* is a unique cryptographic key pair.",
+    "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+    "Alice, Bob and Carol are persons.",
+    "1. ○ Establish: Alice may establish an identity once. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it.",
+    "2. ■ Acquaint: Alice and Bob may jointly come to know each other, provided Alice does not know Bob.",
+    "3. ■ Introduce: Alice may introduce Carol to Bob with the consent of Bob, provided Alice and Bob know each other, Alice knows Carol and Bob does not know Carol."
+   ],
+   "changed": [
+    "2",
+    "3"
+   ]
+  },
+  {
+   "contract": "Friendship",
+   "text": [
+    "Friendship",
+    "Friendship extends Knowledge.",
+    "Alice *trusts* Bob when she knows Bob personally and believes him to keep the undertakings he signs under grassroots contracts.",
+    "Alice and Bob are persons.",
+    "1. ○ Befriend: Alice and Bob, who trust each other and are not friends, may jointly become friends.",
+    "2. ■ Unfriend: Alice may end her friendship with Bob.",
+    "3. ○ Loss of Trust. Alice will end her friendship with Bob if she ceases to trust him."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Groups",
+   "text": [
+    "Groups",
+    "Groups extends Friendship, and strengthens it.",
+    "A *message* is what a person sends.",
+    "Alice and Bob are persons.",
+    "1. ■ Message: Alice may send a message to her friend Bob.",
+    "2. ■ Group. Create: Alice may create a group, of which she is the leader and first member. Close: Alice may close the group by leaving it.",
+    "3. ■ Joining and Leaving. Join: Alice, the leader of a group, may add her friend Bob to it, with the consent of Bob. Remove, Leave: Either Alice or Bob may then end Bob's membership in the group, which also ends when Alice and Bob cease to be friends.",
+    "4. ■ Group messaging. Post: A member of a group may send a message to the group. Deliver: Its leader delivers it to every current member."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Chat",
+   "text": [
+    "Chat",
+    "Chat strengthens Groups, and restricts it.",
+    "A *message* is what a person sends.",
+    "Alice and Bob are persons and Today a date.",
+    "1. ■ Message: Groups:1, only if the current date is Today, and then Alice has sent the message to Bob on Today and Bob has received it from Alice on Today."
+   ],
+   "changed": []
+  }
+ ],
+ "vocab": {
+  "identity": {
+   "phrase": "x has an identity",
+   "vars": [
+    "x"
+   ]
+  },
+  "person": {
+   "phrase": "x is a person",
+   "vars": [
+    "x"
+   ]
+  },
+  "knows": {
+   "phrase": "x knows y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "friend": {
+   "phrase": "x counts y as a friend",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "message": {
+   "phrase": "y has the message t from x",
+   "vars": [
+    "y",
+    "x",
+    "t"
+   ]
+  },
+  "leader": {
+   "phrase": "x is the leader of g",
+   "vars": [
+    "x",
+    "g"
+   ]
+  },
+  "member": {
+   "phrase": "x is a member of the group g of y",
+   "vars": [
+    "x",
+    "g",
+    "y"
+   ]
+  },
+  "listed": {
+   "phrase": "x has y as a member of the group g",
+   "vars": [
+    "x",
+    "y",
+    "g"
+   ]
+  },
+  "posted": {
+   "phrase": "y has the post t of x in g",
+   "vars": [
+    "y",
+    "t",
+    "x",
+    "g"
+   ]
+  },
+  "group_message": {
+   "phrase": "z has the message t of x in g delivered by y",
+   "vars": [
+    "z",
+    "x",
+    "t",
+    "g",
+    "y"
+   ]
+  },
+  "group_delivered": {
+   "phrase": "y has delivered the message t of x in g to z",
+   "vars": [
+    "y",
+    "x",
+    "t",
+    "g",
+    "z"
+   ]
+  },
+  "sent_message": {
+   "phrase": "x has sent t to y on e",
+   "vars": [
+    "x",
+    "y",
+    "t",
+    "e"
+   ]
+  },
+  "received_message": {
+   "phrase": "y has received t from x on e",
+   "vars": [
+    "y",
+    "x",
+    "t",
+    "e"
+   ]
+  },
+  "today": {
+   "phrase": "the current date is e",
+   "vars": [
+    "x",
+    "e"
+   ]
+  }
+ },
+ "reflexive": [
+  "knows"
+ ],
+ "schemas": [
+  {
+   "name": "establish",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Establish",
+   "sentence": "Alice may establish an identity. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "acquaint",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Acquaint",
+   "sentence": "Alice and Bob may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "introduce",
+   "persons": [
+    "Bob",
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Introduce",
+   "sentence": "Alice may introduce Carol to Bob",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to introduce Carol to you."
+   },
+   "field": null
+  },
+  {
+   "name": "befriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Befriend",
+   "sentence": "Alice and Bob may jointly become friends",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to be your friend."
+   },
+   "field": null
+  },
+  {
+   "name": "unfriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "_",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "_",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "_"
+     ],
+     "neg": true
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Bob",
+      "Alice",
+      "_"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Unfriend",
+   "sentence": "Alice may end her friendship with Bob",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "message",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "values": [
+    "Text",
+    "Today"
+   ],
+   "effects": [
+    {
+     "p": "message",
+     "args": [
+      "Bob",
+      "Alice",
+      "Text"
+     ],
+     "neg": false
+    },
+    {
+     "p": "sent_message",
+     "args": [
+      "Alice",
+      "Bob",
+      "Text",
+      "Today"
+     ],
+     "neg": false
+    },
+    {
+     "p": "received_message",
+     "args": [
+      "Bob",
+      "Alice",
+      "Text",
+      "Today"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "today",
+     "args": [
+      "Alice",
+      "Today"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Message",
+   "sentence": "Alice may send Text to Bob",
+   "auto": false,
+   "questions": {},
+   "field": "text"
+  },
+  {
+   "name": "create",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "values": [
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Create",
+   "sentence": "Alice may create Grupo",
+   "auto": false,
+   "questions": {},
+   "field": "name"
+  },
+  {
+   "name": "close",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "values": [
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": true
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "_",
+      "Grupo"
+     ],
+     "neg": true
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "listed",
+      "args": [
+       "Alice",
+       "E1",
+       "Grupo"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "member",
+       "args": [
+        "E1",
+        "Grupo",
+        "Alice"
+       ],
+       "neg": true
+      }
+     ]
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "listed",
+      "args": [
+       "Alice",
+       "E1",
+       "Grupo"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "E1"
+       ],
+       "neg": false
+      },
+      {
+       "p": "member",
+       "args": [
+        "E1",
+        "Grupo",
+        "Alice"
+       ],
+       "neg": false
+      }
+     ]
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Close",
+   "sentence": "Alice may close Grupo by leaving it",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "join",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "values": [
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Grupo",
+      "_"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Join",
+   "sentence": "Alice may add Bob to Grupo",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks you to join her group."
+   },
+   "field": null
+  },
+  {
+   "name": "remove",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "values": [
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Remove",
+   "sentence": "Alice may end Bob's membership in Grupo",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "leave",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "values": [
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Leave",
+   "sentence": "Bob may end his membership in Alice's Grupo",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "post",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "values": [
+    "Text",
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Text",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Text",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Post",
+   "sentence": "Bob may send Text to the group Grupo of Alice",
+   "auto": false,
+   "questions": {},
+   "field": "text"
+  },
+  {
+   "name": "post_own",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "values": [
+    "Text",
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Text",
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Text",
+      "Alice",
+      "Grupo"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Post own",
+   "sentence": "Alice may send Text to the group Grupo of Alice",
+   "auto": false,
+   "questions": {},
+   "field": "text"
+  },
+  {
+   "name": "deliver",
+   "persons": [
+    "Alice",
+    "Carol"
+   ],
+   "one": {
+    "Bob": [
+     "Alice",
+     "Carol"
+    ]
+   },
+   "values": [
+    "Text",
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "group_delivered",
+     "args": [
+      "Alice",
+      "Bob",
+      "Text",
+      "Grupo",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "group_message",
+     "args": [
+      "Carol",
+      "Bob",
+      "Text",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Text",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listed",
+     "args": [
+      "Alice",
+      "Carol",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "group_delivered",
+     "args": [
+      "Alice",
+      "Bob",
+      "Text",
+      "Grupo",
+      "Carol"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver",
+   "sentence": "Alice delivers Text of Bob in Grupo to Carol",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "deliver_leader",
+   "persons": [
+    "Alice"
+   ],
+   "one": {
+    "Bob": [
+     "Alice"
+    ]
+   },
+   "values": [
+    "Text",
+    "Grupo"
+   ],
+   "effects": [
+    {
+     "p": "group_delivered",
+     "args": [
+      "Alice",
+      "Bob",
+      "Text",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "group_message",
+     "args": [
+      "Alice",
+      "Bob",
+      "Text",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "leader",
+     "args": [
+      "Alice",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Text",
+      "Bob",
+      "Grupo"
+     ],
+     "neg": false
+    },
+    {
+     "p": "group_delivered",
+     "args": [
+      "Alice",
+      "Bob",
+      "Text",
+      "Grupo",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver leader",
+   "sentence": "Alice delivers Text of Bob in Grupo to the leader Alice",
+   "auto": true,
+   "questions": {},
+   "field": null
+  }
+ ],
+ "tabs": {
+  "Contacts": "those Alice knows",
+  "Friends": "the friends of Alice",
+  "Groups": "the groups Alice is a member of",
+  "Messages": "the messages Alice received",
+  "Posts": "the group messages Alice received"
+ },
+ "env": [
+  "today"
+ ]
+}

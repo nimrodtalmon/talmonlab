@@ -1,0 +1,479 @@
+{
+ "contract": "Friendship",
+ "chain": [
+  {
+   "contract": "Knowledge",
+   "text": [
+    "Knowledge",
+    "An *identity* is a unique cryptographic key pair.",
+    "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+    "Alice, Bob and Carol are persons.",
+    "1. ○ Establish: Alice may establish an identity once. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it.",
+    "2. ■ Acquaint: Alice and Bob may jointly come to know each other, provided Alice does not know Bob.",
+    "3. ■ Introduce: Alice may introduce Carol to Bob with the consent of Bob, provided Alice and Bob know each other, Alice knows Carol and Bob does not know Carol."
+   ],
+   "changed": [
+    "2",
+    "3"
+   ]
+  },
+  {
+   "contract": "Friendship",
+   "text": [
+    "Friendship",
+    "Friendship extends Knowledge.",
+    "Alice *trusts* Bob when she knows Bob personally and believes him to keep the undertakings he signs under grassroots contracts.",
+    "Alice and Bob are persons.",
+    "1. ○ Befriend: Alice and Bob, who trust each other and are not friends, may jointly become friends.",
+    "2. ■ Unfriend: Alice may end her friendship with Bob.",
+    "3. ○ Loss of Trust. Alice will end her friendship with Bob if she ceases to trust him."
+   ],
+   "changed": []
+  }
+ ],
+ "vocab": {
+  "identity": {
+   "phrase": "x has an identity",
+   "vars": [
+    "x"
+   ]
+  },
+  "person": {
+   "phrase": "x is a person",
+   "vars": [
+    "x"
+   ]
+  },
+  "knows": {
+   "phrase": "x knows y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "friend": {
+   "phrase": "x counts y as a friend",
+   "vars": [
+    "x",
+    "y"
+   ]
+  }
+ },
+ "reflexive": [
+  "knows"
+ ],
+ "schemas": [
+  {
+   "name": "establish",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Establish",
+   "sentence": "Alice may establish an identity. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "acquaint",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Acquaint",
+   "sentence": "Alice and Bob may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "introduce",
+   "persons": [
+    "Bob",
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Introduce",
+   "sentence": "Alice may introduce Carol to Bob",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to introduce Carol to you."
+   },
+   "field": null
+  },
+  {
+   "name": "befriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Befriend",
+   "sentence": "Alice and Bob may jointly become friends",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to be your friend."
+   },
+   "field": null
+  },
+  {
+   "name": "unfriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Unfriend",
+   "sentence": "Alice may end her friendship with Bob",
+   "auto": false,
+   "questions": {},
+   "field": null
+  }
+ ],
+ "tabs": {
+  "Contacts": "those Alice knows",
+  "Friends": "the friends of Alice"
+ },
+ "env": [
+  "today"
+ ]
+}

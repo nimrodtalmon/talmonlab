@@ -1,152 +1,230 @@
-#!/usr/bin/env python3
-"""Reads a compiled contract's platform from a clone of EShapiro2/GLP and writes
-<contract>.json beside index.html: its acts (from the request widget
-declaration the compiler prints, social_menu), the argument types of each act
-(the Proposal type), and the contract's role names of each act (its sas terms).
+"""The prototype's input for one contract, read from the Grassroots Contracts Calculus.
 
-    python3 grassroots/ui/src/build.py /path/to/GLP Friendship friendship
+    python3 build.py CALC NAME OUT.json [GLP] [--changed=NAME:N ...]
+
+CALC is a scratch copy of the Calculus's directory (calculus/ of GLP) with gr/ and rev/ made from
+contracts/*/logic-pragmas.txt and contract.txt, as tools/SAS-WRITING.txt says, and tools/toglp.py run
+for NAME, so that glp/NAME.glp.txt holds the contract's schemas.  GLP is the GLP checkout, for the
+Interface pragmas of the contracts in programs/.
+
+The output holds, for the page: the contract's text and the texts it is written from; the
+vocabulary; and each schema of the Calculus: its persons, values, effects, preconditions and who must
+agree to it, with the button, the question and the fields of the Interface pragmas.
 """
 import json, os, re, sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# ---------- a reader of the Calculus's terms ----------
+TOK = re.compile(r"\s*(?:('(?:[^'\\]|\\.)*')|([A-Za-z_][\w]*)|(-?\d+)|([\[\](),]))")
 
 
 def parse(s):
-    """A small reader for the GLP terms the compiler prints."""
+    pos = 0
+    toks = []
+    while pos < len(s):
+        m = TOK.match(s, pos)
+        if not m or m.end() == pos:
+            if s[pos:].strip() == '':
+                break
+            raise ValueError('cannot read at ' + s[pos:pos + 40])
+        pos = m.end()
+        q, w, n, p = m.groups()
+        toks.append(('q', q[1:-1]) if q else ('w', w) if w else ('n', int(n)) if n else ('p', p))
     i = 0
-
-    def ws():
-        nonlocal i
-        while i < len(s) and s[i] in ' \t\n':
-            i += 1
 
     def term():
         nonlocal i
-        ws()
-        c = s[i]
-        if c == '[':
-            i += 1; out = []; ws()
-            if s[i] == ']':
-                i += 1; return out
+        k, v = toks[i]
+        i += 1
+        if k == 'p' and v == '[':
+            xs = []
+            if toks[i] == ('p', ']'):
+                i += 1
+                return xs
             while True:
-                out.append(term()); ws()
-                if s[i] == ',':
-                    i += 1; continue
-                if s[i] == ']':
-                    i += 1; return out
-                raise ValueError(s[i:i + 30])
-        if c == '"':
-            j = s.index('"', i + 1); v = s[i + 1:j]; i = j + 1; return v
-        if c == "'":
-            j = s.index("'", i + 1); v = s[i + 1:j]; i = j + 1; return v
-        m = re.compile(r'-?\d+').match(s, i)
-        if m:
-            i = m.end(); return int(m.group())
-        m = re.compile(r'[A-Za-z_][A-Za-z0-9_]*').match(s, i)
-        name = m.group(); i = m.end()
-        if i < len(s) and s[i] == '(':
-            i += 1; args = []
+                xs.append(term())
+                k2, v2 = toks[i]
+                i += 1
+                if v2 == ']':
+                    return xs
+        if k in ('w', 'q') and i < len(toks) and toks[i] == ('p', '('):
+            i += 1
+            args = []
             while True:
-                args.append(term()); ws()
-                if s[i] == ',':
-                    i += 1; continue
-                if s[i] == ')':
-                    i += 1; return {'f': name, 'a': args}
-        return name
+                args.append(term())
+                k2, v2 = toks[i]
+                i += 1
+                if v2 == ')':
+                    return {'f': v, 'a': args}
+        if k == 'q':
+            return v
+        return {'w': v} if k == 'w' else v
 
     return term()
 
 
-def args_place(As):
+def atom(t):
+    """atom(P, Args) -> {p, args, neg}; not(atom) -> neg; forall(Vars, A, true, Body)."""
+    if t.get('f') == 'not':
+        a = atom(t['a'][0])
+        a['neg'] = True
+        return a
+    if t.get('f') == 'forall':
+        vs, a, _, body = t['a']
+        return {'forall': vs, 'over': atom(a), 'then': [atom(b) for b in body]}
+    p, args = t['a']
+    return {'p': p['w'] if isinstance(p, dict) else p, 'args': [x['a'][0] if isinstance(x, dict) and x.get('f') == 'const' else x for x in args], 'neg': False}
+
+
+def schemas(text):
+    t = parse(text.strip())
+    if isinstance(t, dict) and t.get('f') == 'environment':
+        t = t['a'][1]
+    if isinstance(t, dict) and t.get('f') == 'reflexive':
+        refl, ss = t['a'][0], t['a'][1]
+    else:
+        refl, ss = [], t
     out = []
-    for x in As:
-        if isinstance(x, dict) and x['f'] == 'at':
-            out.append(x['a'][0])
-        else:
-            out.append(None)
+    for s in ss:
+        name, persons, values, eff, pre, _, by = s['a']
+        name = name['w'] if isinstance(name, dict) else name
+        ps, one = [], {}
+        for p in persons:
+            if isinstance(p, dict) and p.get('f') == 'one':
+                one[p['a'][0]] = p['a'][1] if isinstance(p['a'][1], list) else [p['a'][1]]
+            else:
+                ps.append(p)
+        out.append({'name': name, 'persons': ps, 'one': one, 'values': [v for v in values if v not in one],
+                    'effects': [atom(x) for x in eff], 'pre': [atom(x) for x in pre], 'by': by})
+    return [r['w'] if isinstance(r, dict) else r for r in refl], out
+
+
+# ---------- the texts ----------
+def parents(calc, name, names):
+    l = open(os.path.join(calc, 'gr', name + '.txt')).read().split('\n')[1]
+    l = re.sub(r'\(.*?\)', '', l)
+    rest = l.split(' ', 1)[1] if ' ' in l else ''
+    out = []
+    for d, n in sorted(names.items(), key=lambda x: -len(x[0])):
+        if n != name and re.search(r'\b' + re.escape(d) + r'\b', rest):
+            out.append(n)
+            rest = re.sub(r'\b' + re.escape(d) + r'\b', '', rest)
     return out
 
 
-def main(glp, name, slug):
-    vglp = open(os.path.join(glp, 'cascade', name, 'platform.vglp')).read()
-    menu = parse(re.search(r'Request\? =::= (social_menu\(.*\))\s*$', vglp, re.M).group(1))
-    props = {}
-    block = re.search(r'\nProposal ::=\n(.*?)\n\.\n', vglp, re.S).group(1)
-    for alt in block.split('\n;\n'):
-        t = parse(alt.strip())
-        props[t['f'] if isinstance(t, dict) else t] = t['a'] if isinstance(t, dict) else []
-    names = {}
-    gl = open(os.path.join(glp, 'cascade', name, name + '.glp')).read()
-    for m in re.finditer(r"sas\((\w+), \[([^\]]*)\]", gl):
-        names[m.group(1)] = [x.strip().strip("'") for x in m.group(2).split(',') if x.strip()]
-    acts = []
-    for b in menu['a'][0]:
-        label, alist = b['a']
-        for a in alist:
-            f, me, roles, pre, binds, fields, same, text = a['a']
-            acts.append({
-                'button': label, 'name': f, 'me': me, 'roles': roles, 'binds': binds,
-                'req': [[p['a'][0], args_place(p['a'][1])] for p in pre if p['f'] == 'req'],
-                'forb': [[p['a'][0], args_place(p['a'][1])] for p in pre if p['f'] == 'forb'],
-                'fields': [{'i': x['a'][0], 'label': x['a'][1], 'type': x['a'][2]} for x in fields],
-                'args': props.get(f, []), 'names': names.get(f, []),
-            })
-    # the clause sentence of each act, from the full contract, as the act's caption
-    full = open(os.path.join(glp, 'cascade', name, 'full-contract.txt')).read()
-    for a in acts:
-        m = re.search(r'[■◆○] ' + re.escape(a['button']) + r'[:.] ([^.]*)', full)
-        if m:
-            t = re.sub(r', who [^,]*,', '', m.group(1))
-            t = re.split(r' with the consent|, provided| provided', t)[0]
-            a['sentence'] = re.sub(r' once$', '', t.strip())
-    # the interface pragmas the app is drawn from: the contract's own and those of the contracts it is written from
-    def txt_of(n):
-        for root, _, files in os.walk(os.path.join(glp, 'programs')):
-            if n.replace(' ', '-') + '.txt' in files:
-                return os.path.join(root, n.replace(' ', '-') + '.txt')
-    chain, todo, vocab = [], [name], {}
-    while todo:
-        n = todo.pop()
-        f = txt_of(n)
-        if not f or n in [c['contract'] for c in chain]:
+def chain(calc, name, names):
+    seen, order = set(), []
+
+    def go(n):
+        if n in seen:
+            return
+        seen.add(n)
+        for p in parents(calc, n, names):
+            go(p)
+        order.append(n)
+    go(name)
+    return order
+
+
+def vocab(gr):
+    v = {}
+    for l in gr:
+        if l.startswith('Vocabulary:'):
+            for part in l[len('Vocabulary:'):].strip().rstrip('.').split(';'):
+                if '=' in part:
+                    ph, at = [x.strip() for x in part.rsplit('=', 1)]
+                    m = re.match(r'(\w+)\(([^)]*)\)', at)
+                    if m:
+                        v[m.group(1)] = {'phrase': re.sub(r', for \w+$', '', ph), 'vars': [x.strip() for x in m.group(2).split(',')]}
+    return v
+
+
+def clauses(lines):
+    """Act title -> its sentence, from the numbered clauses."""
+    out = {}
+    for l in lines:
+        m = re.match(r'^\d+\. [■◆○] (.*)$', l)
+        if not m:
             continue
-        lines = open(f).read().split('\n')
-        body = [l for l in lines if not l.startswith('%')]
-        m = re.match(r'(.+?) (?:extends|strengthens|restricts|relaxes|weakens|augments|instantiates) (.+?)[.(,]', body[1] if len(body) > 1 else '')
-        if m:
-            todo += [x.strip() for x in re.split(r',| and ', m.group(2)) if x.strip() and x.strip() != 'it']
-        prag, on = [], False
-        for l in lines:
-            if l.strip() in ('Interface pragmas', 'Pragmas'):
-                on = True; continue
-            if l.strip() == 'Implementation pragmas':
-                on = False; continue
-            if on and l.strip():
-                prag.append(l.rstrip())
-        # the contract's own text: from its title to the line "Logic pragmas"
-        text, on = [], False
-        for l in body:
-            if l.strip() == 'Logic pragmas':
+        body = m.group(1)
+        parts = re.split(r'(?:^|(?<=\. ))([A-Z][A-Za-z ]*?)[:.] ', body)
+        for k in range(1, len(parts) - 1, 2):
+            out[parts[k].strip()] = parts[k + 1].strip()
+    return out
+
+
+def interface(path):
+    """Button -> act line facts, questions; tab lines."""
+    if not path or not os.path.exists(path):
+        return {}, {}
+    lines = open(path).read().split('\n')
+    try:
+        i = lines.index('Interface pragmas')
+    except ValueError:
+        return {}, {}
+    acts, tabs, last = {}, {}, None
+    for l in lines[i + 1:]:
+        if not l.strip() or l.startswith('%'):
+            continue
+        q = re.match(r'^\s+([A-Z]\w*): (.*)$', l)
+        if q and last and not re.search(r'\[', q.group(2)):
+            for b in last:
+                acts[b].setdefault('questions', {})[q.group(1)] = q.group(2)
+            continue
+        body = l.split(': ', 1)[1] if ': ' in l else l
+        bs = re.findall(r'\[([^\]]+)\]', body)
+        if bs:
+            fields = re.findall(r'<([^>]+)>', body)
+            last = bs
+            for b in bs:
+                after = body.split('[' + b + ']', 1)[1]
+                f = re.match(r'\s*<([^>]+)>', after)
+                acts[b] = {'field': f.group(1) if f else None}
+        elif ':' in l:
+            tabs[l.split(':')[0].strip()] = l.split(':', 1)[1].strip().rstrip('.')
+    return acts, tabs
+
+
+def main():
+    calc, name, out = sys.argv[1:4]
+    glp = sys.argv[4] if len(sys.argv) > 4 and not sys.argv[4].startswith('--') else '/home/claude/GLP'
+    changed = [a.split('=', 1)[1] for a in sys.argv if a.startswith('--changed=')]
+    names = {}
+    for l in open(os.path.join(calc, 'NAMES.txt')):
+        cols = [c.strip() for c in l.split('|')]
+        if len(cols) == 5 and cols[0] and cols[0] != 'name on main':
+            names[cols[1]] = cols[2]
+    order = chain(calc, name, names)
+    refl, ss = schemas(open(os.path.join(calc, 'glp', name + '.glp.txt')).read())
+    voc, sent, texts, iface, tabs = {}, {}, [], {}, {}
+    for n in order:
+        gr = open(os.path.join(calc, 'gr', n + '.txt')).read().split('\n')
+        rev = open(os.path.join(calc, 'rev', n + '.txt')).read().rstrip('\n').split('\n')
+        voc.update(vocab(gr))
+        for t, s in clauses(gr).items():
+            m = re.match(r'^(\w[\w ]*):(\d+)', s)
+            s = re.split(r', (?:provided|only if|with the consent of)', s)[0].rstrip('.')
+            sent[t] = sent.get(t, s) if m else s
+        texts.append({'contract': n, 'text': rev, 'changed': [c.split(':', 1)[1] for c in changed if c.split(':', 1)[0] == n]})
+        prog = None
+        for root, _, fs in os.walk(os.path.join(glp, 'programs')):
+            if n + '.txt' in fs and '/tests' not in root:
+                prog = os.path.join(root, n + '.txt')
                 break
-            if on or l.strip() == n:
-                on = True; text.append(l.rstrip())
-        chain.insert(0, {'contract': n, 'lines': prag, 'text': text})
-        # the vocabulary of its Logic pragmas: an English phrase for each basic fact
-        for l in lines:
-            if l.startswith('Vocabulary:'):
-                for part in l[len('Vocabulary:'):].strip().rstrip('.').split(';'):
-                    if '=' not in part:
-                        continue
-                    phrase, atom = [x.strip() for x in part.rsplit('=', 1)]
-                    m2 = re.match(r'(\w+)\(([^)]*)\)', atom)
-                    if m2 and ', for ' not in phrase:
-                        vocab[m2.group(1)] = {'phrase': phrase, 'vars': [v.strip() for v in m2.group(2).split(',')]}
-    # the definitions the contract states, before its names
-    defs = [l.strip() for l in full.split('\n') if '*' in l and not re.match(r'\w+:\d', l)]
-    out = {'contract': name, 'world': slug, 'acts': acts, 'pragmas': chain, 'vocab': vocab, 'definitions': defs}
-    json.dump(out, open(os.path.join(HERE, '..', slug + '.json'), 'w'), indent=1)
-    print(len(acts), 'acts')
+        a, t = interface(prog)
+        iface.update(a)
+        tabs.update(t)
+    for s in ss:
+        title = s['name'].replace('_', ' ').capitalize()
+        s['button'] = title
+        s['sentence'] = sent.get(title, title)
+        s['auto'] = not s['by']
+        i = iface.get(title, {})
+        s['questions'] = i.get('questions', {})
+        s['field'] = i.get('field')
+    json.dump({'contract': name, 'chain': texts, 'vocab': voc, 'reflexive': refl, 'schemas': ss, 'tabs': tabs,
+               'env': ['today']}, open(out, 'w'), indent=1, ensure_ascii=False)
+    print(name, len(ss), 'schemas;', 'chain', order)
 
 
 if __name__ == '__main__':
-    main(*sys.argv[1:4])
+    main()

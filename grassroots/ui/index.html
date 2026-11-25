@@ -5,101 +5,112 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Grassroots UI · prototype</title>
 <style>
-:root { --bg:#f3f3f1; --ink:#1c1f23; --mute:#6c7177; --line:#e5e5e1; --card:#fff; --acc:#14806f; --acc2:#e6f3f0;
+:root { --bg:#f3f3f1; --ink:#1c1f23; --mute:#6c7177; --line:#e5e5e1; --acc:#14806f; --acc2:#e6f3f0; --me:#dcf3ec;
   --alice:#ef6f4f; --bob:#2a9d8f; --carol:#8e63cf; --dave:#e0a030; --hit:#fff0b8; --bad:#c0392b; --good:#1d7a3e;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
 * { box-sizing:border-box; }
 body { margin:0; font:14px/1.45 -apple-system, "Segoe UI", Roboto, Heebo, sans-serif; background:var(--bg); color:var(--ink); }
-button, select, textarea { font:inherit; }
+button, input { font:inherit; }
 button { cursor:pointer; }
-header { display:flex; align-items:center; gap:14px; padding:12px 22px; background:#fff; border-bottom:1px solid var(--line); }
+header { display:flex; align-items:center; gap:12px; padding:10px 22px; background:#fff; border-bottom:1px solid var(--line); flex-wrap:wrap; }
 header b { font-size:16px; }
-header .sub { color:var(--mute); }
-header .sp { flex:1; }
-.pill { padding:4px 12px; border-radius:99px; background:#e8f5ec; color:var(--good); font-size:12.5px; }
-.pill.busy { background:#fff3dc; color:#94600a; }
+.sub { color:var(--mute); }
+.sp { flex:1; }
+.seg { display:inline-flex; background:#efeee9; border-radius:99px; padding:3px; gap:2px; }
+.seg button { border:0; background:none; padding:5px 13px; border-radius:99px; color:var(--mute); }
+.seg button.on { background:#fff; color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.1); font-weight:600; }
+.lbl { color:var(--mute); font-size:12.5px; }
 .hb { border:1px solid var(--line); background:#fff; padding:5px 12px; border-radius:99px; color:var(--ink); }
-.hb.acc { background:var(--acc); border-color:var(--acc); color:#fff; }
-.grid { display:grid; grid-template-columns: 330px auto 430px; gap:20px; justify-content:center; align-items:start; padding:18px 20px 30px; }
-@media (max-width:1400px) { .grid { grid-template-columns: auto; } }
+.hb.on { background:var(--acc2); border-color:var(--acc); color:var(--acc); }
+.grid { display:grid; grid-template-columns: 320px auto 400px; gap:20px; justify-content:center; align-items:start; padding:18px 20px 30px; }
+@media (max-width:1380px) { .grid { grid-template-columns: auto; } }
 .panel { background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 16px; height:calc(100vh - 100px); min-height:560px; overflow-y:auto; }
 .panel h3 { margin:0 0 2px; font-size:14px; }
-.panel .lg { color:var(--mute); font-size:12.5px; margin:0 0 10px; }
+.lg { color:var(--mute); font-size:12.5px; margin:0 0 10px; }
 .ct { font-size:11.5px; color:var(--mute); text-transform:uppercase; letter-spacing:.06em; margin:14px 0 6px; }
 .cl { padding:3px 6px; border-radius:6px; font-size:13px; }
 .cl .no { color:var(--mute); }
-.cl.title { font-weight:700; margin-top:6px; }
+.cl.title { font-weight:700; margin-top:8px; }
 .cl.rel { color:var(--mute); font-style:italic; }
-.voc { font-family:var(--mono); font-size:12px; padding:2px 6px; border-radius:6px; }
+.tag { font-size:10.5px; background:#fff3dc; color:#94600a; border-radius:99px; padding:1px 7px; margin-left:4px; font-weight:600; font-style:normal; }
+.cl.chg { border-left:3px solid #f2c94c; }
+.voc { font-family:var(--mono); font-size:11.5px; padding:2px 6px; border-radius:6px; }
 .hit { background:var(--hit) !important; }
 button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 0 0 3px #f2c94c; }
-.pri small { display:block; font-weight:400; font-size:11.5px; opacity:.9; }
-[data-k] { transition: background .1s; }
 .phones { display:flex; gap:20px; }
 .col { display:flex; flex-direction:column; gap:12px; align-items:center; }
-.phone { width:300px; height:620px; background:#15171a; border-radius:40px; padding:10px; box-shadow:0 10px 30px rgba(0,0,0,.12); }
+.phone { width:300px; height:640px; background:#15171a; border-radius:40px; padding:10px; box-shadow:0 10px 30px rgba(0,0,0,.12); }
 .scr { position:relative; width:100%; height:100%; background:#f8f8f6; border-radius:31px; overflow:hidden; display:flex; flex-direction:column; }
-.top { display:flex; align-items:center; gap:10px; padding:28px 16px 10px; background:#fff; }
-.back { border:0; background:none; color:var(--acc); font-size:22px; padding:0 4px 0 0; line-height:1; }
+.top { display:flex; align-items:center; gap:10px; padding:26px 14px 10px; background:#fff; border-bottom:1px solid var(--line); }
+.top .who { flex:1; min-width:0; }
+.top .nm { font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.top .st { font-size:11.5px; color:var(--mute); }
+.back { border:0; background:none; color:var(--acc); font-size:24px; padding:0 2px 0 0; line-height:1; }
+.ib { border:1px solid var(--line); background:#fff; color:var(--mute); width:24px; height:24px; border-radius:50%; font-size:12px; font-weight:700; padding:0; flex:none; }
 .av { width:32px; height:32px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700; flex:none; font-size:14px; }
-.av.big { width:60px; height:60px; font-size:26px; }
 .av.sm { width:22px; height:22px; font-size:11px; }
-.nm { font-weight:700; font-size:15px; }
-.zt { padding:6px 12px 0; background:#fff; border-bottom:1px solid var(--line); }
+.av.grp { background:#5b6470; border-radius:10px; }
+.badge { display:inline-block; width:14px; height:14px; border-radius:50%; background:var(--acc); color:#fff; font-size:9px; line-height:14px; text-align:center; vertical-align:1px; margin-left:4px; }
+.zt { padding:8px 10px 0; }
 .zt:empty { display:none; }
-.zm { flex:1; overflow-y:auto; padding:12px; }
-.zb { display:flex; flex-wrap:wrap; gap:8px; padding:10px 12px 18px; background:#fff; border-top:1px solid var(--line); }
+.zm { flex:1; overflow-y:auto; padding:10px; }
+.zb { background:#fff; border-top:1px solid var(--line); padding:8px 10px 14px; display:flex; flex-direction:column; gap:8px; }
 .zb:empty { display:none; }
-.ask { background:#fff; border:1px solid var(--acc); border-radius:14px; padding:10px 12px; margin-bottom:8px; font-size:13.5px; }
+.acts { display:flex; flex-wrap:wrap; gap:6px; }
+.ask { background:#fff; border:1px solid var(--acc); border-radius:14px; padding:10px 12px; margin-bottom:8px; font-size:13.5px; box-shadow:0 2px 6px rgba(0,0,0,.05); }
 .ask .btns { display:flex; gap:8px; margin-top:8px; }
-.pri { background:var(--acc); color:#fff; border:0; border-radius:99px; padding:7px 16px; font-weight:600; }
-.sec { background:var(--acc2); color:var(--acc); border:0; border-radius:99px; padding:7px 14px; font-weight:600; }
-.ghost { background:none; border:0; color:var(--mute); padding:7px 8px; }
-.pri:disabled, .sec:disabled { opacity:.4; cursor:default; }
+.pri { background:var(--acc); color:#fff; border:0; border-radius:99px; padding:6px 14px; font-weight:600; font-size:13px; }
+.sec { background:var(--acc2); color:var(--acc); border:0; border-radius:99px; padding:6px 12px; font-weight:600; font-size:13px; }
+.ghost { background:none; border:0; color:var(--mute); padding:6px 8px; }
+.pri small, .sec small { display:block; font-weight:400; font-size:11px; opacity:.85; max-width:240px; text-align:left; }
 .note { display:flex; gap:8px; align-items:center; color:var(--mute); font-size:12.5px; margin:0 2px 8px; }
 .note.bad { color:#9a3a1a; }
 .spin { width:11px; height:11px; border:2px solid #ccc; border-top-color:var(--acc); border-radius:50%; animation:s 1s linear infinite; flex:none; }
 @keyframes s { to { transform:rotate(360deg); } }
-.h { font-size:11.5px; color:var(--mute); text-transform:uppercase; letter-spacing:.06em; margin:4px 2px 8px; }
-.row { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:14px; background:#fff; border:1px solid var(--line); margin-bottom:7px; width:100%; text-align:left; }
-.chips { display:flex; gap:5px; flex-wrap:wrap; margin-top:2px; }
-.chip { font-size:11.5px; background:#efeee9; color:var(--mute); padding:1px 8px; border-radius:99px; }
-.facts { display:flex; flex-direction:column; gap:3px; margin:0 2px 12px; }
+.h { font-size:11px; color:var(--mute); text-transform:uppercase; letter-spacing:.06em; margin:6px 4px 6px; }
+.row { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:14px; background:#fff; border:1px solid var(--line); margin-bottom:6px; width:100%; text-align:left; }
+.row .t { font-weight:600; }
+.row .s { font-size:12px; color:var(--mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px; }
+.chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:1px; }
+.chip { font-size:11px; background:#efeee9; color:var(--mute); padding:0 7px; border-radius:99px; }
+.facts { display:flex; flex-direction:column; gap:4px; }
 .fact { font-size:13px; color:var(--mute); }
 .fact b { color:var(--ink); font-weight:600; }
-.dup { font-size:11px; color:#9a3a1a; margin-left:4px; }
-.prof { text-align:center; margin:4px 0 12px; }
-.prof .nm { font-size:19px; margin-top:6px; }
-.empty { color:var(--mute); text-align:center; padding:20px 8px; font-size:13px; }
-.sheet { position:absolute; inset:auto 0 0 0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.15); padding:16px; max-height:70%; overflow-y:auto; }
+.empty { color:var(--mute); text-align:center; padding:18px 8px; font-size:13px; }
+.bub { max-width:78%; padding:6px 10px; border-radius:14px; margin:3px 0; font-size:13.5px; background:#fff; border:1px solid var(--line); align-self:flex-start; }
+.bub.me { background:var(--me); border-color:#c6e8dd; align-self:flex-end; }
+.bub .by { font-size:11px; font-weight:700; }
+.bub .when { font-size:10.5px; color:var(--mute); margin-left:6px; }
+.thread { display:flex; flex-direction:column; }
+.compose { display:flex; gap:6px; }
+.compose input { flex:1; border:1px solid var(--line); border-radius:99px; padding:7px 12px; outline:none; min-width:0; }
+.compose button { width:36px; height:36px; border-radius:50%; border:0; background:var(--acc); color:#fff; font-size:16px; flex:none; }
+.sheet { position:absolute; inset:auto 0 0 0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.15); padding:14px; max-height:75%; overflow-y:auto; }
 .shade { position:absolute; inset:0; background:rgba(0,0,0,.25); }
-.opt { display:block; width:100%; text-align:left; border:1px solid var(--line); background:#fff; border-radius:12px; padding:10px 12px; margin-bottom:7px; font-size:13.5px; }
+.sheet .sh { font-weight:700; margin-bottom:8px; }
+.opt { display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:1px solid var(--line); background:#fff; border-radius:12px; padding:8px 10px; margin-bottom:6px; font-size:13.5px; }
+.sheet input { width:100%; border:1px solid var(--line); border-radius:10px; padding:8px 10px; margin-bottom:8px; }
+.expl { font-size:11.5px; color:var(--mute); }
 .sys { text-decoration:underline dotted var(--bad); text-underline-offset:3px; }
 .scripts { display:flex; align-items:center; gap:6px; color:var(--mute); font-size:12.5px; }
-/* the UI code */
 .code { font:12px/1.6 var(--mono); }
 .ln { display:flex; gap:8px; padding:0 6px; border-radius:6px; white-space:pre-wrap; }
 .ln > span:last-child { flex:1; min-width:0; }
 .ln .g { width:14px; flex:none; text-align:center; }
 .ln .no { width:22px; flex:none; text-align:right; color:#b4b6b9; }
-.kw { color:#8a8f95; }
-.bt { color:var(--acc); font-weight:600; }
-.pr { color:#7a4fc0; }
-.cm { color:#a6a9ad; font-style:italic; }
-.why { font:12px/1.4 -apple-system, "Segoe UI", sans-serif; color:var(--bad); padding:0 6px 4px 52px; white-space:normal; }
-.ok { color:var(--good); }
-.badm { color:var(--bad); }
-textarea.ed { width:100%; height:420px; border:1px solid var(--line); border-radius:10px; padding:10px; font:12.5px/1.6 var(--mono); resize:vertical; }
+.kw { color:#8a8f95; } .bt { color:var(--acc); font-weight:600; } .pr { color:#7a4fc0; } .cm { color:#a6a9ad; font-style:italic; }
+.why { font:12px/1.4 -apple-system, "Segoe UI", sans-serif; color:var(--bad); padding:0 6px 4px 52px; }
+.ok { color:var(--good); } .badm { color:var(--bad); }
 .sum { display:flex; flex-direction:column; gap:3px; margin:6px 0 10px; font-size:13px; }
-.err { color:var(--bad); font-size:12.5px; margin:2px 0; }
-.bar { display:flex; gap:8px; align-items:center; margin:8px 0 4px; }
 </style>
 </head>
 <body>
 <header>
-  <b>Grassroots UI</b><span class="sub">prototype · <span id="cname">…</span>, live on peoplesweb.org</span>
+  <b>Grassroots UI</b><span class="sub">prototype, simulated in the page</span>
   <span class="sp"></span>
-  <span class="pill busy" id="status">connecting…</span>
+  <span class="lbl">Contract</span><span class="seg" id="csel"></span>
+  <span class="lbl">UI</span><span class="seg" id="msel"></span>
+  <button class="hb" id="explain">Explain</button>
   <button class="hb" id="reset">Start over</button>
 </header>
 <div class="grid">
@@ -108,207 +119,255 @@ textarea.ed { width:100%; height:420px; border:1px solid var(--line); border-rad
   <section class="panel" id="code"></section>
 </div>
 <script src="ui.js"></script>
+<script src="engine.js"></script>
 <script>
-const API = 'https://peoplesweb.org/api/';
-const W = new URLSearchParams(location.search).get('c') || 'friendship';
+const CONTRACTS = {
+  chat: {title: 'Chat', modules: {chats: 'Chats', tabs: 'Tabs'}},
+  groups: {title: 'Groups', modules: {chats: 'Chats', tabs: 'Tabs'}},
+  friendship: {title: 'Friendship', modules: {people: 'People', pages: 'Pages only'}},
+};
 const PERSONS = ['alice', 'bob', 'carol', 'dave'], PHONES = ['alice', 'bob'], SCRIPTED = ['carol', 'dave'];
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
-const UIS = {'person-first': 'Person-first', 'pages-only': 'Pages only'};
-let SPEC = null, ST = null, VER = -1, P = null, R = null, B = null, UIN = new URLSearchParams(location.search).get('ui') || 'person-first';
-const TEXT = {}, used = {}, ui = {};
-let editing = false;
+const q = new URLSearchParams(location.search);
+let CN = q.get('c') in CONTRACTS ? q.get('c') : 'chat', MN = null, SIM = null, SPEC = null, P = null, R = null, B = null, W = null, EXPLAIN = false, TN = 0;
+const ui = {};
 const $ = s => document.querySelector(s);
-const S = (f, ...a) => ({f, a});
-const isS = (t, f) => t && typeof t === 'object' && !Array.isArray(t) && t.f === f;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const cap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
-const fn = a => typeof a === 'string' ? a : a.f;
-const argsOf = a => typeof a === 'string' ? [] : a.a;
-const av = (p, cls) => `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p] || '#888'}">${cap(p)[0]}</span>`;
-const sing = w => w.replace(/s$/, '');
+const isP = x => PERSONS.includes(x);
+const isT = x => x && typeof x === 'object' && 't' in x;
+const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : String(x);
+const lead = x => Array.isArray(x) ? (x.find(y => !isP(y)) ?? x[0]) : x;
+const av = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc(String(p)[0].toUpperCase())}</span>`;
 const K = (...ks) => `data-k="${ks.filter(Boolean).join(' ')}"`;
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-/* ---------- the live state ---------- */
-function screen(p) {
-  const cs = (ST && ST.persons[p]) || {};
-  let view = null, notes = [], menu = null, asks = [];
-  for (const [id, v] of Object.entries(cs)) {
-    if (isS(v, 'output')) { for (const x of v.a[0]) { if (isS(x, 'view')) { view = x; notes = []; } else if (x && x.f) notes.push(x); } }
-    else if (isS(v, 'request_r')) { if (!used[p + ':' + id]) menu = {id: +id, path: v.a[0].a[0]}; }
-    else if (isS(v, 'approval_w')) { const ap = v.a[0]; if (!used[p + ':' + id]) asks.push({id: +id, path: ap.a[ap.a.length - 1].a[0], words: ap.a[1]}); }
-  }
-  const atoms = view ? view.a[1] : [], pending = view ? view.a[3] : [], tabs = view ? view.a[4].map(t => ({label: t.a[0], pred: t.a[1]})) : [];
-  return {view, notes, menu, asks, atoms, pending, tabs};
-}
-function holds(atoms, pred, places, val) { return atoms.some(a => fn(a) === pred && places.every((k, j) => k === null || argsOf(a)[j] === val[k])); }
-function enabled(act, s, val) {
-  for (const [p, ks] of act.req) if (!holds(s.atoms, p, ks, val)) return false;
-  for (const [p, ks] of act.forb) if (ks.every(k => k === null || val[k] !== undefined) && holds(s.atoms, p, ks, val)) return false;
-  const ps = act.roles.map(k => val[k]).filter(Boolean);
-  return new Set(ps).size === ps.length;
-}
-const named = (s, me) => [...new Set(s.atoms.flatMap(argsOf))].filter(x => PERSONS.includes(x) && x !== me);
-function listItems(c, s, me) { return c.items.named ? named(s, me) : [...new Set(s.atoms.filter(a => fn(a) === c.items.pred).flatMap(argsOf))]; }
-/* atoms grouped, with the number of copies the state holds */
-function grouped(atoms) {
-  const m = new Map();
-  for (const a of atoms) { const k = JSON.stringify(a); m.set(k, {a, n: (m.get(k) || {n: 0}).n + 1}); }
-  return [...m.values()];
-}
-function fact(a, holder) {
-  const v = SPEC.vocab[fn(a)];
-  if (!v) return esc(fn(a));
-  const val = {[v.vars[0]]: holder}; v.vars.slice(1).forEach((x, j) => val[x] = argsOf(a)[j]);
-  return v.phrase.split(/\b/).map(w => w in val ? `<b>${esc(cap(val[w]))}</b>` : esc(w)).join('');
+/* ---------- facts in the contract's words ---------- */
+function fact(a, holder, me) {
+  const v = SIM.vocab[a.p];
+  if (!v) return esc(a.p);
+  const val = {[v.vars[0]]: holder}; v.vars.slice(1).forEach((x, j) => val[x] = a.args[j]);
+  return v.phrase.split(/\b/).map(w => w in val ? `<b>${esc(val[w] === me ? 'you' : show(val[w]))}</b>` : esc(w)).join('')
+    .replace(/^<b>you<\/b> has /, '<b>you</b> have ').replace(/^<b>you<\/b> is /, '<b>you</b> are ').replace(/^<b>you<\/b> counts /, '<b>you</b> count ').replace(/^<b>you<\/b> knows /, '<b>you</b> know ');
 }
 function sentence(act, val) {
-  if (!act.sentence) return esc(act.button);
-  const map = {}; act.names.forEach((n, j) => { map[n] = val[j + 1] ? cap(val[j + 1]) : '…'; });
+  const map = {}; act.names.forEach((n, j) => { map[n] = val[j + 1] !== undefined ? show(val[j + 1]) : '…'; });
   return act.sentence.replace(/\b[A-Z][a-z]+\b/g, w => w in map ? `<b>${esc(map[w])}</b>` : esc(w));
 }
-function words(ws) {
-  return (ws || []).map(w => isS(w, 'text') ? esc(w.a[0]) : isS(w, 'person') ? '<b>' + esc(cap(w.a[0])) + '</b>'
-    : isS(w, 'named') ? ' · ' + esc(w.a[0]) + ': <b>' + esc(cap(w.a[1])) + '</b>' : isS(w, 'valued') ? ' · ' + esc(w.a[0]) + ': ' + esc(w.a[1]) : '').join('');
+const valOf = (act, b) => act.names.reduce((o, n, j) => (o[j + 1] = b[n], o), {});
+
+/* ---------- the person's local view ---------- */
+const view = p => W.view(p);
+function holdsL(atoms, pred, places, val) { return atoms.some(a => a.p === pred && a.args.length === places.length && places.every((k, j) => k === null || same(a.args[j], val[k]))); }
+function enabled(act, atoms, val) {
+  for (const [p, ks] of act.req) if (!holdsL(atoms, p, ks, val)) return false;
+  for (const [p, ks] of act.forb) if (ks.every(k => k === null || val[k] !== undefined) && holdsL(atoms, p, ks, val)) return false;
+  const ps = act.roles.map(k => val[k]).filter(x => x !== undefined);
+  return new Set(ps).size === ps.length;
 }
-const request = (act, val) => S('propose', S(act.name, ...act.args.map((_, k) => val[k + 1])));
-async function send(p, id, path, value) {
-  used[p + ':' + id] = true; if (ui[p]) ui[p].sheet = null; if (ST) ST.status = 'working'; render();
-  await fetch(API + W + '/act', {method: 'POST', body: JSON.stringify({person: p, id, path, value})});
+const named = (atoms, me) => [...new Set(atoms.flatMap(a => a.args).filter(x => isP(x) && x !== me))];
+function items(c, atoms, me) {
+  if (c.items.named) return named(atoms, me);
+  if (c.items.atoms) return atoms.filter(a => a.p === c.items.atoms).map(a => a.args);
+  const out = []; for (const a of atoms) if (a.p === c.items.pred) for (const x of a.args) if (!isT(x) && !out.some(y => same(x, y))) out.push(x);
+  return out;
+}
+const mentions = (a, v) => Array.isArray(v) ? v.every(x => a.args.some(y => same(x, y))) : a.args.some(y => same(v, y));
+/* the bindings an action offers, over the person's view; a typed place stays open */
+function offers(act, c, atoms, me, env, comps) {
+  const ch = {[act.me]: [me]}, open = [];
+  for (const [r, v] of Object.entries(c.bind)) {
+    const k = act.names.indexOf(r) + 1;
+    if (typeof v === 'string') ch[k] = [env[v]];
+    else if (v.param) ch[k] = [env[v.param][v.pos - 1]];
+    else if (v.select) ch[k] = items(comps.find(x => x.id === v.select), atoms, me);
+    else { open.push(k); ch[k] = [undefined]; }
+  }
+  let vals = [{}];
+  for (let k = 1; k <= act.args.length; k++) { if (!ch[k]) return {vals: [], open}; vals = vals.flatMap(v => ch[k].map(x => ({...v, [k]: x}))); }
+  return {vals: vals.filter(v => enabled(act, atoms, v)), open};
 }
 
-/* ---------- the contract panel ---------- */
+/* ---------- acting ---------- */
+function propose(p, act, val) {
+  const s = SIM.schemas.find(x => x.name === act.name), b = {};
+  act.names.forEach((n, j) => b[n] = val[j + 1]);
+  W.notes[p].length = 0;
+  W.propose(s, b);
+  if (ui[p]) ui[p].sheet = null;
+  render(); later();
+}
+function answer(p, id, yes) { W.notes[p].length = 0; W.answer(id, p, yes); render(); later(); }
+/* Carol and Dave are scripted persons: they answer yes to every question, after a moment */
+function later() { clearTimeout(TN); TN = setTimeout(() => { let n = 0; for (const s of SCRIPTED) for (const a of view(s).asks) { W.answer(a.id, s, true); n++; } if (n) { render(); later(); } }, 700); }
+
+/* ---------- a phone ---------- */
+function phone(p) {
+  const v = view(p), u = ui[p], d = document.createElement('div');
+  d.className = 'phone';
+  if (!P.ui.containers[u.at]) { u.at = P.ui.start; u.env = {}; }
+  const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: ''}, acts = [];
+  let composer = '', title = cap(p), avatar = av(p), info = null;
+  const ident = v.atoms.filter(a => !a.args.length);
+  for (const x of v.pending) zone.top += `<div class="note"><span class="spin"></span>${esc(x.s.button)}<span class="sys">: waiting for ${[...x.wait].map(cap).join(', ')}</span></div>`;
+  for (const n of v.notes) zone.top += `<div class="note bad"><span class="sys">${n.refused ? 'Not done: ' + esc(n.refused) : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`;
+  for (const c of comps) {
+    if (c.hidden) continue;
+    const lk = 'line:' + c.line;
+    if (c.kind === 'inbox') {
+      for (const a of v.asks) {
+        const role = Object.keys(a.b).find(r => a.b[r] === p), act = SPEC.acts.find(x => x.name === a.s.name);
+        const qt = (a.s.questions[role] || '').replace(/\b[A-Z][a-z]+\b/g, w => w in a.b ? `<b>${esc(show(a.b[w]))}</b>` : w);
+        zone[c.zone] += `<div class="ask" ${K(lk, 'act:' + a.s.name)}>${qt || sentence(act, valOf(act, a.b)) + '?'}${EXPLAIN && qt ? `<div class="expl">${sentence(act, valOf(act, a.b))}</div>` : ''}<div class="btns"><button class="pri" data-ans="1" data-id="${a.id}">Yes</button><button class="ghost" data-ans="0" data-id="${a.id}">No</button></div></div>`;
+      }
+    } else if (c.kind === 'details') {
+      const who = c.about === 'me' ? null : env[c.about];
+      const fs = v.atoms.filter(a => c.shows.includes(a.p) && (c.about === 'me' ? !a.args.length : mentions(a, who)));
+      if (c.about === 'me') info = info || {title: cap(p), fs, lk};
+      else { title = show(lead(who)); avatar = av(lead(who)); info = {title, fs, lk}; }
+    } else if (c.kind === 'thread') {
+      const ts = [], seen = new Set(), par = env[C.params[0]];
+      const mine = v.atoms.filter(a => c.shows.includes(a.p) && mentions(a, par)).sort((x, y) => x.seq - y.seq);
+      for (const a of mine) {
+        const t = a.args.find(isT); if (!t || seen.has(JSON.stringify(t))) continue; seen.add(JSON.stringify(t));
+        const when = mine.filter(b => b.args.some(x => same(x, t))).flatMap(b => b.args).find(x => typeof x === 'string' && /^day /.test(x));
+        ts.push(`<div class="bub${t.by === p ? ' me' : ''}" ${K(lk, 'pred:' + a.p)}>${t.by !== p && Array.isArray(par) ? `<div class="by" style="color:${COL[t.by]}">${cap(t.by)}</div>` : ''}${esc(t.t)}${when ? `<span class="when">${esc(when)}</span>` : ''}</div>`);
+      }
+      zone[c.zone] += `<div class="thread">${ts.join('') || `<div class="empty sys">No messages yet.</div>`}</div>`;
+    } else if (c.kind === 'list') {
+      const it = items(c, v.atoms, p);
+      zone[c.zone] += `<div class="h" ${K(lk)}>${esc(c.title)}</div>` + it.map(x => {
+        const chips = (c.shows || []).flatMap(pr => v.atoms.filter(a => a.p === pr && mentions(a, x)).slice(0, 1).map(a => `<span class="chip" ${K(lk, 'pred:' + a.p)}>${esc(chipName(a.p))}</span>`)).join('');
+        const s = Array.isArray(x) ? x.filter(isP).map(y => y === p ? 'yours' : cap(y)).join(', ') : '';
+        const th = c.event ? P.ui.containers[c.event.navigate].components.find(y => y.kind === 'thread') : null;
+        const last = th ? lastText(v.atoms.filter(a => th.shows.includes(a.p)), x, p) : '';
+        return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
+      }).join('') + (it.length ? '' : `<div class="empty sys">None yet.</div>`);
+    } else if (c.kind === 'action' && c.act) {
+      const act = SPEC.acts.find(x => x.name === c.act), {vals, open} = offers(act, c, v.atoms, p, env, comps);
+      if (!vals.length) continue;
+      const typedValue = open.length && act.values.includes(act.names[open[0] - 1]);
+      if (typedValue && act.field === 'text') {
+        composer += `<div class="compose" ${K(lk, 'act:' + act.name)}><input placeholder="${esc(act.button)}" data-compose="${acts.length}"><button data-send="${acts.length}">➤</button></div>` + (EXPLAIN ? `<div class="expl">${sentence(act, vals[0])}</div>` : '');
+        acts.push({act, vals, open, c}); continue;
+      }
+      const twin = comps.filter(x => x.kind === 'action' && x.button === c.button).length > 1;
+      const sub = EXPLAIN || twin ? `<small>${sentence(act, vals.length === 1 && !open.length ? vals[0] : partial(act, c, env, p)).replace(/<\/?b>/g, '')}</small>` : '';
+      zone[c.zone] += `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}" ${K(lk, 'act:' + act.name)} data-act="${acts.length}">${esc(act.button)}${sub}</button>`;
+      acts.push({act, vals, open, c});
+    }
+  }
+  if (info && !info.fs.length) info = null;
+  let h = `<div class="scr"><div class="top">${u.at !== P.ui.start ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${info ? '<button class="ib" data-info="1">i</button>' : ''}</div>`;
+  h += `<div class="zt">${zone.top}</div><div class="zm">${zone.middle}</div><div class="zb">${zone.bottom ? `<div class="acts">${zone.bottom}</div>` : ''}${composer}</div>`;
+  if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
+  d.innerHTML = h + '</div>';
+  const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => f(b));
+  on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
+  on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.sheet = null; render(); });
+  on('[data-back]', () => { u.at = P.ui.start; u.env = {}; u.sheet = null; render(); });
+  on('[data-close]', () => { u.sheet = null; render(); });
+  on('[data-info]', () => { u.sheet = {html: `<div class="sh">${esc(info.title)}</div><div class="facts">${info.fs.map(a => `<div class="fact" ${K(info.lk, 'pred:' + a.p)}>${fact(a, p, p)}</div>`).join('')}</div>`}; render(); });
+  on('[data-act]', b => act(p, acts[+b.dataset.act]));
+  d.querySelectorAll('[data-send]').forEach(b => {
+    const i = +b.dataset.send, inp = d.querySelector(`[data-compose="${i}"]`), go = () => { if (inp.value.trim()) sendText(p, acts[i], inp.value.trim(), i); };
+    b.onclick = go; inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+    if (u.focus === i) { inp.focus(); u.focus = null; }
+  });
+  d.querySelectorAll('[data-opt]').forEach(b => b.onclick = () => u.sheet.go[+b.dataset.opt]());
+  const nf = d.querySelector('[data-name]');
+  if (nf) { nf.focus(); const go = () => { if (nf.value.trim()) u.sheet.name(nf.value.trim()); }; nf.onkeydown = e => { if (e.key === 'Enter') go(); }; d.querySelector('[data-namego]').onclick = go; }
+  const zm = d.querySelector('.zm'); if (zm.querySelector('.thread')) zm.scrollTop = zm.scrollHeight;
+  return d;
+}
+function chipName(pr) { const t = Object.entries(SIM.tabs).find(([, v]) => v.includes(pr.replace(/_/g, ' ')) || new RegExp('\\b' + pr + '\\b').test(v)); return t ? t[0].replace(/s$/, '') : pr.replace(/_/g, ' '); }
+function lastText(atoms, x, p) {
+  const ts = atoms.filter(a => mentions(a, x)).map(a => ({a, t: a.args.find(isT)})).filter(o => o.t).sort((m, n) => n.a.seq - m.a.seq);
+  return ts.length ? (ts[0].t.by === p ? 'You: ' : '') + ts[0].t.t : '';
+}
+function partial(act, c, env, p) {
+  const val = {[act.me]: p};
+  for (const [r, v] of Object.entries(c.bind)) { const k = act.names.indexOf(r) + 1; if (typeof v === 'string') val[k] = env[v]; else if (v.param) val[k] = env[v.param][v.pos - 1]; }
+  return val;
+}
+/* one way: done at once; several: a sheet of the people or the things to choose; a typed name: a field */
+function act(p, w) {
+  const u = ui[p];
+  if (!w.open.length && w.vals.length === 1) return propose(p, w.act, w.vals[0]);
+  if (w.open.length) {
+    const k = w.open[0];
+    if (w.act.values.includes(w.act.names[k - 1])) {
+      u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div>${EXPLAIN ? `<div class="expl" style="margin-bottom:8px">${sentence(w.act, w.vals[0])}</div>` : ''}<input data-name="1" placeholder="${esc(w.act.field || '')}"><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
+        name: x => propose(p, w.act, {...w.vals[0], [k]: x})};
+      return render();
+    }
+    const opts = PERSONS.filter(x => x !== p).map(x => ({...w.vals[0], [k]: x})).filter(v => enabled(w.act, view(p).atoms, v));
+    return choose(p, w.act, opts, k);
+  }
+  const k = Object.keys(w.vals[0]).map(Number).find(i => i !== w.act.me && w.vals.some(v => !same(v[i], w.vals[0][i])));
+  choose(p, w.act, w.vals, k);
+}
+function choose(p, act, vals, k) {
+  ui[p].sheet = {html: `<div class="sh">${esc(act.button)}</div>` + (vals.length ? '' : `<div class="empty sys">No one to choose.</div>`) + vals.map((v, i) => `<button class="opt" data-opt="${i}">${av(lead(v[k]))}<div><div>${esc(show(v[k]))}</div>${EXPLAIN ? `<div class="expl">${sentence(act, v)}</div>` : ''}</div></button>`).join(''),
+    go: vals.map(v => () => propose(p, act, v))};
+  render();
+}
+function sendText(p, w, text, i) {
+  ui[p].focus = i;
+  propose(p, w.act, {...w.vals[0], [w.open[0]]: {t: text, by: p, n: ++W.seq}});
+}
+
+/* ---------- panels ---------- */
 function contractPanel() {
-  let h = `<h3>The contract</h3><p class="lg">${esc(SPEC.contract)} and the contracts it is written from. Point at a clause, a fact, a line of the UI or a button: the others light up.</p>`;
-  for (const c of SPEC.pragmas) {
+  let h = `<h3>The contract</h3><p class="lg">${esc(SIM.contract)} and the contracts it is written from. Point at a clause, a fact, a line of the UI or a button: the others light up.</p>`;
+  for (const c of SIM.chain) {
+    const proposed = c.contract === 'Chat';
     c.text.forEach((l, i) => {
-      const m = l.match(/^(\d+)\. ([■◆○]) ([^:.]+)[:.] (.*)$/);
-      if (i === 0) h += `<div class="cl title">${esc(l)}</div>`;
+      const m = l.match(/^(\d+)\. ([■◆○]) (.*)$/);
+      if (i === 0) h += `<div class="cl title">${esc(l)}${proposed ? '<span class="tag">proposed</span>' : ''}</div>`;
       else if (m) {
-        const acts = SPEC.acts.filter(a => a.button === m[3]).map(a => 'act:' + a.name);
-        h += `<div class="cl" ${K(...acts)}><span class="no">${m[1]}. ${m[2]}</span> <b>${esc(m[3])}</b>: ${esc(m[4])}</div>`;
+        const keys = SIM.schemas.filter(s => new RegExp('(^|\\. )' + s.button + '[:.] ').test(m[3])).map(s => 'act:' + s.name);
+        const chg = c.changed.includes(m[1]);
+        h += `<div class="cl${chg ? ' chg' : ''}" ${K(...keys)}><span class="no">${m[1]}. ${m[2]}</span> ${esc(m[3]).replace(/(^|\. )([A-Z][A-Za-z ]*?)([:.]) /g, '$1<b>$2</b>$3 ')}${chg ? '<span class="tag">proposed fix</span>' : ''}</div>`;
       } else h += `<div class="cl${/ (extends|strengthens|restricts|unites) /.test(l) ? ' rel' : ''}">${esc(l).replace(/\*([^*]+)\*/g, '<i>$1</i>')}</div>`;
     });
   }
   h += `<div class="ct">Facts a person's state holds</div>`;
-  for (const [p, v] of Object.entries(SPEC.vocab)) h += `<div class="voc" ${K('pred:' + p)}>${esc(v.phrase)} <span class="kw">= ${esc(p)}(${v.vars.join(',')})</span></div>`;
+  for (const [p, v] of Object.entries(SIM.vocab)) if (!SIM.env.includes(p)) h += `<div class="voc" ${K('pred:' + p)}>${esc(v.phrase)} <span class="kw">= ${esc(p)}(${v.vars.join(',')})</span></div>`;
   h += `<p class="lg" style="margin-top:12px">■ enforced by the app · ◆ attested · ○ undertaken by the person.</p>`;
   $('#contract').innerHTML = h;
 }
-
-/* ---------- the UI code panel ---------- */
-const KW = /\b(screen|top|middle|bottom|inbox|list|shows|opens|everyone|of|pick|typed)\b/g;
+const KW = /\b(screen|top|middle|bottom|inbox|list|shows|opens|everyone|atoms|of|pick|typed|thread)\b/g;
 function codeLine(L) {
-  const comp = P && L.screen && L.id ? P.ui.containers[L.screen].components.find(c => c.id === L.id) : null;
+  const comp = L.screen && L.id ? P.ui.containers[L.screen].components.find(c => c.id === L.id) : null;
   let keys = ['line:' + L.n], g = '', why = [];
-  const err = P.errors.filter(e => e.line === L.n);
   if (comp) {
     if (comp.kind === 'action' && comp.act) { keys.push('act:' + comp.act); const v = R.comps[comp.id]; if (v) { g = v.ok ? '<span class="ok">✓</span>' : '<span class="badm">✗</span>'; why = v.why; } }
     (comp.shows || []).forEach(p => keys.push('pred:' + p));
   }
+  const err = P.errors.filter(e => e.line === L.n);
   if (err.length) { g = '<span class="badm">!</span>'; why = err.map(e => e.msg); }
-  const preds = new Set(Object.keys(SPEC.vocab));
+  const preds = new Set(Object.keys(SIM.vocab));
   let t = esc(L.raw);
   if (L.kind === 'comment') t = `<span class="cm">${t}</span>`;
   else {
-    t = t.replace(/#.*$/, m => `<span class="cm">${m}</span>`);
     if (comp && comp.kind === 'action') t = t.replace(esc(comp.button), `<span class="bt">${esc(comp.button)}</span>`);
-    t = t.replace(/\b([a-z]\w*)\b/g, (w) => preds.has(w) ? `<span class="pr">${w}</span>` : w).replace(KW, '<span class="kw">$1</span>');
+    t = t.replace(/\b([a-z]\w*)\b/g, w => preds.has(w) ? `<span class="pr">${w}</span>` : w).replace(KW, '<span class="kw">$1</span>');
     if (L.kind === 'screen') t = `<b>${t}</b>`;
   }
   return `<div class="ln" ${K(...keys)}><span class="no">${L.n}</span><span class="g">${g}</span><span>${t}</span></div>` + why.map(w => `<div class="why">${esc(w)}</div>`).join('');
 }
 function codePanel() {
-  let h = `<h3>The UI</h3><p class="lg">Screens in three zones: notifications on top, the person's state in the middle, actions at the bottom. Each action is an act of the contract; each role gets a source. The checker reads it against the contract.</p>`;
-  h += `<div class="bar"><select class="hb" id="uisel">${Object.entries(UIS).map(([k, v]) => `<option value="${k}"${k === UIN ? ' selected' : ''}>${v}</option>`).join('')}${TEXT.edited ? `<option value="edited"${UIN === 'edited' ? ' selected' : ''}>Edited</option>` : ''}</select>`;
-  h += editing ? `<button class="hb acc" id="apply">Apply</button><button class="hb" id="cancel">Cancel</button>` : `<button class="hb" id="edit">Edit</button>`;
-  h += `</div>`;
-  if (R) {
-    const n = Object.values(R.acts).filter(a => a.covered).length, m = Object.keys(R.acts).length;
-    h += `<div class="sum"><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}: ${n} of ${m} acts covered${R.inbox ? '' : ', and no inbox'}${Object.values(R.acts).filter(a => !a.covered).map(a => ' · <span class="badm">' + esc(a.button) + '</span>').join('')}</div>`;
-    h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact shown' : '<span class="badm">✗ hidden</span>: ' + R.hidden.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ')}</div>`;
-    if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered${B.missed ? '; e.g. not ' + esc(B.examples[0].answer) + ' when Alice has only ' + esc(B.examples[0].state.join(', ')) : ''}.</div>`;
-    h += `</div>`;
-  }
-  if (editing) h += `<textarea class="ed" id="ed" spellcheck="false">${esc(TEXT[UIN])}</textarea>` + (P.errors.length ? P.errors.map(e => `<div class="err">line ${e.line}: ${esc(e.msg)}</div>`).join('') : '');
-  else h += `<div class="code">${P.lines.map(codeLine).join('')}</div>`;
-  h += `<div class="ct">The language</div><div class="lg"><b>screen</b> Name, or Name(p) opened from a list with the item as p · <b>inbox</b> · <b>me</b>: facts, or <b>p</b>: facts · <b>list</b> Title: <b>everyone</b> or <b>of</b> fact; <b>shows</b> facts; <b>opens</b> Screen · Button: Role = p, <b>typed</b>, <b>pick everyone</b> or <b>pick of</b> fact.</div>`;
+  let h = `<h3>The UI: ${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Screens in three zones: notifications, the person's state, actions. Each action is an act of the contract; each role gets a source. The checker reads it against the contract.</p>`;
+  const n = Object.values(R.acts).filter(a => a.covered).length, m = Object.keys(R.acts).length;
+  h += `<div class="sum"><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}: ${n} of ${m} acts covered${Object.values(R.acts).filter(a => !a.covered).map(a => ' · <span class="badm">' + esc(a.button) + '</span>').join('')}</div>`;
+  h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact shown' : '<span class="badm">✗ hidden</span>: ' + R.hidden.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ')}</div>`;
+  if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
+  h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
+  h += `<div class="ct">The language</div><div class="lg"><b>screen</b> Name, or Name(p) opened from a list with the item as p · <b>inbox</b> · <b>me</b>: facts, or <b>p</b>: facts · <b>thread</b>: facts · <b>list</b> Title: <b>everyone</b>, <b>of</b> fact, or <b>atoms of</b> fact; <b>shows</b> facts; <b>opens</b> Screen · Button: Role = p, p.i, <b>typed</b>, <b>pick everyone</b> or <b>pick of</b> fact.</div>`;
   $('#code').innerHTML = h;
-  $('#uisel').onchange = () => { UIN = $('#uisel').value; editing = false; load(); };
-  if (editing) {
-    $('#apply').onclick = () => { TEXT.edited = $('#ed').value; UIN = 'edited'; editing = false; load(); };
-    $('#cancel').onclick = () => { editing = false; codePanel(); };
-  } else $('#edit').onclick = () => { editing = true; codePanel(); $('#ed').focus(); };
-}
-
-/* ---------- a phone: the UI read over the person's state ---------- */
-function offers(c, s, me, env, comps) {
-  const a = SPEC.acts.find(x => x.name === c.act), choices = {[a.me]: [me]};
-  for (const [r, v] of Object.entries(c.bind || {})) {
-    const k = a.names.indexOf(r) + 1;
-    choices[k] = typeof v === 'string' ? [env[v]] : v.select ? listItems(comps.find(x => x.id === v.select), s, me) : PERSONS.filter(x => x !== me);
-  }
-  let vals = [{}];
-  for (let k = 1; k <= a.args.length; k++) { if (!choices[k]) return []; vals = vals.flatMap(v => choices[k].map(x => ({...v, [k]: x}))); }
-  return vals.filter(v => enabled(a, s, v));
-}
-function phone(p) {
-  const s = screen(p), u = ui[p], d = document.createElement('div');
-  d.className = 'phone';
-  if (!P.ui.containers[u.at]) { u.at = P.ui.start; u.env = {}; }
-  const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: ''}, ways = [];
-  for (const c of s.pending) zone.top += `<div class="note"><span class="spin"></span>${esc(((SPEC.acts.find(x => x.name === fn(c)) || {}).button) || fn(c))}<span class="sys">, waiting for the others</span></div>`;
-  for (const n of s.notes) if (isS(n, 'refused')) zone.top += `<div class="note bad"><span class="sys">Not done:</span>&nbsp;${esc(fn(n.a[0]))}</div>`;
-  for (const c of comps) {
-    if (c.hidden) continue;
-    const lk = 'line:' + c.line;
-    if (c.kind === 'inbox') {
-      for (const a of s.asks) zone[c.zone] += `<div class="ask" ${K(lk)}>${words(a.words)}<div class="btns"><button class="pri" data-ans="yes" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'>Yes</button><button class="ghost" data-ans="no" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'>No</button></div></div>`;
-    } else if (c.kind === 'details') {
-      const who = c.about === 'me' ? p : env[c.about];
-      const fs = grouped(s.atoms.filter(a => c.shows.includes(fn(a)) && (c.about === 'me' ? !argsOf(a).length : argsOf(a).includes(who))));
-      let h = c.about === 'me' ? '' : `<div class="prof" ${K(lk)}>${av(who, 'big')}<div class="nm">${cap(who)}</div></div>`;
-      h += `<div class="facts">${fs.map(({a, n}) => `<div class="fact" ${K(lk, 'pred:' + fn(a))}>${fact(a, p)}${n > 1 ? `<span class="dup">×${n}</span>` : ''}</div>`).join('')}</div>`;
-      zone[c.zone] += h;
-    } else if (c.kind === 'list') {
-      const it = listItems(c, s, p);
-      zone[c.zone] += `<div class="h" ${K(lk)}>${esc(c.title)}</div>` + (it.length ? it.map(q => {
-        const chips = grouped(s.atoms.filter(a => (c.shows || []).includes(fn(a)) && argsOf(a).includes(q)))
-          .map(({a, n}) => `<span class="chip" ${K(lk, 'pred:' + fn(a))}>${esc(sing((s.tabs.find(t => t.pred === fn(a)) || {label: fn(a)}).label))}${n > 1 ? ' ×' + n : ''}</span>`).join('');
-        return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item="${q}"` : ''}>${av(q)}<div><div style="font-weight:600">${cap(q)}</div><div class="chips">${chips}</div></div></button>`;
-      }).join('') : `<div class="empty sys">No one yet.</div>`);
-    } else if (c.kind === 'action' && c.act && s.view) {
-      const a = SPEC.acts.find(x => x.name === c.act), vs = offers(c, s, p, env, comps);
-      if (!vs.length) continue;
-      ways.push({a, vs});
-      /* two actions of one button on a screen: each says which places it fills, in the clause's words */
-      const twin = comps.filter(x => x.kind === 'action' && x.button === c.button).length > 1;
-      const part = {[a.me]: p}; for (const [r, v] of Object.entries(c.bind)) if (typeof v === 'string') part[a.names.indexOf(r) + 1] = env[v];
-      zone[c.zone] += `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}" ${K(lk, 'act:' + a.name)} data-way="${ways.length - 1}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}${twin ? `<small>${sentence(a, part).replace(/<\/?b>/g, '')}</small>` : ''}</button>`;
-    }
-  }
-  let h = `<div class="scr"><div class="top">${u.at !== P.ui.start ? '<button class="back" data-back="1">‹</button>' : ''}${av(p)}<div class="nm">${cap(p)}</div></div>`;
-  h += `<div class="zt">${zone.top}</div><div class="zm">${s.view ? zone.middle : '<div class="empty sys">Starting…</div>'}</div><div class="zb">${zone.bottom}</div>`;
-  if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="nm" style="margin-bottom:8px">${esc(u.sheet.title)}</div>${u.sheet.opts.map((o, i) => `<button class="opt" data-opt="${i}">${o.cap}</button>`).join('')}<button class="ghost sys" data-close="1">Cancel</button></div>`;
-  d.innerHTML = h + '</div>';
-  const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => f(b));
-  on('[data-ans]', b => send(p, +b.dataset.id, JSON.parse(b.dataset.path), b.dataset.ans));
-  on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav); u.env = {[c.event.navigate && P.ui.containers[c.event.navigate].params[0]]: b.dataset.item}; u.at = c.event.navigate; render(); });
-  on('[data-back]', () => { u.at = P.ui.start; u.env = {}; render(); });
-  on('[data-close]', () => { u.sheet = null; render(); });
-  on('[data-way]', b => { const w = ways[+b.dataset.way]; u.sheet = {title: w.a.button, opts: w.vs.map(v => ({cap: sentence(w.a, v), go: () => send(p, s.menu.id, s.menu.path, request(w.a, v))}))}; render(); });
-  on('[data-opt]', b => u.sheet.opts[+b.dataset.opt].go());
-  return d;
-}
-/* Carol and Dave are scripted persons: they answer yes to every question */
-function scripts() {
-  for (const p of SCRIPTED) for (const a of screen(p).asks) send(p, a.id, a.path, 'yes');
-  $('#scripts').innerHTML = SCRIPTED.map(p => av(p, 'sm')).join('') + '&nbsp;Carol and Dave have no phone here: a script answers yes to each of their questions.';
 }
 function render() {
-  if (!ST || !SPEC || !P) return;
-  const ready = ST.status === 'ready';
-  $('#status').className = 'pill' + (ready ? '' : ' busy');
-  $('#status').textContent = ready ? 'Ready' : ST.status === 'working' ? 'Agents working…' : ST.status === 'starting' ? 'Starting… (a minute or two)' : ST.status;
   $('#phones').innerHTML = '';
   PHONES.forEach(p => $('#phones').appendChild(phone(p)));
 }
@@ -316,24 +375,37 @@ document.addEventListener('mouseover', e => {
   const el = e.target.closest('[data-k]'), ks = el ? el.dataset.k.split(' ') : [];
   document.querySelectorAll('[data-k]').forEach(x => x.classList.toggle('hit', ks.length > 0 && x.dataset.k.split(' ').some(k => ks.includes(k))));
 });
-async function poll() {
-  for (;;) {
-    try {
-      const st = await (await fetch(API + W + '/state?since=' + VER)).json();
-      if (st.version !== VER || st.status !== (ST && ST.status)) { ST = st; VER = st.version; render(); if (st.status === 'ready') scripts(); }
-    } catch (e) { $('#status').textContent = 'Reaching the server…'; await new Promise(r => setTimeout(r, 3000)); }
-  }
+function segs() {
+  $('#csel').innerHTML = Object.entries(CONTRACTS).map(([k, v]) => `<button class="${k === CN ? 'on' : ''}" data-c="${k}">${v.title}</button>`).join('');
+  $('#msel').innerHTML = Object.entries(CONTRACTS[CN].modules).map(([k, v]) => `<button class="${k === MN ? 'on' : ''}" data-m="${k}">${v}</button>`).join('');
+  document.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { CN = b.dataset.c; MN = null; start(); });
+  document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { MN = b.dataset.m; module(); });
 }
-async function load() {
-  if (!(UIN in TEXT)) TEXT[UIN] = await (await fetch(`${W}.${UIN}.ui`)).text();
-  P = GUI.resolve(SPEC, GUI.read(TEXT[UIN]));
-  R = P.ui.start ? GUI.check(SPEC, P.ui) : null;
-  B = R && !P.errors.length ? GUI.brute(SPEC, P.ui, PERSONS) : null;
-  PERSONS.forEach(p => { if (!ui[p] || !P.ui.containers[ui[p].at]) ui[p] = {at: P.ui.start, env: {}, sheet: null}; });
-  codePanel(); render();
+const cache = {};
+const get = async u => cache[u] || (cache[u] = await (await fetch(u)).text());
+async function module() {
+  P = GUI.resolve(SPEC, GUI.read(await get(`modules/${CN}.${MN}.ui`)));
+  R = GUI.check(SPEC, P.ui);
+  B = CN === 'friendship' ? GUI.brute(SPEC, P.ui, PERSONS) : null;
+  PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null});
+  segs(); codePanel(); render();
 }
-$('#reset').onclick = async () => { await fetch(API + W + '/reset', {method: 'POST'}); VER = -1; for (const k in used) delete used[k]; PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null}); };
-fetch(W + '.json').then(r => r.json()).then(s => { SPEC = s; $('#cname').textContent = s.contract; contractPanel(); return load(); }).then(poll);
+function newWorld() {
+  W = new Engine.World(SIM, PERSONS);
+  const est = SIM.schemas.find(s => s.name === 'establish');
+  for (const s of SCRIPTED) W.propose(est, {Alice: s});
+}
+async function start() {
+  SIM = JSON.parse(await get(`sim-${CN}.json`));
+  SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env};
+  MN = MN || Object.keys(CONTRACTS[CN].modules)[0];
+  newWorld(); contractPanel();
+  $('#scripts').innerHTML = SCRIPTED.map(p => av(p, 'sm')).join('') + '&nbsp;Carol and Dave have no phone here: a script answers yes to each of their questions.';
+  await module();
+}
+$('#reset').onclick = () => { newWorld(); PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null}); render(); };
+$('#explain').onclick = () => { EXPLAIN = !EXPLAIN; $('#explain').classList.toggle('on', EXPLAIN); render(); };
+start();
 </script>
 </body>
 </html>

@@ -1,0 +1,39 @@
+# Chats: a chat with each person, and one with each group.
+screen Chats
+  top
+    inbox
+  middle
+    me: identity, person
+    list Groups: atoms of member; opens Group
+    list Contacts: everyone; shows knows, friend; opens Chat
+  bottom
+    Establish
+    Acquaint: Bob = typed
+    Create: Grupo = typed
+    Close: Grupo = pick of leader
+
+screen Chat(p)
+  top
+    inbox
+  middle
+    p: knows, friend
+    thread: message, sent_message, received_message
+  bottom
+    Befriend: Bob = p
+    Unfriend: Bob = p
+    Introduce: Bob = p, Carol = pick of knows
+    Introduce: Carol = p, Bob = pick of knows
+    Join: Bob = p, Grupo = pick of leader
+    Remove: Bob = p, Grupo = pick of listed
+    Message: Bob = p, Text = typed
+
+screen Group(g)
+  top
+    inbox
+  middle
+    g: member, leader, listed, posted, group_delivered
+    thread: group_message
+  bottom
+    Leave: Grupo = g.1, Alice = g.2
+    Post: Grupo = g.1, Alice = g.2, Text = typed
+    Post own: Grupo = g.1, Text = typed

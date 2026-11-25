@@ -1,4 +1,4 @@
-# Person-first: one screen of people, one screen per person.
+# People: one screen of people, one screen per person.
 screen Home
   top
     inbox
@@ -15,5 +15,5 @@ screen Person(p)
   bottom
     Befriend: Bob = p
     Unfriend: Bob = p
-    Introduce: Bob = p, Carol = pick everyone
-    Introduce: Carol = p, Bob = pick everyone
+    Introduce: Bob = p, Carol = pick of knows
+    Introduce: Carol = p, Bob = pick of knows
