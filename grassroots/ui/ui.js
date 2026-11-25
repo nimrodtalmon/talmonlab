@@ -118,14 +118,15 @@
     return out;
   }
   const itemKinds = l => l.items.named ? ['named'] : l.items.atoms ? ['atom:' + l.items.atoms] : ['pred:' + l.items.pred];
-  /* the ways into a screen: each a path of lists from the start screen, to a depth of four; a list `with`
-     its screen's parameter keeps, of its facts, those that name the value the path came with */
+  /* the ways into a screen: each a path of lists from the start screen, to a depth of four, every list
+     after the first kept, by `with`, to the atoms that name a position of its screen's parameter */
   function paths(ui) {
     const out = {[ui.start]: [null]}, todo = [[ui.start, null, 0]];
     while (todo.length) {
       const [c, d, depth] = todo.shift();
       if (depth >= 4) continue;
-      for (const x of ui.containers[c].components) if (x.event) {
+      /* past the start screen, a way goes on only through a list kept to its screen's parameter */
+      for (const x of ui.containers[c].components) if (x.event && (c === ui.start || x.items.within)) {
         const nd = {kind: itemKinds(x)[0], list: x.id, via: x.items.within ? {desc: d, pos: x.items.within.pos} : null};
         const to = x.event.navigate, key = JSON.stringify(nd);
         out[to] = out[to] || [];
