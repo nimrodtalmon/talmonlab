@@ -1,0 +1,22 @@
+{
+ "name": "Person-first",
+ "start": "Home",
+ "containers": {
+  "Home": {"params": [], "components": [
+   {"id": "me", "kind": "details", "about": "me", "shows": ["identity", "person"]},
+   {"id": "establish", "kind": "action", "act": "establish", "bind": {}},
+   {"id": "inbox", "kind": "inbox"},
+   {"id": "people", "kind": "list", "title": "Contacts", "items": {"named": true},
+    "shows": ["knows", "friend"], "event": {"navigate": "Person", "bind": {"p": "item"}}},
+   {"id": "acquaint", "kind": "action", "act": "acquaint", "bind": {"Bob": {"field": "any person"}}}
+  ]},
+  "Person": {"params": ["p"], "components": [
+   {"id": "facts", "kind": "details", "about": "p", "shows": ["knows", "friend"]},
+   {"id": "befriend", "kind": "action", "act": "befriend", "bind": {"Bob": "p"}},
+   {"id": "unfriend", "kind": "action", "act": "unfriend", "bind": {"Bob": "p"}},
+   {"id": "introduce-to", "kind": "action", "act": "introduce", "bind": {"Bob": "p", "Carol": {"select": "others"}}},
+   {"id": "introduce-whom", "kind": "action", "act": "introduce", "bind": {"Carol": "p", "Bob": {"select": "others"}}},
+   {"id": "others", "kind": "list", "title": "Contacts", "items": {"named": true}, "role": "choices"}
+  ]}
+ }
+}

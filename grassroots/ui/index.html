@@ -71,9 +71,10 @@ footer { text-align:center; color: var(--mute); font-size:13px; padding-bottom:3
 </head>
 <body>
 <header>
-  <b>Grassroots UI</b><span class="sub">prototype · person-first · <span id="cname">…</span>, live</span>
+  <b>Grassroots UI</b><span class="sub">prototype · <span id="cname">…</span>, live</span>
   <span class="sp"></span>
   <span class="status busy" id="status">connecting…</span>
+  <select class="hb" id="uisel"><option value="person-first">UI: person-first</option><option value="pages-only">UI: pages only</option></select>
   <button class="hb" id="reset">Start over</button>
 </header>
 <div id="banner"></div>
@@ -86,7 +87,7 @@ const PERSONS = ['alice', 'bob', 'carol', 'dave'];
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
 let SPEC = null, ST = null, VER = -1, CHECK = null;
 const used = {};
-const ui = {}; PERSONS.forEach(p => ui[p] = {tab: 'people', person: null, sheet: null});
+const ui = {};
 const $ = s => document.querySelector(s);
 const S = (f, ...a) => ({f, a});
 const isS = (t, f) => t && typeof t === 'object' && !Array.isArray(t) && t.f === f;
@@ -96,7 +97,6 @@ const fn = a => typeof a === 'string' ? a : a.f;
 const argsOf = a => typeof a === 'string' ? [] : a.a;
 const av = (p, big) => `<span class="av${big ? ' big' : ''}" style="background:${COL[p] || '#888'}">${cap(p)[0]}</span>`;
 const sing = w => w.replace(/s$/, '');
-
 /* the person's screen data, from the live state: the last view, the open menu, the questions */
 function screen(p) {
   const cs = (ST && ST.persons[p]) || {};
@@ -143,34 +143,6 @@ function words(ws) {
 }
 /* a question's words with each person a star, to find its pragma line */
 function skel(ws) { return (ws || []).map(w => isS(w, 'person') ? '*' : isS(w, 'text') ? w.a[0] : '').join('').replace(/\s+/g, ' ').trim(); }
-/* the keys of a pragma line: the tab it names, the buttons it writes, or the question it puts */
-function keys(line) {
-  const t = line.trim();
-  if (/^\s/.test(line) && !t.includes('[')) return ['q:' + t.replace(/^[A-Z][a-z]+:\s*/, '').replace(/\b[A-Z][a-z]+\b/g, '*').replace(/\s+/g, ' ')];
-  if (t.includes('[')) return [...t.matchAll(/\[([^\]]+)\]/g)].map(m => 'act:' + m[1]);
-  return ['tab:' + t.split(':')[0]];
-}
-function panel() {
-  let h = `<h3>The UI language of this app</h3><p class="lg">The interface pragmas of the contract, and of the contract it extends. Point at anything on a phone to see the line it comes from. <i>Italic</i>: the contract's own words (its clauses, definitions and vocabulary), names filled in. <span class="sys">Dotted</span>: words of this prototype, from no contract.</p>`;
-  for (const c of SPEC.pragmas) {
-    h += `<div class="ct">${esc(c.contract)}</div>`;
-    for (const l of c.lines) h += `<div class="pl" data-keys="${esc(JSON.stringify(keys(l)))}">${esc(l)}</div>`;
-  }
-  if (CHECK) {
-    const r = CHECK['person-first'], v = CHECK['pages-only'];
-    h += `<div class="ct">Completeness of this interface</div><div class="lg" style="margin:4px 0 6px">An act is covered when the person to whose page it is attached, and every person picked from those you know, is one its precondition makes you know. Then every allowed answer can be given.</div>`;
-    for (const a of SPEC.acts) {
-      const x = r.acts[a.name];
-      h += `<div class="pl" data-keys='${JSON.stringify(['act:' + a.button])}'>${x.covered ? '✓' : '✗'} ${esc(a.button)}: ${x.free.length ? 'a person you may not know yet, picked from all' : x.anchored.length ? 'on the page of a person you know' : 'on its own'}</div>`;
-    }
-    h += `<div class="lg" style="margin-top:8px">Checked by brute force over all ${r.brute.states} states of Alice with three others: all ${r.brute.answers} allowed answers offered. A variant putting every act on a person's page misses ${v.brute.missed}, e.g. ${esc(v.brute.examples[0].answer)} when Alice knows no one.</div>`;
-  }
-  $('#lang').innerHTML = h;
-}
-document.addEventListener('mouseover', e => {
-  const el = e.target.closest('[data-src]'), k = el && el.dataset.src;
-  document.querySelectorAll('.pl').forEach(x => x.classList.toggle('hit', !!k && JSON.parse(x.dataset.keys).includes(k)));
-});
 /* a fact in the contract's words: its vocabulary phrase, the holder and the other places filled in */
 function fact(a, holder) {
   const v = SPEC.vocab[fn(a)];
@@ -193,85 +165,116 @@ function relations(s, q) {
 }
 
 /* the ways an act can be taken with person q at one of its places; the other bound places to pick */
-function waysWith(act, s, me, q) {
-  const out = [];
-  for (const k of act.binds) {
-    const others = act.binds.filter(j => j !== k);
-    const val = {[act.me]: me, [k]: q};
-    if (!others.length) { if (enabled(act, s, val)) out.push({act, val, pick: null}); continue; }
-    const j = others[0];
-    const cands = known(s, me).filter(x => x !== q && enabled(act, s, {...val, [j]: x}));
-    if (cands.length) out.push({act, val, pick: {place: j, cands}});
-  }
-  return out;
+/* ---------- the UI description, as text for the side panel ---------- */
+function srcText(v) {
+  if (v === 'me') return 'me';
+  if (typeof v === 'string') return v;
+  if (v.select) return 'pick from ' + v.select;
+  if (v.field) return v.field;
+  return JSON.stringify(v);
 }
+function itemsText(it) { return it.named ? 'every person named in my state' : 'the persons in my ' + it.pred + ' facts'; }
+function compText(c) {
+  if (c.kind === 'details') return `details ${c.about}: ${c.shows.join(', ')}`;
+  if (c.kind === 'inbox') return 'inbox';
+  if (c.kind === 'list') return `list ${c.id} "${c.title}": ${itemsText(c.items)}${c.event ? ' → ' + c.event.navigate + '(' + Object.entries(c.event.bind).map(([k, v]) => k + ' = ' + v).join(', ') + ')' : ''}${c.shows ? '; shows ' + c.shows.join(', ') : ''}`;
+  if (c.kind === 'action') { const b = Object.entries(c.bind || {}); return `action ${actOf(c).button}${b.length ? ' (' + b.map(([r, v]) => r + ': ' + srcText(v)).join(', ') + ')' : ''}`; }
+  return c.kind;
+}
+const actOf = c => SPEC.acts.find(a => a.name === c.act);
+function panel() {
+  if (!SPEC || !UI) return;
+  const r = CHECK && CHECK[UIN];
+  let h = `<h3>The UI of this app</h3><p class="lg">Written in a small part of IFML: screens, lists, details, actions bound to the contract's acts, and navigation. Point at anything on a phone to see the line it comes from. <span class="sys">Dotted</span>: words of this prototype, from no contract.</p>`;
+  for (const [name, d] of Object.entries(UI.containers)) {
+    h += `<div class="pl"><b>screen ${esc(name)}${d.params.length ? '(' + d.params.join(', ') + ')' : ''}</b></div>`;
+    for (const c of d.components) {
+      const v = r && c.kind === 'action' ? r.acts[c.act].components.find(x => x.component === c.id && x.container === name) : null;
+      h += `<div class="pl" data-keys='${JSON.stringify(['c:' + name + ':' + c.id])}'>  ${esc(compText(c))}${v ? (v.ok ? '  <span style="color:#1d7a3e">✓</span>' : '  <span style="color:#c0392b">✗ ' + esc(v.why.join('; ')) + '</span>') : ''}</div>`;
+    }
+  }
+  if (r) {
+    h += `<div class="ct">Check</div>`;
+    h += `<div class="pl">${r.complete ? '✓ complete' : '✗ not complete'}: ${Object.values(r.acts).filter(a => a.covered).length} of ${Object.keys(r.acts).length} acts covered${r.inbox ? ', inbox reachable' : ', no inbox'}</div>`;
+    for (const [n, a] of Object.entries(r.acts)) if (!a.covered) h += `<div class="pl" style="color:#c0392b">✗ ${esc(a.button)}: ${esc((a.components[0] || {why: ['no action for it']}).why.join('; ') || 'no reachable action for it')}</div>`;
+    h += `<div class="pl">${r.visible ? '✓ visible: every fact shown' : '✗ hidden: ' + esc(r.visibility.hidden.join(', '))}</div>`;
+    h += `<div class="lg" style="margin-top:6px">Brute force over all ${r.brute.states} states of Alice among four: ${r.brute.answers - r.brute.missed} of ${r.brute.answers} allowed answers offered${r.brute.missed ? ', e.g. missing ' + esc(r.brute.examples[0].answer) + ' when Alice knows no one' : ''}.</div>`;
+  }
+  h += `<div class="ct">Words of the contract (interface pragmas)</div>`;
+  for (const c of SPEC.pragmas) { h += `<div class="lg" style="margin:6px 0 2px">${esc(c.contract)}</div>`; for (const l of c.lines) h += `<div class="pl">${esc(l)}</div>`; }
+  $('#lang').innerHTML = h;
+}
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('[data-src]'), k = el && el.dataset.src;
+  document.querySelectorAll('.pl[data-keys]').forEach(x => x.classList.toggle('hit', !!k && JSON.parse(x.dataset.keys).includes(k)));
+});
 
+/* ---------- the interpreter: a phone draws the UI description over the person's state ---------- */
+function listItems(c, s, me) {
+  if (c.items.named) return known(s, me);
+  return [...new Set(s.atoms.filter(a => fn(a) === c.items.pred).map(a => argsOf(a)[0]))];
+}
+function offers(c, s, me, env, comps) {
+  const a = actOf(c), choices = {[a.me]: [me]};
+  for (const [r, v] of Object.entries(c.bind || {})) {
+    const k = a.names.indexOf(r) + 1;
+    choices[k] = v === 'me' ? [me] : typeof v === 'string' ? [env[v]] : v.select ? listItems(comps.find(x => x.id === v.select), s, me) : PERSONS.filter(x => x !== me);
+  }
+  let vals = [{}];
+  for (let k = 1; k <= a.args.length; k++) { if (!choices[k]) return []; vals = vals.flatMap(v => choices[k].map(x => ({...v, [k]: x}))); }
+  return vals.filter(v => enabled(a, s, v));
+}
 function phone(p) {
   const s = screen(p), u = ui[p], d = document.createElement('div');
   d.className = 'phone';
-  const identity = s.atoms.includes('identity');
-  let h = `<div class="scr"><div class="top">${av(p)}<div><div class="nm">${cap(p)}</div><div class="st">${s.view ? own(s, p).join(' · ') : '<span class="sys">starting…</span>'}</div></div></div><div class="body">`;
-  for (const a of s.asks) h += `<div class="card ask" data-src="q:${esc(skel(a.words))}">${words(a.words)}<div class="btns"><button class="pri" data-ans="yes" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'><span class="sys">Accept</span></button><button class="ghost" data-ans="no" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'><span class="sys">Decline</span></button></div></div>`;
+  if (!UI.containers[u.at]) { u.at = UI.start; u.env = {}; }
+  const C = UI.containers[u.at], comps = C.components, env = u.env;
+  let h = `<div class="scr"><div class="top">${u.at !== UI.start ? '<button class="back" data-back="1" style="margin:0 4px 0 0;font-size:20px">‹</button>' : ''}${av(p)}<div><div class="nm">${cap(p)}</div><div class="st">${s.view ? own(s, p).join(' · ') : '<span class="sys">starting…</span>'}</div></div></div><div class="body">`;
   for (const c of s.pending) h += `<div class="pend"><span class="spin"></span>${esc(((SPEC.acts.find(x => x.name === (c.f || c)) || {}).button) || c.f || c)}<span class="sys">, waiting for the others</span></div>`;
   for (const n of s.notes) if (isS(n, 'refused')) h += `<div class="note"><span class="sys">Not done:</span> ${esc(fn(n.a[0]))}</div>`;
-  // acts that bind no person and ask for nothing: offered on their own (Establish)
-  const solo = SPEC.acts.filter(a => !a.binds.length && !a.fields.length && enabled(a, s, {[a.me]: p}));
-  if (!identity && s.view) {
-    h += `<div class="card">${defsFor(solo).map(d => `<div class="cap cl" style="color:var(--mute);margin-bottom:6px">${d}</div>`).join('')}`;
-    for (const a of solo) h += `<div class="row2"><button class="pri" data-src="act:${esc(a.button)}" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button></div><div class="cap cl" style="font-size:12px;color:var(--mute);margin-top:4px">${sentence(a, {[a.me]: p})}</div>`;
-    h += `</div>`;
-  } else if (u.tab === 'people' && u.person) {
-    const q = u.person, rel = relations(s, q);
-    h += `<button class="back" data-back="1" data-src="tab:${esc(first(s))}">‹ ${esc(first(s))}</button><div class="ph">${av(q, true)}<div class="nm">${cap(q)}</div></div>${s.atoms.filter(a => argsOf(a).includes(q)).map(a => `<div class="cap cl" style="text-align:center;color:var(--mute)">${fact(a, p)}</div>`).join('')}<div style="height:12px"></div>`;
-    const ways = SPEC.acts.flatMap(a => waysWith(a, s, p, q));
-    h += ways.length ? '' : `<div class="empty sys">Nothing to do with ${cap(q)} now.</div>`;
-    ways.forEach((w, i) => {
-      h += `<div class="act"><button class="sec" data-src="act:${esc(w.act.button)}" data-way="${i}" ${s.menu ? '' : 'disabled'}>${esc(w.act.button)}${w.pick ? '…' : ''}</button><div class="cap cl">${sentence(w.act, w.val)}</div></div>`;
-    });
-    u.ways = ways;
-  } else if (u.tab === 'people') {
-    const ps = known(s, p);
-    h += `<div class="h" data-src="tab:${esc(first(s))}">${esc(first(s))}</div>`;
-    h += ps.length ? ps.map(q => `<button class="person" data-person="${q}">${av(q)}<div><div style="font-weight:600">${cap(q)}</div><div class="chips">${relations(s, q).map(r => `<span class="chip" data-src="tab:${esc(r.tab)}">${esc(r.tab)}</span>`).join('')}</div></div></button>`).join('') : `<div class="empty sys">No one yet.</div>`;
-    const adders = SPEC.acts.filter(a => a.fields.some(f => f.type === 'key' || f.type === 'person') && enabled(a, s, {[a.me]: p}));
-    for (const a of adders) h += `<button class="sec" style="width:100%;margin-top:6px" data-add="${a.name}" data-src="act:${esc(a.button)}" ${s.menu ? '' : 'disabled'}><span class="sys">+</span> ${esc(a.button)}</button>`;
-  } else {
-    h += `<div class="h">${cap(p)}</div><div class="card">${own(s, p).map(f => `<div class="cl">${f}</div>`).join('')}</div>`;
-    for (const a of solo) h += `<div class="act"><button class="sec" data-src="act:${esc(a.button)}" data-solo="${a.name}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}</button><div class="cap cl">${sentence(a, {[a.me]: p})}</div></div>`;
+  const ways = [];
+  for (const c of comps) {
+    const src = `c:${u.at}:${c.id}`;
+    if (c.kind === 'details') {
+      const who = c.about === 'me' ? null : env[c.about];
+      if (who) h += `<div class="ph" data-src="${src}">${av(who, true)}<div class="nm">${cap(who)}</div></div>` + s.atoms.filter(a => argsOf(a).includes(who) && c.shows.includes(fn(a))).map(a => `<div class="cap cl" style="text-align:center;color:var(--mute)" data-src="${src}">${fact(a, p)}</div>`).join('') + '<div style="height:10px"></div>';
+    } else if (c.kind === 'inbox') {
+      for (const a of s.asks) h += `<div class="card ask" data-src="${src}">${words(a.words)}<div class="btns"><button class="pri" data-ans="yes" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'><span class="sys">Accept</span></button><button class="ghost" data-ans="no" data-id="${a.id}" data-path='${JSON.stringify(a.path)}'><span class="sys">Decline</span></button></div></div>`;
+    } else if (c.kind === 'list' && c.event) {
+      const it = listItems(c, s, p);
+      h += `<div class="h" data-src="${src}">${esc(c.title)}</div>`;
+      h += it.length ? it.map(q => `<button class="person" data-src="${src}" data-nav="${c.id}" data-item="${q}">${av(q)}<div><div style="font-weight:600">${cap(q)}</div><div class="chips">${(c.shows || []).filter(pr => s.atoms.some(a => fn(a) === pr && argsOf(a).includes(q))).map(pr => `<span class="chip">${esc((s.tabs.find(t => t.pred === pr) || {label: pr}).label)}</span>`).join('')}</div></div></button>`).join('') : `<div class="empty sys">No one yet.</div>`;
+    } else if (c.kind === 'action') {
+      const a = actOf(c), vs = offers(c, s, p, env, comps);
+      if (!vs.length || !s.view) continue;
+      const fixed = vs.length === 1 && !Object.values(c.bind || {}).some(v => typeof v === 'object');
+      ways.push({a, vs});
+      h += `<div class="act"><button class="${u.at === UI.start && !Object.keys(c.bind || {}).length ? 'pri' : 'sec'}" data-src="${src}" data-way="${ways.length - 1}" ${s.menu ? '' : 'disabled'}>${esc(a.button)}${fixed ? '' : '…'}</button><div class="cap cl">${fixed ? sentence(a, vs[0]) : esc(a.sentence || '')}</div></div>`;
+    }
   }
   h += `</div>`;
-  if (identity) h += `<div class="nav"><button data-tab="people" class="${u.tab === 'people' ? 'on' : ''}">${esc(first(s))}</button><button data-tab="me" class="${u.tab === 'me' ? 'on' : ''}">${cap(p)}</button></div>`;
   if (u.sheet) {
     const sh = u.sheet;
     h += `<div class="shade" data-close="1"></div><div class="sheet"><div style="font-weight:700;margin-bottom:6px">${esc(sh.title)}</div>`;
-    h += sh.opts.length ? sh.opts.map((o, i) => `<button class="person" data-opt="${i}">${av(o.who)}<div><div style="font-weight:600">${cap(o.who)}</div><div class="cap cl" style="font-size:12px;color:var(--mute)">${o.cap || ''}</div></div></button>`).join('') : `<div class="empty sys">No one to choose.</div>`;
+    h += sh.opts.map((o, i) => `<button class="person" data-opt="${i}"><div class="cap cl" style="font-size:13px">${o.cap}</div></button>`).join('');
     h += `<button class="ghost sys" data-close="1">Cancel</button></div>`;
   }
   h += `</div>`;
   d.innerHTML = h;
   const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => f(b));
   on('[data-ans]', b => send(p, +b.dataset.id, JSON.parse(b.dataset.path), b.dataset.ans));
-  on('[data-tab]', b => { u.tab = b.dataset.tab; u.person = null; render(); });
-  on('[data-person]', b => { u.person = b.dataset.person; render(); });
-  on('[data-back]', () => { u.person = null; render(); });
+  on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), ev = c.event; u.env = Object.fromEntries(Object.entries(ev.bind).map(([k, v]) => [k, v === 'item' ? b.dataset.item : env[v]])); u.at = ev.navigate; render(); });
+  on('[data-back]', () => { u.at = UI.start; u.env = {}; render(); });
   on('[data-close]', () => { u.sheet = null; render(); });
-  on('[data-solo]', b => { const a = SPEC.acts.find(x => x.name === b.dataset.solo); send(p, s.menu.id, s.menu.path, request(a, {[a.me]: p})); });
   on('[data-way]', b => {
-    const w = u.ways[+b.dataset.way];
-    if (!w.pick) return send(p, s.menu.id, s.menu.path, request(w.act, w.val));
-    u.sheet = {title: w.act.button, opts: w.pick.cands.map(x => { const v = {...w.val, [w.pick.place]: x}; return {who: x, cap: sentence(w.act, v), go: () => send(p, s.menu.id, s.menu.path, request(w.act, v))}; })};
-    render();
-  });
-  on('[data-add]', b => {
-    const a = SPEC.acts.find(x => x.name === b.dataset.add), f = a.fields[0];
-    const cands = PERSONS.filter(x => x !== p && !known(s, p).includes(x));
-    u.sheet = {title: a.button, opts: cands.map(x => { const v = {[a.me]: p, [f.i]: x}; return {who: x, cap: sentence(a, v), go: () => send(p, s.menu.id, s.menu.path, request(a, v))}; })};
+    const w = ways[+b.dataset.way];
+    if (w.vs.length === 1 && !b.textContent.endsWith('…')) return send(p, s.menu.id, s.menu.path, request(w.a, w.vs[0]));
+    u.sheet = {title: w.a.button, opts: w.vs.map(v => ({cap: sentence(w.a, v), go: () => send(p, s.menu.id, s.menu.path, request(w.a, v))}))};
     render();
   });
   on('[data-opt]', b => u.sheet.opts[+b.dataset.opt].go());
   return d;
 }
-
 function render() {
   if (!ST || !SPEC) return;
   const ready = ST.status === 'ready';
@@ -289,9 +292,13 @@ async function poll() {
     } catch (e) { $('#status').textContent = 'Reaching the server…'; await new Promise(r => setTimeout(r, 3000)); }
   }
 }
-$('#reset').onclick = async () => { await fetch(API + W + '/reset', {method: 'POST'}); VER = -1; for (const k in used) delete used[k]; PERSONS.forEach(p => ui[p] = {tab: 'people', person: null, sheet: null}); };
-fetch(W + '.check.json').then(r => r.ok ? r.json() : null).then(c => { CHECK = c; if (SPEC) panel(); }).catch(() => {});
-fetch(W + '.json').then(r => r.json()).then(s => { SPEC = s; $('#cname').textContent = s.contract; panel(); poll(); });
+$('#reset').onclick = async () => { await fetch(API + W + '/reset', {method: 'POST'}); VER = -1; for (const k in used) delete used[k]; PERSONS.forEach(p => ui[p] = {at: UI.start, env: {}, sheet: null}); };
+let UIN = new URLSearchParams(location.search).get('ui') || 'person-first', UI = null;
+$('#uisel').value = UIN;
+$('#uisel').onchange = () => { UIN = $('#uisel').value; loadUI().then(() => { PERSONS.forEach(p => ui[p] = {at: UI.start, env: {}, sheet: null}); panel(); render(); }); };
+const loadUI = () => fetch(`${W}.${UIN}.ui.json`).then(r => r.json()).then(u => { UI = u; });
+Promise.all([fetch(W + '.json').then(r => r.json()), fetch(W + '.check.json').then(r => r.ok ? r.json() : null).catch(() => null), loadUI()])
+  .then(([s, c]) => { SPEC = s; CHECK = c; $('#cname').textContent = s.contract; PERSONS.forEach(p => ui[p] = {at: UI.start, env: {}, sheet: null}); panel(); poll(); });
 </script>
 </body>
 </html>

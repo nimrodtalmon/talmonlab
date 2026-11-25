@@ -1,86 +1,86 @@
 {
  "person-first": {
-  "interface": "person-first",
-  "controls": [
-   {
-    "act": "establish",
-    "at": "home",
-    "page": null,
-    "pick": {}
-   },
-   {
-    "act": "acquaint",
-    "at": "home",
-    "page": null,
-    "pick": {
-     "2": "open"
-    }
-   },
-   {
-    "act": "introduce",
-    "at": "page",
-    "page": 1,
-    "pick": {
-     "3": "named"
-    }
-   },
-   {
-    "act": "introduce",
-    "at": "page",
-    "page": 3,
-    "pick": {
-     "1": "named"
-    }
-   },
-   {
-    "act": "befriend",
-    "at": "page",
-    "page": 2,
-    "pick": {}
-   },
-   {
-    "act": "unfriend",
-    "at": "page",
-    "page": 2,
-    "pick": {}
-   }
-  ],
+  "name": "Person-first",
   "acts": {
    "establish": {
+    "button": "Establish",
     "covered": true,
-    "anchored": [],
-    "free": []
+    "components": [
+     {
+      "component": "establish",
+      "container": "Home",
+      "ok": true,
+      "why": []
+     }
+    ]
    },
    "acquaint": {
+    "button": "Acquaint",
     "covered": true,
-    "anchored": [],
-    "free": [
-     2
+    "components": [
+     {
+      "component": "acquaint",
+      "container": "Home",
+      "ok": true,
+      "why": []
+     }
     ]
    },
    "introduce": {
+    "button": "Introduce",
     "covered": true,
-    "anchored": [
-     1,
-     3
-    ],
-    "free": []
+    "components": [
+     {
+      "component": "introduce-to",
+      "container": "Person",
+      "ok": true,
+      "why": []
+     },
+     {
+      "component": "introduce-whom",
+      "container": "Person",
+      "ok": true,
+      "why": []
+     }
+    ]
    },
    "befriend": {
+    "button": "Befriend",
     "covered": true,
-    "anchored": [
-     2
-    ],
-    "free": []
+    "components": [
+     {
+      "component": "befriend",
+      "container": "Person",
+      "ok": true,
+      "why": []
+     }
+    ]
    },
    "unfriend": {
+    "button": "Unfriend",
     "covered": true,
-    "anchored": [
-     2
-    ],
-    "free": []
+    "components": [
+     {
+      "component": "unfriend",
+      "container": "Person",
+      "ok": true,
+      "why": []
+     }
+    ]
    }
   },
+  "visibility": {
+   "shown": [
+    "friend",
+    "identity",
+    "knows",
+    "person"
+   ],
+   "hidden": []
+  },
+  "inbox": true,
+  "complete": true,
+  "visible": true,
   "brute": {
    "states": 256,
    "answers": 560,
@@ -89,85 +89,84 @@
   }
  },
  "pages-only": {
-  "interface": "pages-only",
-  "controls": [
-   {
-    "act": "establish",
-    "at": "home",
-    "page": null,
-    "pick": {}
-   },
-   {
-    "act": "acquaint",
-    "at": "page",
-    "page": 2,
-    "pick": {}
-   },
-   {
-    "act": "introduce",
-    "at": "page",
-    "page": 1,
-    "pick": {
-     "3": "named"
-    }
-   },
-   {
-    "act": "introduce",
-    "at": "page",
-    "page": 3,
-    "pick": {
-     "1": "named"
-    }
-   },
-   {
-    "act": "befriend",
-    "at": "page",
-    "page": 2,
-    "pick": {}
-   },
-   {
-    "act": "unfriend",
-    "at": "page",
-    "page": 2,
-    "pick": {}
-   }
-  ],
+  "name": "Pages only",
   "acts": {
    "establish": {
+    "button": "Establish",
     "covered": true,
-    "anchored": [],
-    "free": []
+    "components": [
+     {
+      "component": "establish",
+      "container": "Home",
+      "ok": true,
+      "why": []
+     }
+    ]
    },
    "acquaint": {
+    "button": "Acquaint",
     "covered": false,
-    "anchored": [],
-    "free": [
-     2
+    "components": [
+     {
+      "component": "acquaint",
+      "container": "Person",
+      "ok": false,
+      "why": [
+       "Bob may be someone this source does not reach"
+      ]
+     }
     ]
    },
    "introduce": {
+    "button": "Introduce",
     "covered": true,
-    "anchored": [
-     1,
-     3
-    ],
-    "free": []
+    "components": [
+     {
+      "component": "introduce-to",
+      "container": "Person",
+      "ok": true,
+      "why": []
+     }
+    ]
    },
    "befriend": {
+    "button": "Befriend",
     "covered": true,
-    "anchored": [
-     2
-    ],
-    "free": []
+    "components": [
+     {
+      "component": "befriend",
+      "container": "Person",
+      "ok": true,
+      "why": []
+     }
+    ]
    },
    "unfriend": {
+    "button": "Unfriend",
     "covered": true,
-    "anchored": [
-     2
-    ],
-    "free": []
+    "components": [
+     {
+      "component": "unfriend",
+      "container": "Person",
+      "ok": true,
+      "why": []
+     }
+    ]
    }
   },
+  "visibility": {
+   "shown": [
+    "identity",
+    "knows",
+    "person"
+   ],
+   "hidden": [
+    "friend"
+   ]
+  },
+  "inbox": true,
+  "complete": false,
+  "visible": false,
   "brute": {
    "states": 256,
    "answers": 560,
