@@ -18,6 +18,7 @@
  *           (Alice for the one who acts); a name of the screen's subject takes its value from it, and any other
  *           name is TYPED, FROM EVERYONE, FROM a predicate's values, or IS a name of the subject; an act whose
  *           clause only points to another (Pay issuer: Notes:3, ...) is written with no sentence, in the act's names
+ *   A line indented deeper than the lines of its screen goes on the line before it.
  */
 (function (G) {
   const SRC = /^([A-Z]\w*)\s+(TYPED|FROM\s+EVERYONE|FROM\s+[a-z]\w*|IS\s+[A-Z]\w*)$/;
@@ -26,12 +27,21 @@
     const ui = {name: '', start: null, containers: {}}, lines = [], errors = [];
     let scr = null, n = 0;
     const err = (i, m) => errors.push({line: i, msg: m});
+    /* a line indented deeper than the lines of its screen goes on the line before it */
+    const logical = [];
+    let inner = null;
     for (const raw of text.split('\n')) {
       n++;
-      const t = raw.replace(/#.*$/, '').trimEnd(), ind = t.length - t.trimStart().length, s = t.trim();
-      const L = {n, raw, kind: 'blank'};
+      const t = raw.replace(/#.*$/, '').trimEnd(), ind = t.length - t.trimStart().length, L = {n, raw, kind: 'blank'};
       lines.push(L);
-      if (!s) { if (raw.trim().startsWith('#')) L.kind = 'comment'; continue; }
+      if (!t.trim()) { if (raw.trim().startsWith('#')) L.kind = 'comment'; continue; }
+      if (ind === 0) inner = null; else if (inner === null) inner = ind;
+      const prev = logical[logical.length - 1];
+      if (ind > 0 && ind > inner && prev && prev.ind > 0) { prev.s += ' ' + t.trim(); prev.more.push(L); continue; }
+      logical.push({n, ind, s: t.trim(), L, more: []});
+    }
+    for (const {n, ind, s, L, more} of logical) {
+      const mark = o => { Object.assign(L, o); more.forEach(x => Object.assign(x, o)); };
       let m;
       if (ind === 0) {
         if (!(m = s.match(/^SCREEN\s+([A-Za-z][\w-]*)(?:\s+ABOUT\s+(?:"([^"]+)"|([A-Z]\w*)))?\s*:$/))) { err(n, 'expected: SCREEN Name: or SCREEN Name ABOUT Bob: or SCREEN Name ABOUT "a fact":'); continue; }
@@ -40,12 +50,12 @@
         ui.containers[scr] = {params: m[2] || m[3] ? ['it'] : [], components: [], line: n, aboutText: m[2] || null, aboutName: m[3] || null};
         if (!ui.start) { ui.start = scr; if (m[2] || m[3]) err(n, 'the start screen is about nothing'); }
         else if (!m[2] && !m[3]) err(n, 'a screen other than the start is ABOUT something');
-        Object.assign(L, {kind: 'screen', screen: scr});
+        mark({kind: 'screen', screen: scr});
         continue;
       }
       if (!scr) { err(n, 'a line before the first screen'); continue; }
       const C = ui.containers[scr], id = 'l' + n, base = {id, line: n};
-      const push = c => { C.components.push(c); Object.assign(L, {kind: 'comp', screen: scr, id}); };
+      const push = c => { C.components.push(c); mark({kind: 'comp', screen: scr, id}); };
       if (s === 'QUESTIONS') { push({...base, zone: 'top', kind: 'inbox'}); continue; }
       if ((m = s.match(/^SHOW(?:\s+([A-Z]\w*))?\s*:\s*([\w,\s]+)$/))) { push({...base, zone: 'middle', kind: 'details', name: m[1] || null, shows: m[2].split(',').map(x => x.trim()).filter(Boolean)}); continue; }
       if ((m = s.match(/^THREAD\s*:\s*([\w,\s]+)$/))) { push({...base, zone: 'middle', kind: 'thread', shows: m[1].split(',').map(x => x.trim()).filter(Boolean)}); continue; }
