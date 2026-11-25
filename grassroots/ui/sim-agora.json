@@ -93,19 +93,24 @@
    ]
   },
   "note": {
-   "phrase": "x holds n y-bonds due e",
+   "phrase": "x holds n y-notes of type t",
    "vars": [
     "x",
     "y",
-    "bond(e"
+    "t",
+    "n"
    ]
   },
   "escrow_note": {
-   "phrase": "z holds n w-bonds due e in escrow from x for y on k",
+   "phrase": "z holds n w-notes of type t in escrow from x for y on k",
    "vars": [
     "z",
     "w",
-    "bond(e"
+    "t",
+    "x",
+    "y",
+    "k",
+    "n"
    ]
   },
   "today": {
@@ -202,6 +207,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -246,6 +255,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -325,6 +338,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -437,6 +454,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Type",
     "SumSet",
@@ -499,6 +534,46 @@
     "SumSet": "Sum",
     "TotalSet": "Total"
    },
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "size",
+        "a": [
+         "SumSet"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         "Sum"
+        ]
+       }
+      ]
+     },
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "size",
+        "a": [
+         "TotalSet"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         "Total"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Type",
     "SumSet",
@@ -648,6 +723,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Type",
     "SumSet",
@@ -743,6 +836,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Type",
     "SumSet",
@@ -835,6 +946,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Type",
     "SumSet",
@@ -950,6 +1079,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Type",
     "Cond",
@@ -1068,6 +1215,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Type",
     "Cond",
@@ -1184,6 +1349,46 @@
     "BobCoin1Set": 1,
     "CarolCoin1Set": 1
    },
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "size",
+        "a": [
+         "BobCoin1Set"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         1
+        ]
+       }
+      ]
+     },
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "size",
+        "a": [
+         "CarolCoin1Set"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         1
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "BobCoin1Set",
     "CarolCoin1Set"
@@ -1324,6 +1529,46 @@
     "BobCoin1Set": 1,
     "CarolBondDay1Set": 1
    },
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "size",
+        "a": [
+         "BobCoin1Set"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         1
+        ]
+       }
+      ]
+     },
+     {
+      "f": "eq",
+      "a": [
+       {
+        "f": "size",
+        "a": [
+         "CarolBondDay1Set"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         1
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "BobCoin1Set",
     "CarolBondDay1Set"
@@ -1459,6 +1704,70 @@
     "BobBondDay1Set": 1,
     "CarolCoin1Set": 1
    },
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "le",
+      "a": [
+       {
+        "f": "num",
+        "a": [
+         "Day"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         "Today"
+        ]
+       }
+      ]
+     },
+     {
+      "f": "and",
+      "a": [
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "size",
+          "a": [
+           "BobBondDay1Set"
+          ]
+         },
+         {
+          "f": "num",
+          "a": [
+           1
+          ]
+         }
+        ]
+       },
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "size",
+          "a": [
+           "CarolCoin1Set"
+          ]
+         },
+         {
+          "f": "num",
+          "a": [
+           1
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [
+    "Day"
+   ],
    "values": [
     "BobBondDay1Set",
     "CarolCoin1Set",
@@ -1605,6 +1914,70 @@
     "BobBondDay1Set": 1,
     "CarolBondTerm1Set": 1
    },
+   "guard": {
+    "f": "and",
+    "a": [
+     {
+      "f": "le",
+      "a": [
+       {
+        "f": "num",
+        "a": [
+         "Day"
+        ]
+       },
+       {
+        "f": "num",
+        "a": [
+         "Today"
+        ]
+       }
+      ]
+     },
+     {
+      "f": "and",
+      "a": [
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "size",
+          "a": [
+           "BobBondDay1Set"
+          ]
+         },
+         {
+          "f": "num",
+          "a": [
+           1
+          ]
+         }
+        ]
+       },
+       {
+        "f": "eq",
+        "a": [
+         {
+          "f": "size",
+          "a": [
+           "CarolBondTerm1Set"
+          ]
+         },
+         {
+          "f": "num",
+          "a": [
+           1
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "derived": [
+    "Day"
+   ],
    "values": [
     "BobBondDay1Set",
     "CarolBondTerm1Set",
@@ -1730,6 +2103,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item"
    ],
@@ -1787,6 +2164,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Mart"
    ],
@@ -1855,6 +2236,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Mart"
    ],
@@ -1942,6 +2327,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Mart"
@@ -2036,6 +2425,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Mart"
@@ -2125,6 +2518,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Wish",
     "Mart"
@@ -2212,6 +2609,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Wish",
     "Mart"
@@ -2296,6 +2697,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Mart"
@@ -2403,6 +2808,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Mart"
@@ -2501,6 +2910,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Mart"
@@ -2636,6 +3049,10 @@
     "Mart": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Mart"
@@ -2772,6 +3189,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Item",
     "SumSet",
@@ -2902,6 +3337,24 @@
    "sizes": {
     "SumSet": "Sum"
    },
+   "guard": {
+    "f": "eq",
+    "a": [
+     {
+      "f": "size",
+      "a": [
+       "SumSet"
+      ]
+     },
+     {
+      "f": "num",
+      "a": [
+       "Sum"
+      ]
+     }
+    ]
+   },
+   "derived": [],
    "values": [
     "Item",
     "SumSet",
@@ -3016,6 +3469,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Thing"
@@ -3124,6 +3581,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Bob",
@@ -3220,6 +3681,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Alice",
@@ -3311,6 +3776,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Item",
     "Bob",

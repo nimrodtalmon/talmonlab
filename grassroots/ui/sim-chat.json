@@ -181,6 +181,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -225,6 +229,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -304,6 +312,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -412,6 +424,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -514,6 +530,10 @@
    "one": {},
    "types": {},
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [],
    "effects": [
     {
@@ -635,6 +655,10 @@
     "Today": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Text",
     "Today"
@@ -729,6 +753,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Grupo"
    ],
@@ -796,6 +824,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Grupo"
    ],
@@ -912,6 +944,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Grupo"
    ],
@@ -1007,6 +1043,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Grupo"
    ],
@@ -1092,6 +1132,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Grupo"
    ],
@@ -1169,6 +1213,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Text",
     "Grupo"
@@ -1239,6 +1287,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Text",
     "Grupo"
@@ -1308,6 +1360,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Text",
     "Grupo"
@@ -1411,6 +1467,10 @@
     "Grupo": "const"
    },
    "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
    "values": [
     "Text",
     "Grupo"

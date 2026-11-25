@@ -1,30 +1,31 @@
 # Chats, on Groups as it is: a person keeps only the messages they receive.
-screen Chats
-  inbox
-  me: identity, person
-  list Groups: atoms of member; opens Group
-  list Contacts: everyone; shows knows, friend; opens Chat
-  Establish
-  Acquaint: Bob = field
-  Create: Grupo = field
-  Close: Grupo = pick of leader
 
-screen Chat(p)
-  inbox
-  p: knows, friend
-  thread: message
-  Befriend: Bob = p
-  Unfriend: Bob = p
-  Introduce: Bob = p, Carol = pick of knows
-  Introduce: Carol = p, Bob = pick of knows
-  Join: Bob = p, Grupo = pick of leader
-  Remove: Bob = p, Grupo = pick of listed
-  Message: Bob = p, Text = field
+SCREEN Chats:
+    QUESTIONS
+    SHOW Alice: identity, person
+    LIST Groups: "Alice is a member of the group Grupo of Bob" OPENS Group
+    LIST Contacts: EVERYONE WITH knows, friend OPENS Chat
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+    Create: Alice may create Grupo, Grupo TYPED
+    Close: Alice may close Grupo by leaving it, Grupo FROM leader
 
-screen Group(g)
-  inbox
-  g: member, leader, listed, posted, group_delivered
-  thread: group_message
-  Leave: Grupo = g.1, Alice = g.2
-  Post: Grupo = g.1, Alice = g.2, Text = field
-  Post own: Grupo = g.1, Text = field
+SCREEN Chat ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, friend
+    THREAD: message
+    Befriend: Alice and Bob may jointly become friends
+    Unfriend: Alice may end her friendship with Bob
+    Introduce: Alice may introduce Carol to Bob, Carol FROM knows
+    Introduce: Alice may introduce Bob to Carol, Carol FROM knows
+    Join: Alice may add Bob to Grupo, Grupo FROM leader
+    Remove: Alice may end Bob's membership in Grupo, Grupo FROM listed
+    Message: Alice may send Text to Bob, Text TYPED
+
+SCREEN Group ABOUT "Alice is a member of the group Grupo of Bob":
+    QUESTIONS
+    SHOW: member, leader, listed, posted, group_delivered
+    THREAD: group_message
+    Leave: Alice may end her membership in Bob's Grupo
+    Post: Alice may send Text to the group Grupo of Bob, Text TYPED
+    Post own: Alice may send Text to the group Grupo of Alice, Text TYPED

@@ -1,70 +1,71 @@
 # Market: markets and their walls, things, a wallet, and what one holds in escrow.
-screen Agora
-  inbox
-  me: identity, person
-  list Markets: atoms of member; opens Market
-  list Wall: atoms of post; opens Post
-  list Things: of item; shows made; opens Thing
-  list Wallet: atoms of note; opens Note
-  list In escrow: atoms of escrow_note; opens Escrow
-  list Items in escrow: atoms of escrow_item; opens Held
-  list People: everyone; shows knows, has_member, delivered_post; opens Person
-  Establish
-  Acquaint: Bob = field
-  Make: Item = field
-  Open: Mart = field
-  Issue: Type = field, Sum = field
-  Withdraw: Alice = field, Item = field, Mart = field
 
-screen Market(m)
-  inbox
-  m.1: keeper, has_member, posted
-  Offer: Mart = m.1, Alice = m.2, Item = pick of item
-  Offer own: Mart = m.1, Item = pick of item
-  Want: Mart = m.1, Alice = m.2, Wish = field
-  Want own: Mart = m.1, Wish = field
+SCREEN Agora:
+    QUESTIONS
+    SHOW Alice: identity, person
+    LIST Markets: "Alice is a member of the market Mart of Bob" OPENS Market
+    LIST Wall: "Alice sees Bob's post of Item on the wall of Mart" OPENS Post
+    LIST Things: FROM item WITH made OPENS Thing
+    LIST Wallet: "Alice holds Sum Carol-notes of type Type" OPENS Note
+    LIST In escrow: "Alice holds Sum Dave-notes of type Type in escrow from Bob for Carol on Cond" OPENS Escrow
+    LIST Items in escrow: "Alice holds the item Item in escrow from Bob for Carol on Cond" OPENS Held
+    LIST People: EVERYONE WITH knows, has_member, delivered_post OPENS Person
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+    Make: Alice may make the item Item, Item TYPED
+    Open: Alice may open Mart under a new name of hers, Mart TYPED
+    Issue: Alice may issue Sum Alice-notes of type Type, Type TYPED, Sum TYPED
+    Withdraw: Alice may withdraw her post of Item in Bob's Mart, Bob TYPED, Item TYPED, Mart TYPED
 
-screen Post(w)
-  inbox
-  w: post, delivered_post
-  Withdraw own: Item = w.2, Mart = w.3
-  Swap items: Bob = w.1, Thing = w.2, Item = pick of item
+SCREEN Market ABOUT "Alice is a member of the market Mart of Bob":
+    QUESTIONS
+    SHOW Mart: keeper, has_member, posted
+    Offer: Alice may post Item to the wall of Bob's Mart, Item FROM item
+    Offer own: Alice may post Item to the wall of Alice's Mart, Item FROM item
+    Want: Alice may post Wish to the wall of Bob's Mart, Wish TYPED
+    Want own: Alice may post Wish to the wall of Alice's Mart, Wish TYPED
 
-screen Thing(t)
-  inbox
-  t: item, made
-  Swap items: Item = t, Bob = pick of knows, Thing = field
-  Swap item for coin: Item = t, Bob = pick of knows, Dave = field, Sum = field
-  Swap item for bond: Item = t, Bob = pick of knows, Dave = field, Sum = field
-  Deposit item: Item = t, Carol = pick of knows, Bob = pick of knows, Cond = field
+SCREEN Post ABOUT "Alice sees Bob's post of Item on the wall of Mart":
+    QUESTIONS
+    SHOW: post, delivered_post
+    Withdraw own: Alice may withdraw her post of Item in Alice's Mart
+    Swap items: Alice and Bob may jointly swap the item Item2 for the item Item, Item2 FROM item
 
-screen Note(n)
-  inbox
-  n: note
-  Pay: Carol = n.1, Type = n.2, Bob = pick of knows, Sum = field
-  Pay issuer: Bob = n.1, Type = n.2, Sum = field
-  Swap: Carol = n.1, Type = n.2, Sum = field, Bob = pick of knows, Dave = field, Other = field, Total = field
-  Deposit: Dave = n.1, Type = n.2, Sum = field, Carol = pick of knows, Bob = pick of knows, Cond = field
-  Redeem: Bob = n.1, Carol = field
-  Redeem coin against bond: Bob = n.1, Carol = field
-  Redeem bond: Bob = n.1, Carol = field, Day = field
-  Redeem bond against bond: Bob = n.1, Carol = field, Day = field
+SCREEN Thing ABOUT Item:
+    QUESTIONS
+    SHOW Item: item, made
+    Swap items: Alice and Bob may jointly swap the item Item for the item Thing, Bob FROM knows, Thing TYPED
+    Swap item for coin: Alice and Bob may jointly swap the item Item for Sum Dave-coins, Bob FROM knows, Dave TYPED, Sum TYPED
+    Swap item for bond: Alice and Bob may jointly swap the item Item for Sum Dave-bonds due Day, Bob FROM knows, Dave TYPED, Sum TYPED
+    Deposit item: Alice may deposit the item Item with Carol for Bob on Cond, Carol FROM knows, Bob FROM knows, Cond TYPED
 
-screen Escrow(e)
-  inbox
-  e: escrow_note
-  Release: Dave = e.1, Type = e.2, Alice = e.3, Bob = e.4, Cond = e.5, Sum = field
-  Return: Dave = e.1, Type = e.2, Alice = e.3, Bob = e.4, Cond = e.5, Sum = field
+SCREEN Note ABOUT "Alice holds Sum Carol-notes of type Type":
+    QUESTIONS
+    SHOW: note
+    Pay: Alice may pay Bob Sum Carol-notes of type Type, Bob FROM knows, Sum TYPED
+    Pay issuer: Bob IS Carol, Sum TYPED
+    Swap: Alice and Bob may jointly swap Sum Carol-notes of type Type for Total Dave-notes of type Other, Sum TYPED, Bob FROM knows, Dave TYPED, Other TYPED, Total TYPED
+    Deposit: Alice may deposit Sum Carol-notes of type Type with Bob for Dave on Cond, Sum TYPED, Bob FROM knows, Dave FROM knows, Cond TYPED
+    Redeem: Alice may redeem a Carol-coin against a Bob-coin, Bob TYPED
+    Redeem coin against bond: Alice may redeem a Carol-coin against a Bob-bond due Day, Bob TYPED
+    Redeem bond: Alice may redeem a Carol-bond due Day against a Bob-coin, Bob TYPED
+    Redeem bond against bond: Alice may redeem a Carol-bond due Day against a Bob-bond due Term, Bob TYPED
 
-screen Held(h)
-  inbox
-  h: escrow_item
-  Release item: Item = h.1, Alice = h.2, Bob = h.3, Cond = h.4
-  Return item: Item = h.1, Alice = h.2, Bob = h.3, Cond = h.4
+SCREEN Escrow ABOUT "Alice holds Sum Dave-notes of type Type in escrow from Bob for Carol on Cond":
+    QUESTIONS
+    SHOW: escrow_note
+    Release: Alice and Carol may jointly release Sum Dave-notes of type Type that Bob deposited on Cond, Sum TYPED
+    Return: Alice and Bob may jointly return Sum Dave-notes of type Type deposited for Carol on Cond, Sum TYPED
 
-screen Person(p)
-  inbox
-  p: knows, has_member, delivered_post
-  Introduce: Bob = p, Carol = pick of knows
-  Introduce: Carol = p, Bob = pick of knows
-  Join: Bob = p, Mart = pick of keeper
+SCREEN Held ABOUT "Alice holds the item Item in escrow from Bob for Carol on Cond":
+    QUESTIONS
+    SHOW: escrow_item
+    Release item: Alice and Carol may jointly release the item Item that Bob deposited on Cond
+    Return item: Alice and Bob may jointly return the item Item deposited for Carol on Cond
+
+SCREEN Person ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, has_member, delivered_post
+    Introduce: Alice may introduce Carol to Bob, Carol FROM knows
+    Introduce: Alice may introduce Bob to Carol, Carol FROM knows
+    Join: Alice may admit Bob to Mart, Mart FROM keeper

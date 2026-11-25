@@ -203,9 +203,18 @@ def vocab(gr):
             for part in l[len('Vocabulary:'):].strip().rstrip('.').split(';'):
                 if '=' in part:
                     ph, at = [x.strip() for x in part.rsplit('=', 1)]
-                    m = re.match(r'(\w+)\(([^)]*)\)', at)
-                    if m:
-                        v[m.group(1)] = {'phrase': re.sub(r', for \w+$', '', ph), 'vars': [x.strip() for x in m.group(2).split(',')]}
+                    m = re.match(r'(\w+)\((.*)\)$', at)
+                    if m and m.group(1) not in v:
+                        # arguments split at the commas outside parentheses; a set's *n is named n
+                        args, depth, cur = [], 0, ''
+                        for ch in m.group(2):
+                            if ch == ',' and depth == 0:
+                                args.append(cur); cur = ''
+                                continue
+                            depth += (ch == '(') - (ch == ')')
+                            cur += ch
+                        args.append(cur)
+                        v[m.group(1)] = {'phrase': re.sub(r', for \w+$', '', ph), 'vars': [x.strip().lstrip('*') for x in args]}
     return v
 
 
@@ -270,7 +279,9 @@ def main():
     for n in order:
         gr = open(os.path.join(calc, 'gr', n + '.txt')).read().split('\n')
         rev = open(os.path.join(calc, 'rev', n + '.txt')).read().rstrip('\n').split('\n')
-        voc.update(vocab(gr))
+        # a predicate's first phrase in the chain is its most general; a later contract may phrase a special case
+        for k, x in vocab(gr).items():
+            voc.setdefault(k, x)
         for t, s in clauses(gr).items():
             m = re.match(r'^(\w[\w ]*):(\d+)', s)
             s = re.split(r', (?:provided|only if|with the consent of)', s)[0].rstrip('.')

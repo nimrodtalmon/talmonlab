@@ -1,33 +1,34 @@
 # Assembly: one's DAOs; in each DAO its proposals; a screen for each proposal to vote and decide on.
-screen Home
-  inbox
-  me: identity, person
-  list DAOs: atoms of member; opens Dao
-  list People: everyone; shows knows, listed; opens Person
-  Establish
-  Acquaint: Bob = field
-  Found: Delos = field
 
-screen Dao(d)
-  inbox
-  d.1: steward, listed
-  list Proposals: atoms of proposal with d.1; shows passed, rejected; opens Proposal
-  Propose: Delos = d.1, Alice = d.2, Prop = field
-  Propose own: Delos = d.1, Prop = field
+SCREEN Home:
+    QUESTIONS
+    SHOW Alice: identity, person
+    LIST DAOs: "Alice is a member of Bob's Delos" OPENS Dao
+    LIST People: EVERYONE WITH knows, listed OPENS Person
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+    Found: Alice may found Delos under a new name of hers, Delos TYPED
 
-screen Proposal(q)
-  inbox
-  q: proposed, vote_for, vote_against, voted, decided, passed, rejected, delivered, delivered_vote, delivered_decision
-  Vote for: Prop = q.1, Delos = q.2, Alice = pick of member
-  Vote against: Prop = q.1, Delos = q.2, Alice = pick of member
-  Vote own for: Prop = q.1, Delos = q.2
-  Vote own against: Prop = q.1, Delos = q.2
-  Pass: Prop = q.1, Delos = q.2
-  Reject: Prop = q.1, Delos = q.2
+SCREEN Dao ABOUT "Alice is a member of Bob's Delos":
+    QUESTIONS
+    SHOW Delos: steward, listed
+    LIST Proposals: "Alice holds Prop of Delos" WITH passed, rejected OPENS Proposal
+    Propose: Alice may make the proposal Prop to Bob's Delos, Prop TYPED
+    Propose own: Alice may make the proposal Prop to Alice's Delos, Prop TYPED
 
-screen Person(p)
-  inbox
-  p: knows, listed
-  Introduce: Bob = p, Carol = pick of knows
-  Introduce: Carol = p, Bob = pick of knows
-  Join: Bob = p, Delos = pick of steward
+SCREEN Proposal ABOUT "Alice holds Prop of Delos":
+    QUESTIONS
+    SHOW: proposed, vote_for, vote_against, voted, decided, passed, rejected, delivered, delivered_vote, delivered_decision
+    Vote for: Alice may vote for Prop of Bob's Delos, Bob FROM member
+    Vote against: Alice may vote against Prop of Bob's Delos, Bob FROM member
+    Vote own for: Alice may vote for Prop of Alice's Delos
+    Vote own against: Alice may vote against Prop of Alice's Delos
+    Pass: Alice may pass Prop of Delos
+    Reject: Alice may reject Prop of Delos
+
+SCREEN Person ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, listed
+    Introduce: Alice may introduce Carol to Bob, Carol FROM knows
+    Introduce: Alice may introduce Bob to Carol, Carol FROM knows
+    Join: Alice may admit Bob to Delos, Delos FROM steward

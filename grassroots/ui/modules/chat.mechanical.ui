@@ -1,23 +1,24 @@
 # Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
-screen Home
-  inbox
-  me: identity, person
-  list People: everyone; shows knows, friend, member, listed, message, sent_message, received_message, posted, group_delivered, group_message; opens Person
-  list Leader: atoms of leader
-  Establish
-  Acquaint: Bob = field
-  Introduce: Bob = pick of knows, Carol = pick of knows
-  Befriend: Bob = pick of knows
-  Unfriend: Bob = pick of friend
-  Message: Bob = pick of friend, Text = field
-  Create: Grupo = field
-  Close: Grupo = pick of leader
-  Join: Bob = pick of friend, Grupo = pick of leader
-  Remove: Bob = pick of listed, Grupo = pick of leader
-  Leave: Alice = pick of member, Grupo = pick of member
-  Post: Alice = pick of member, Text = field, Grupo = pick of member
-  Post own: Text = field, Grupo = pick of member
 
-screen Person(p)
-  inbox
-  p: knows, friend, member, listed, message, sent_message, received_message, posted, group_delivered, group_message
+SCREEN Home:
+    QUESTIONS
+    SHOW Alice: identity, person
+    LIST People: EVERYONE WITH knows, friend, member, listed, message, sent_message, received_message, posted, group_delivered, group_message OPENS Person
+    LIST Leader: "Alice is the leader of Grupo"
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+    Introduce: Alice may introduce Carol to Bob, Bob FROM knows, Carol FROM knows
+    Befriend: Alice and Bob may jointly become friends, Bob FROM knows
+    Unfriend: Alice may end her friendship with Bob, Bob FROM friend
+    Message: Alice may send Text to Bob, Bob FROM friend, Text TYPED
+    Create: Alice may create Grupo, Grupo TYPED
+    Close: Alice may close Grupo by leaving it, Grupo FROM leader
+    Join: Alice may add Bob to Grupo, Bob FROM friend, Grupo FROM leader
+    Remove: Alice may end Bob's membership in Grupo, Bob FROM listed, Grupo FROM leader
+    Leave: Alice may end her membership in Bob's Grupo, Bob FROM member, Grupo FROM member
+    Post: Alice may send Text to the group Grupo of Bob, Bob FROM member, Text TYPED, Grupo FROM member
+    Post own: Alice may send Text to the group Grupo of Alice, Text TYPED, Grupo FROM member
+
+SCREEN Person ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, friend, member, listed, message, sent_message, received_message, posted, group_delivered, group_message

@@ -1,28 +1,29 @@
 # Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
-screen Home
-  inbox
-  me: identity, person
-  list People: everyone; shows knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision; opens Person
-  list steward: atoms of steward
-  list proposal: atoms of proposal
-  list decided: atoms of decided
-  list voted: atoms of voted
-  list passed: atoms of passed
-  list rejected: atoms of rejected
-  Establish
-  Acquaint: Bob = field
-  Introduce: Bob = pick of knows, Carol = pick of knows
-  Found: Delos = field
-  Join: Bob = pick of knows, Delos = pick of steward
-  Propose: Alice = pick of member, Prop = field, Delos = pick of member
-  Propose own: Prop = field, Delos = pick of member
-  Vote for: Alice = pick of member, Prop = pick of proposal, Delos = pick of member
-  Vote own for: Prop = pick of proposal, Delos = pick of member
-  Vote against: Alice = pick of member, Prop = pick of proposal, Delos = pick of member
-  Vote own against: Prop = pick of proposal, Delos = pick of member
-  Pass: Prop = pick of proposal, Delos = pick of steward
-  Reject: Prop = pick of proposal, Delos = pick of steward
 
-screen Person(p)
-  inbox
-  p: knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision
+SCREEN Home:
+    QUESTIONS
+    SHOW Alice: identity, person
+    LIST People: EVERYONE WITH knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision OPENS Person
+    LIST Steward: "Alice is the steward of Delos"
+    LIST Proposal: "Alice holds Prop of Delos"
+    LIST Decided: "Alice has decided Prop of Delos"
+    LIST Voted: "Alice has voted on Prop of Delos"
+    LIST Passed: "Alice holds Prop of Delos as passed"
+    LIST Rejected: "Alice holds Prop of Delos as rejected"
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+    Introduce: Alice may introduce Carol to Bob, Bob FROM knows, Carol FROM knows
+    Found: Alice may found Delos under a new name of hers, Delos TYPED
+    Join: Alice may admit Bob to Delos, Bob FROM knows, Delos FROM steward
+    Propose: Alice may make the proposal Prop to Bob's Delos, Bob FROM member, Prop TYPED, Delos FROM member
+    Propose own: Alice may make the proposal Prop to Alice's Delos, Prop TYPED, Delos FROM member
+    Vote for: Alice may vote for Prop of Bob's Delos, Bob FROM member, Prop FROM proposal, Delos FROM member
+    Vote own for: Alice may vote for Prop of Alice's Delos, Prop FROM proposal, Delos FROM member
+    Vote against: Alice may vote against Prop of Bob's Delos, Bob FROM member, Prop FROM proposal, Delos FROM member
+    Vote own against: Alice may vote against Prop of Alice's Delos, Prop FROM proposal, Delos FROM member
+    Pass: Alice may pass Prop of Delos, Prop FROM proposal, Delos FROM steward
+    Reject: Alice may reject Prop of Delos, Prop FROM proposal, Delos FROM steward
+
+SCREEN Person ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision

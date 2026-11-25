@@ -1,18 +1,30 @@
 /* The UI language of the prototype: a reader, and the checker of the paper's two propositions.
  *
- *   screen NAME            the start screen is the first; another screen has one parameter: screen Person(p)
- *       inbox                    the pending questions of the person, with yes and no
- *       me: P, Q                 details: the facts of predicates P, Q about the person, or about the parameter (p: P, Q)
- *       list T: everyone|of P; shows P, Q; opens S     a list of every person named in the state, or of those in P's facts
- *       list T: atoms of P [with p.i]; ...               a list of the person's P facts; on a screen whose parameter is
- *                                                      a fact, `with` keeps those that name its argument at position i
- *       BUTTON: Role = SOURCE, ...                     an action for the act of that button; SOURCE is the parameter,
- *                                                      field (an open field), or pick everyone | pick of P
+ * Alice is the person whose phone it is.  Keywords are in capitals; everything else is the contract's.
+ *
+ *   SCREEN Chats:                                    the first screen is the start screen
+ *   SCREEN Chat ABOUT Bob:                           a screen about a person or a value, named Bob here
+ *   SCREEN Group ABOUT "Alice is a member of Bob's Grupo":   or about a fact of Alice's, in the contract's words
+ *       QUESTIONS                                    the questions put to Alice, with yes and no
+ *       SHOW Alice: identity, person                 facts of these predicates about Alice, about a name of the
+ *       SHOW Bob: knows, friend                      screen's subject, or (SHOW:) about the whole subject
+ *       THREAD: message, sent_message                the same, drawn as a conversation
+ *       LIST Contacts: EVERYONE WITH knows OPENS Chat        everyone named in Alice's facts
+ *       LIST Groups: "Alice is a member of Bob's Grupo" OPENS Group   Alice's facts of a predicate; on a screen
+ *                                                    about a fact, a name they share with it keeps the list to it
+ *       LIST Markets: FROM keeper OPENS Market       the values in Alice's facts of a predicate
+ *       Introduce: Alice may introduce Carol to Bob, Carol FROM knows
+ *           an action: its button, then the contract's sentence for the act, its names renamed as one likes
+ *           (Alice for the one who acts); a name of the screen's subject takes its value from it, and any other
+ *           name is TYPED, FROM EVERYONE, FROM a predicate's values, or IS a name of the subject; an act whose
+ *           clause only points to another (Pay issuer: Notes:3, ...) is written with no sentence, in the act's names
  */
 (function (G) {
+  const SRC = /^([A-Z]\w*)\s+(TYPED|FROM\s+EVERYONE|FROM\s+[a-z]\w*|IS\s+[A-Z]\w*)$/;
+  const KEYWORDS = /^(SCREEN|SHOW|LIST|THREAD|QUESTIONS|ABOUT|WITH|OPENS|FROM|TYPED|EVERYONE|IS)\b/;
   function read(text) {
     const ui = {name: '', start: null, containers: {}}, lines = [], errors = [];
-    let scr = null, n = 0, picks = 0;
+    let scr = null, n = 0;
     const err = (i, m) => errors.push({line: i, msg: m});
     for (const raw of text.split('\n')) {
       n++;
@@ -22,75 +34,160 @@
       if (!s) { if (raw.trim().startsWith('#')) L.kind = 'comment'; continue; }
       let m;
       if (ind === 0) {
-        if (!(m = s.match(/^screen\s+([A-Za-z][\w-]*)\s*(?:\(\s*([a-z]\w*)\s*\))?$/))) { err(n, 'expected: screen NAME or screen NAME(p)'); continue; }
+        if (!(m = s.match(/^SCREEN\s+([A-Za-z][\w-]*)(?:\s+ABOUT\s+(?:"([^"]+)"|([A-Z]\w*)))?\s*:$/))) { err(n, 'expected: SCREEN Name: or SCREEN Name ABOUT Bob: or SCREEN Name ABOUT "a fact":'); continue; }
         scr = m[1];
-        if (ui.containers[scr]) { err(n, 'screen ' + scr + ' twice'); continue; }
-        ui.containers[scr] = {params: m[2] ? [m[2]] : [], components: [], line: n};
-        if (!ui.start) { ui.start = scr; if (m[2]) err(n, 'the start screen has no parameter'); }
-        else if (!m[2]) err(n, 'a screen other than the start has one parameter');
+        if (ui.containers[scr]) { err(n, 'screen ' + scr + ' twice'); scr = null; continue; }
+        ui.containers[scr] = {params: m[2] || m[3] ? ['it'] : [], components: [], line: n, aboutText: m[2] || null, aboutName: m[3] || null};
+        if (!ui.start) { ui.start = scr; if (m[2] || m[3]) err(n, 'the start screen is about nothing'); }
+        else if (!m[2] && !m[3]) err(n, 'a screen other than the start is ABOUT something');
         Object.assign(L, {kind: 'screen', screen: scr});
         continue;
       }
       if (!scr) { err(n, 'a line before the first screen'); continue; }
       const C = ui.containers[scr], id = 'l' + n, base = {id, line: n};
-      if (s === 'inbox') { C.components.push({...base, zone: 'top', kind: 'inbox'}); Object.assign(L, {kind: 'comp', screen: scr, id}); continue; }
-      if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+|atoms\s+of\s+\w+(?:\s+with\s+[a-z]\w*\.\d)?)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
-        const w = m[2].match(/^atoms\s+of\s+(\w+)(?:\s+with\s+([a-z]\w*)\.(\d))?$/);
-        const c = {...base, zone: 'middle', kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : w ? {atoms: w[1]} : {pred: m[2].replace(/^of\s+/, '')}};
-        if (w && w[2]) { if (!C.params.includes(w[2])) { err(n, w[2] + ' is not the parameter of ' + scr); continue; } c.items.within = {param: w[2], pos: +w[3]}; }
-        for (const part of m[3].split(';').map(x => x.trim()).filter(Boolean)) {
-          if (part.startsWith('shows')) c.shows = part.slice(5).split(',').map(x => x.trim()).filter(Boolean);
-          else c.opens = part.slice(5).trim();
+      const push = c => { C.components.push(c); Object.assign(L, {kind: 'comp', screen: scr, id}); };
+      if (s === 'QUESTIONS') { push({...base, zone: 'top', kind: 'inbox'}); continue; }
+      if ((m = s.match(/^SHOW(?:\s+([A-Z]\w*))?\s*:\s*([\w,\s]+)$/))) { push({...base, zone: 'middle', kind: 'details', name: m[1] || null, shows: m[2].split(',').map(x => x.trim()).filter(Boolean)}); continue; }
+      if ((m = s.match(/^THREAD\s*:\s*([\w,\s]+)$/))) { push({...base, zone: 'middle', kind: 'thread', shows: m[1].split(',').map(x => x.trim()).filter(Boolean)}); continue; }
+      if ((m = s.match(/^LIST\s+([^:"]+):\s*(EVERYONE|FROM\s+[a-z]\w*|"[^"]+")(?:\s+WITH\s+([\w\s,]+?))?(?:\s+OPENS\s+([\w-]+))?$/))) {
+        const c = {...base, zone: 'middle', kind: 'list', title: m[1].trim(), items: m[2] === 'EVERYONE' ? {named: true} : m[2].startsWith('FROM') ? {pred: m[2].replace(/^FROM\s+/, '')} : {fact: m[2].slice(1, -1)}};
+        if (m[3]) c.shows = m[3].split(',').map(x => x.trim()).filter(Boolean);
+        if (m[4]) c.opens = m[4];
+        push(c); continue;
+      }
+      if (KEYWORDS.test(s)) { err(n, 'not understood'); continue; }
+      if ((m = s.match(/^([A-Z][\w' -]*?):\s*(.*)$/)) || (m = s.match(/^([A-Z][\w' -]*)()$/))) {
+        const parts = m[2].replace(/\.\s*$/, '').split(/,\s*/), sources = {};
+        while (parts.length && SRC.test(parts[parts.length - 1].trim())) {
+          const q = parts.pop().trim().match(SRC);
+          sources[q[1]] = q[2] === 'TYPED' ? {field: true} : /^IS\s/.test(q[2]) ? {is: q[2].replace(/^IS\s+/, '')} : /^FROM\s+EVERYONE$/.test(q[2]) ? {from: 'everyone'} : {from: q[2].replace(/^FROM\s+/, '')};
         }
-        C.components.push(c); Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
-      }
-      if ((m = s.match(/^thread:\s*([\w,\s]+)$/))) {
-        C.components.push({...base, zone: 'middle', kind: 'thread', shows: m[1].split(',').map(x => x.trim()).filter(Boolean)});
-        Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
-      }
-      if ((m = s.match(/^(me|[a-z]\w*)(?:\.(\d))?:\s*([\w,\s]+)$/)) && (m[1] === 'me' || C.params.includes(m[1]))) {
-        C.components.push({...base, zone: 'middle', kind: 'details', about: m[1], pos: m[2] ? +m[2] : null, shows: m[3].split(',').map(x => x.trim()).filter(Boolean)});
-        Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
-      }
-      if ((m = s.match(/^([A-Z][\w' -]*?)\s*(?::\s*(.*))?$/))) {
-        const c = {...base, zone: 'bottom', kind: 'action', button: m[1].trim(), bind: {}};
-        for (const part of (m[2] || '').split(',').map(x => x.trim()).filter(Boolean)) {
-          const q = part.match(/^([A-Z]\w*)\s*=\s*(typed|pick everyone|pick of \w+|[a-z]\w*\.\d|[a-z]\w*)$/);
-          if (!q) { err(n, 'expected: Role = field, pick everyone, pick of P, the parameter, or p.i'); continue; }
-          let v = q[2];
-          if (v === 'field') v = {field: true};
-          else if (/\.\d$/.test(v)) { const [pp, i] = v.split('.'); if (!C.params.includes(pp)) { err(n, pp + ' is not the parameter of ' + scr); continue; } v = {param: pp, pos: +i}; }
-          else if (v.startsWith('pick')) {
-            const pid = 'pick' + (++picks);
-            C.components.push({id: pid, zone: 'middle', line: n, kind: 'list', hidden: true, title: v, items: v === 'pick everyone' ? {named: true} : {pred: v.replace('pick of ', '')}});
-            v = {select: pid};
-          } else if (!C.params.includes(v)) { err(n, v + ' is not the parameter of ' + scr); continue; }
-          c.bind[q[1]] = v;
-        }
-        C.components.push(c); Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
+        push({...base, zone: 'bottom', kind: 'action', button: m[1].trim(), said: parts.join(', ').trim(), sources, bind: {}});
+        continue;
       }
       err(n, 'not understood');
-    }
-    for (const [name, d] of Object.entries(ui.containers)) for (const c of d.components) if (c.opens) {
-      const to = ui.containers[c.opens];
-      if (!to) err(c.line, 'no screen ' + c.opens);
-      else c.event = {navigate: c.opens, bind: {[to.params[0]]: 'item'}};
     }
     if (!ui.start) err(1, 'no screen');
     return {ui, lines, errors};
   }
 
-  /* the act of an action: by its button, and, of several, the one whose roles the bindings name */
-  function actOf(spec, c) {
-    const as = spec.acts.filter(a => a.button === c.button);
-    return as.find(a => Object.keys(c.bind).every(r => a.names.includes(r))) || as[0];
+  /* a sentence of the contract as a pattern: its names (of the act's places, or of a phrase's variables)
+     match any capitalized names, the same name where it repeats, and his, her, its or their one another */
+  const PRON = /\b(?:his|her|hers|him|its|their)\b/g;
+  const reEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function pattern(text, slots) {
+    let re = '', last = 0;
+    const order = [], words = /\b[A-Za-z]\w*\b/g, lit = x => reEsc(x).replace(PRON, '(?:his|her|hers|him|its|their)').replace(/\s+/g, '\\s+');
+    let w;
+    while ((w = words.exec(text))) {
+      if (!slots.includes(w[0])) continue;
+      re += lit(text.slice(last, w.index));
+      const j = order.indexOf(w[0]);
+      re += j < 0 ? '([A-Z]\\w*)' : '\\' + (j + 1);
+      if (j < 0) order.push(w[0]);
+      last = w.index + w[0].length;
+    }
+    re += lit(text.slice(last));
+    return {re: new RegExp('^' + re + '\\.?$'), order};
   }
+  function matchWith(pat, text) {
+    const m = text.trim().match(pat.re);
+    if (!m) return null;
+    const map = {};
+    pat.order.forEach((x, j) => map[x] = m[j + 1]);
+    return new Set(Object.values(map)).size === pat.order.length ? map : null;
+  }
+  /* a fact of Alice's, in the words of the contract's vocabulary: its predicate and the names of its arguments */
+  function fact(spec, text) {
+    /* or in the Logic pragmas' form, pred(Alice, Bob), which every predicate has, a phrase or not */
+    const m = text.trim().match(/^([a-z]\w*)\(([^()]*)\)$/);
+    if (m) {
+      const xs = m[2].split(',').map(x => x.trim()), known = spec.vocab[m[1]] ? spec.vocab[m[1]].vars.length : (spec.acts.flatMap(a => a.req.concat(a.forb)).find(([p]) => p === m[1]) || [null, null])[1];
+      if (known === null || (typeof known === 'number' ? known : known.length + 1) !== xs.length || !xs.every(x => /^[A-Z]\w*$/.test(x))) return null;
+      return {pred: m[1], holder: xs[0], args: xs.slice(1)};
+    }
+    for (const [p, v] of Object.entries(spec.vocab)) {
+      if ((spec.env || []).includes(p)) continue;
+      const m = matchWith(pattern(v.phrase, v.vars), text);
+      if (m) return {pred: p, holder: m[v.vars[0]], args: v.vars.slice(1).map(x => m[x])};
+    }
+    return null;
+  }
+  const template = a => a.sentence.split(/\.\s/)[0].replace(/\.$/, '');
+
   function resolve(spec, parsed) {
-    for (const d of Object.values(parsed.ui.containers)) for (const c of d.components) if (c.kind === 'action') {
-      const a = actOf(spec, c);
-      if (!a) { parsed.errors.push({line: c.line, msg: 'the contract has no act of the button ' + c.button}); continue; }
-      c.act = a.name;
-      for (const r of Object.keys(c.bind)) if (!a.names.includes(r)) parsed.errors.push({line: c.line, msg: a.button + ' has no role ' + r + ' (its roles: ' + a.names.join(', ') + ')'});
+    const {ui, errors} = parsed, err = (i, m) => errors.push({line: i, msg: m});
+    let picks = 0;
+    for (const C of Object.values(ui.containers)) {
+      /* the subject: its names, each the whole subject or an argument of the fact at its position */
+      C.names = {};
+      if (C.aboutName) C.names[C.aboutName] = null;
+      if (C.aboutText) {
+        const f = fact(spec, C.aboutText);
+        if (!f) err(C.line, 'no fact of the contract reads "' + C.aboutText + '"');
+        else if (f.holder !== 'Alice') err(C.line, 'a screen is about a fact of Alice\'s: it starts with Alice');
+        else { C.aboutPred = f.pred; f.args.forEach((x, j) => { if (!(x in C.names)) C.names[x] = j + 1; }); }
+      }
+      for (const c of [...C.components]) {
+        if (c.kind === 'details') {
+          if (!c.name) { if (!C.params.length) err(c.line, 'SHOW: shows the subject, and this screen is about nothing'); c.about = 'it'; c.pos = null; }
+          else if (c.name === 'Alice') { c.about = 'me'; c.pos = null; }
+          else if (c.name in C.names) { c.about = 'it'; c.pos = C.names[c.name]; }
+          else err(c.line, c.name + ' is neither Alice nor a name of the screen\'s subject');
+        }
+        if (c.kind === 'list' && c.items.fact) {
+          const f = fact(spec, c.items.fact);
+          if (!f) { err(c.line, 'no fact of the contract reads "' + c.items.fact + '"'); continue; }
+          if (f.holder !== 'Alice') { err(c.line, 'a list is of Alice\'s facts: it starts with Alice'); continue; }
+          c.items = {atoms: f.pred, args: f.args};
+          const shared = f.args.filter(x => x in C.names);
+          if (shared.length) {
+            if (C.names[shared[0]] === null) err(c.line, 'a list is kept only to a part of a fact the screen is about');
+            else c.items.within = {param: 'it', pos: C.names[shared[0]]};
+          }
+        }
+        if (c.kind !== 'action') continue;
+        const cands = spec.acts.filter(a => a.button === c.button);
+        if (!cands.length) { err(c.line, 'the contract has no act of the button ' + c.button); continue; }
+        let a = null, map = null;
+        for (const x of cands) {
+          const slots = [...new Set(x.all.concat(x.names))];
+          const mm = c.said ? matchWith(pattern(template(x), slots), c.said) : Object.fromEntries(x.names.map(r => [r, r]));
+          if (mm) { a = x; map = mm; break; }
+        }
+        if (!a) { err(c.line, 'not the contract\'s sentence for ' + c.button + ', "' + template(cands[0]) + '", with its names renamed'); continue; }
+        c.act = a.name;
+        const nm = r => map[r] || r, me = a.names[a.me - 1];
+        /* in a sentence Alice is the one who acts; a name the sentence does not say, and a line with no sentence, are the act's own */
+        if (c.said && me in map && map[me] !== 'Alice') { err(c.line, map[me] + ' acts here; the one who acts is Alice'); continue; }
+        const used = new Set();
+        for (const r of a.names) {
+          if (r === me) continue;
+          const N = nm(r);
+          used.add(N);
+          if (c.said && r in map && N === 'Alice') { err(c.line, 'Alice is the one who acts; ' + r + ' needs another name'); continue; }
+          const src = c.sources[N];
+          if (src && src.is) {
+            if (src.is in C.names) c.bind[r] = C.names[src.is] === null ? 'it' : {param: 'it', pos: C.names[src.is]};
+            else err(c.line, src.is + ' is not a name of the screen\'s subject');
+          } else if (src) {
+            if (src.field) c.bind[r] = {field: true};
+            else {
+              const pid = 'pick' + (++picks);
+              C.components.push({id: pid, zone: 'middle', line: c.line, kind: 'list', hidden: true, title: N, items: src.from === 'everyone' ? {named: true} : {pred: src.from}});
+              c.bind[r] = {select: pid};
+            }
+          } else if (N in C.names) c.bind[r] = C.names[N] === null ? 'it' : {param: 'it', pos: C.names[N]};
+        }
+        for (const N of Object.keys(c.sources)) if (!used.has(N)) err(c.line, N + ' is not a name of this sentence');
+      }
+    }
+    for (const d of Object.values(ui.containers)) for (const c of d.components) if (c.opens) {
+      const to = ui.containers[c.opens];
+      if (!to) { err(c.line, 'no screen ' + c.opens); continue; }
+      if (to.aboutPred && c.items.atoms !== to.aboutPred) err(c.line, c.opens + ' is about a ' + to.aboutPred + ' fact, and this list is not of them');
+      else if (!to.aboutPred && c.items.atoms) err(c.line, c.opens + ' is about a person or a value, and this list is of facts');
+      else c.event = {navigate: c.opens, bind: {it: 'item'}};
     }
     return parsed;
   }
@@ -106,7 +203,7 @@
       const names = [...new Set(s.persons.concat(Object.keys(s.one), s.values))].filter(x => !env.has(x) && !sets.has(x) && !derived.has(x));
       const me = s.by[0], loc = (c) => [c.p, c.args.slice(1).map(x => names.includes(x) ? names.indexOf(x) + 1 : null)];
       const mine = s.pre.filter(c => c.p && c.args[0] === me && !sim.env.includes(c.p));
-      return {name: s.name, button: s.button, names, me: names.indexOf(me) + 1, args: names, roles: s.persons.map(x => names.indexOf(x) + 1), people: s.persons.concat(Object.keys(s.one)).map(x => names.indexOf(x) + 1),
+      return {name: s.name, button: s.button, names, all: s.persons.concat(Object.keys(s.one), s.values), pnames: s.persons.concat(Object.keys(s.one)), me: names.indexOf(me) + 1, args: names, roles: s.persons.map(x => names.indexOf(x) + 1), people: s.persons.concat(Object.keys(s.one)).map(x => names.indexOf(x) + 1),
         values: s.values.filter(x => !env.has(x) && !s.persons.includes(x) && !sets.has(x) && !derived.has(x)), types: s.types || {}, field: s.field, sentence: s.sentence, questions: s.questions,
         req: mine.filter(c => !c.neg).map(loc), forb: mine.filter(c => c.neg).map(loc)};
     });
@@ -201,7 +298,7 @@
     /* Proposition 2: a predicate with arguments is shown by a list of its atoms on the start screen or, if
        its atoms each name a person, next to everyone there or by the details of a person whose screen that
        list opens; one without arguments, by the person's details on the start screen */
-    const st = ui.containers[ui.start].components, shown = new Set(), arity = p => spec.vocab[p] ? spec.vocab[p].vars.length - 1 : 0;
+    const st = ui.containers[ui.start].components, shown = new Set(), arity = p => spec.vocab[p] ? spec.vocab[p].vars.length - 1 : (spec.acts.flatMap(a => a.req.concat(a.forb)).find(([q]) => q === p) || [null, []])[1].length;
     const everyone = st.filter(x => x.kind === 'list' && !x.hidden && x.items.named);
     const opened = new Set(everyone.filter(x => x.event).map(x => x.event.navigate));
     for (const p of preds) {
@@ -277,6 +374,6 @@
     }
     return Object.keys(out).filter(p => out[p]);
   }
-  const api = {read, resolve, check, brute, actOf, acts, personal};
+  const api = {read, resolve, check, brute, acts, personal, fact, template};
   if (typeof module !== 'undefined') module.exports = api; else G.GUI = api;
 })(this);
