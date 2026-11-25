@@ -69,6 +69,7 @@
     "Alice"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -111,6 +112,7 @@
     "Bob"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -188,6 +190,7 @@
     "Carol"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -294,6 +297,7 @@
     "Bob"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -394,6 +398,7 @@
     "Bob"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -475,5 +480,6 @@
  },
  "env": [
   "today"
- ]
+ ],
+ "parametric": []
 }

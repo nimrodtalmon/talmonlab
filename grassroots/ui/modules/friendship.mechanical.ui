@@ -1,0 +1,14 @@
+# Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
+screen Home
+  inbox
+  me: identity, person
+  list People: everyone; shows knows, friend; opens Person
+  Establish
+  Acquaint: Bob = field
+  Introduce: Bob = pick of knows, Carol = pick of knows
+  Befriend: Bob = pick of knows
+  Unfriend: Bob = pick of friend
+
+screen Person(p)
+  inbox
+  p: knows, friend

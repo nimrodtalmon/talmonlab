@@ -164,9 +164,9 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 <script src="engine.js"></script>
 <script>
 const CONTRACTS = {
-  chat: {title: 'Chat (proposed)', modules: {chats: 'Chats'}},
-  groups: {title: 'Groups', modules: {chats: 'Chats'}},
-  friendship: {title: 'Friendship', modules: {people: 'People', pages: 'Pages only (not complete)'}},
+  chat: {title: 'Chat (proposed)', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
+  groups: {title: 'Groups', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
+  friendship: {title: 'Friendship', modules: {people: 'People', mechanical: 'Mechanical', pages: 'Pages only (not complete)'}},
 };
 /* the look: modules that change how the app is drawn and nothing of what it lets a person do */
 const LOOKS = {
@@ -398,7 +398,7 @@ function contractPanel() {
   h += `<p class="lg" style="margin-top:12px">■ enforced by the app · ◆ attested · ○ undertaken by the person.</p>`;
   $('#contract').innerHTML = h;
 }
-const KW = /\b(screen|top|middle|bottom|inbox|list|shows|opens|everyone|atoms|of|pick|field|thread)\b/g;
+const KW = /\b(screen|inbox|list|shows|opens|everyone|atoms|of|pick|field|thread)\b/g;
 function codeLine(L) {
   const comp = L.screen && L.id ? P.ui.containers[L.screen].components.find(c => c.id === L.id) : null;
   let keys = ['line:' + L.n], g = '', why = [];
@@ -419,13 +419,13 @@ function codeLine(L) {
   return `<div class="ln" ${K(...keys)}><span class="no">${L.n}</span><span class="g">${g}</span><span>${t}</span></div>` + why.map(w => `<div class="why">${esc(w)}</div>`).join('');
 }
 function codePanel() {
-  let h = `<h3>${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Screens in three zones: notifications, the person's state, actions. Each action is an act of the contract; each role gets a source. The checker reads it against the contract.</p>`;
+  let h = `<h3>${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Each screen lists what it shows and which acts it offers. Each action is an act of the contract, with a source for each role. The checker reads it against the contract; where things go on the screen is the look's.</p>`;
   const n = Object.values(R.acts).filter(a => a.covered).length, m = Object.keys(R.acts).length;
   h += `<div class="sum"><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}: ${n} of ${m} acts covered${Object.values(R.acts).filter(a => !a.covered).map(a => ' · <span class="badm">' + esc(a.button) + '</span>').join('')}</div>`;
   h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact shown' : '<span class="badm">✗ hidden</span>: ' + R.hidden.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ')}</div>`;
   if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
-  h += `<div class="ct">The language</div><div class="lg"><b>screen</b> Name, or Name(p) opened from a list with the item as p · <b>inbox</b> · <b>me</b>: facts, or <b>p</b>: facts · <b>thread</b>: facts · <b>list</b> Title: <b>everyone</b>, <b>of</b> fact, or <b>atoms of</b> fact; <b>shows</b> facts; <b>opens</b> Screen · Button: Role = p, p.i, <b>field</b>, <b>pick everyone</b> or <b>pick of</b> fact. The zones top, middle and bottom only place things.</div>`;
+  h += `<div class="ct">The language</div><div class="lg"><b>screen</b> Name, or Name(p) opened from a list with the item as p · <b>inbox</b> · <b>me</b>: facts, or <b>p</b>: facts · <b>thread</b>: facts · <b>list</b> Title: <b>everyone</b>, <b>of</b> fact, or <b>atoms of</b> fact; <b>shows</b> facts; <b>opens</b> Screen · Button: Role = p, p.i, <b>field</b>, <b>pick everyone</b> or <b>pick of</b> fact.</div>`;
   $('#code').innerHTML = h;
 }
 function render() {

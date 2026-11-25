@@ -1,0 +1,23 @@
+# Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
+screen Home
+  inbox
+  me: identity, person
+  list People: everyone; shows knows, friend, member, listed, message, posted, group_delivered, group_message; opens Person
+  list Leader: atoms of leader
+  Establish
+  Acquaint: Bob = field
+  Introduce: Bob = pick of knows, Carol = pick of knows
+  Befriend: Bob = pick of knows
+  Unfriend: Bob = pick of friend
+  Message: Bob = pick of friend, Text = field
+  Create: Grupo = field
+  Close: Grupo = pick of leader
+  Join: Bob = pick of friend, Grupo = pick of leader
+  Remove: Bob = pick of listed, Grupo = pick of leader
+  Leave: Alice = pick of member, Grupo = pick of member
+  Post: Alice = pick of member, Text = field, Grupo = pick of member
+  Post own: Text = field, Grupo = pick of member
+
+screen Person(p)
+  inbox
+  p: knows, friend, member, listed, message, posted, group_delivered, group_message

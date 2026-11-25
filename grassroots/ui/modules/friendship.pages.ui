@@ -1,17 +1,13 @@
 # Pages only: every act on a person's page. Not complete.
 screen Home
-  top
-    inbox
-  middle
-    me: identity, person
-    list Contacts: everyone; shows knows; opens Person
-  bottom
-    Establish
+  inbox
+  me: identity, person
+  list Contacts: everyone; shows knows; opens Person
+  Establish
 
 screen Person(p)
-  bottom
-    Acquaint: Bob = p
-    Befriend: Bob = p
-    Unfriend: Bob = p
-    Introduce: Bob = p, Carol = pick of knows
-    Introduce: Carol = p, Bob = pick of knows
+  Acquaint: Bob = p
+  Befriend: Bob = p
+  Unfriend: Bob = p
+  Introduce: Bob = p, Carol = pick of knows
+  Introduce: Carol = p, Bob = pick of knows

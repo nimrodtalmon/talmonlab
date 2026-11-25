@@ -63,26 +63,56 @@ def parse(s):
 
 
 def atom(t):
-    """atom(P, Args) -> {p, args, neg}; not(atom) -> neg; forall(Vars, A, true, Body)."""
-    if t.get('f') == 'not':
+    """atom(P, Args) -> {p, args, neg}; not(c) -> neg; forall(Vars, A, true, Body); or(...); exists(Vars, Body);
+    and(...) -> a list of conditions, flattened by conds()."""
+    f = t.get('f') if isinstance(t, dict) else None
+    if f == 'not':
         a = atom(t['a'][0])
-        a['neg'] = True
-        return a
-    if t.get('f') == 'forall':
+        if isinstance(a, dict) and 'p' in a:
+            a['neg'] = True
+            return a
+        return {'not': a}
+    if f == 'forall':
         vs, a, _, body = t['a']
-        return {'forall': vs, 'over': atom(a), 'then': [atom(b) for b in body]}
+        return {'forall': vs, 'over': atom(a), 'then': conds(body)}
+    if f == 'exists':
+        return {'exists': t['a'][0], 'body': conds(t['a'][1])}
+    if f == 'or':
+        return {'or': [conds(x) for x in t['a']]}
+    if f == 'and':
+        return {'and': conds(t)}
     p, args = t['a']
-    return {'p': p['w'] if isinstance(p, dict) else p, 'args': [x['a'][0] if isinstance(x, dict) and x.get('f') == 'const' else x for x in args], 'neg': False}
+    return {'p': p['w'] if isinstance(p, dict) else p, 'args': [arg(x) for x in args], 'neg': False}
+
+
+TYPES = {}
+
+
+def arg(x):
+    """A typed argument, const(V), num(V), set(V), text(V) or val(V), is its variable; the type is kept in TYPES."""
+    if isinstance(x, dict) and x.get('f') in ('const', 'num', 'set', 'text', 'val') and len(x['a']) == 1 and isinstance(x['a'][0], str):
+        TYPES.setdefault(x['a'][0], x['f'])
+        return x['a'][0]
+    return x
+
+
+def conds(t):
+    if isinstance(t, list):
+        return [c for x in t for c in conds(x)]
+    if isinstance(t, dict) and t.get('f') == 'and':
+        return [c for x in t['a'] for c in conds(x)]
+    if isinstance(t, dict) and t.get('w') == 'true':
+        return []
+    return [atom(t)]
 
 
 def schemas(text):
     t = parse(text.strip())
-    if isinstance(t, dict) and t.get('f') == 'environment':
+    refl, env, param = [], [], []
+    while isinstance(t, dict) and t.get('f') in ('environment', 'reflexive', 'parametric'):
+        {'environment': env, 'reflexive': refl, 'parametric': param}[t['f']].extend(t['a'][0])
         t = t['a'][1]
-    if isinstance(t, dict) and t.get('f') == 'reflexive':
-        refl, ss = t['a'][0], t['a'][1]
-    else:
-        refl, ss = [], t
+    ss = t
     out = []
     for s in ss:
         name, persons, values, eff, pre, _, by = s['a']
@@ -93,9 +123,12 @@ def schemas(text):
                 one[p['a'][0]] = p['a'][1] if isinstance(p['a'][1], list) else [p['a'][1]]
             else:
                 ps.append(p)
-        out.append({'name': name, 'persons': ps, 'one': one, 'values': [v for v in values if v not in one],
-                    'effects': [atom(x) for x in eff], 'pre': [atom(x) for x in pre], 'by': by})
-    return [r['w'] if isinstance(r, dict) else r for r in refl], out
+        TYPES.clear()
+        eff_, pre_ = conds(eff), conds(pre)
+        out.append({'name': name, 'persons': ps, 'one': one, 'types': dict(TYPES), 'values': [v for v in values if v not in one],
+                    'effects': eff_, 'pre': pre_, 'by': by})
+    w = lambda xs: [r['w'] if isinstance(r, dict) else r for r in xs]
+    return w(refl), w(env), w(param), out
 
 
 # ---------- the texts ----------
@@ -194,7 +227,7 @@ def main():
         if len(cols) == 5 and cols[0] and cols[0] != 'name on main':
             names[cols[1]] = cols[2]
     order = chain(calc, name, names)
-    refl, ss = schemas(open(os.path.join(calc, 'glp', name + '.glp.txt')).read())
+    refl, envs, param, ss = schemas(open(os.path.join(calc, 'glp', name + '.glp.txt')).read())
     voc, sent, texts, iface, tabs = {}, {}, [], {}, {}
     for n in order:
         gr = open(os.path.join(calc, 'gr', n + '.txt')).read().split('\n')
@@ -222,7 +255,7 @@ def main():
         s['questions'] = i.get('questions', {})
         s['field'] = i.get('field')
     json.dump({'contract': name, 'chain': texts, 'vocab': voc, 'reflexive': refl, 'schemas': ss, 'tabs': tabs,
-               'env': ['today']}, open(out, 'w'), indent=1, ensure_ascii=False)
+               'env': envs or ['today'], 'parametric': param}, open(out, 'w'), indent=1, ensure_ascii=False)
     print(name, len(ss), 'schemas;', 'chain', order)
 
 

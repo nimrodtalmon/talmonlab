@@ -1,7 +1,6 @@
 /* The UI language of the prototype: a reader, and the checker of the paper's two propositions.
  *
  *   screen NAME            the start screen is the first; another screen has one parameter: screen Person(p)
- *     top | middle | bottom      three zones: notifications, state, actions
  *       inbox                    the pending questions of the person, with yes and no
  *       me: P, Q                 details: the facts of predicates P, Q about the person, or about the parameter (p: P, Q)
  *       list T: everyone|of P; shows P, Q; opens S     a list of every person named in the state, or of those in P's facts
@@ -11,7 +10,7 @@
 (function (G) {
   function read(text) {
     const ui = {name: '', start: null, containers: {}}, lines = [], errors = [];
-    let scr = null, zone = null, n = 0, picks = 0;
+    let scr = null, n = 0, picks = 0;
     const err = (i, m) => errors.push({line: i, msg: m});
     for (const raw of text.split('\n')) {
       n++;
@@ -22,7 +21,7 @@
       let m;
       if (ind === 0) {
         if (!(m = s.match(/^screen\s+([A-Za-z][\w-]*)\s*(?:\(\s*([a-z]\w*)\s*\))?$/))) { err(n, 'expected: screen NAME or screen NAME(p)'); continue; }
-        scr = m[1]; zone = null;
+        scr = m[1];
         if (ui.containers[scr]) { err(n, 'screen ' + scr + ' twice'); continue; }
         ui.containers[scr] = {params: m[2] ? [m[2]] : [], components: [], line: n};
         if (!ui.start) { ui.start = scr; if (m[2]) err(n, 'the start screen has no parameter'); }
@@ -31,15 +30,10 @@
         continue;
       }
       if (!scr) { err(n, 'a line before the first screen'); continue; }
-      if (ind <= 2) {
-        if (!['top', 'middle', 'bottom'].includes(s)) { err(n, 'expected: top, middle or bottom'); continue; }
-        zone = s; Object.assign(L, {kind: 'zone', screen: scr, zone}); continue;
-      }
-      if (!zone) { err(n, 'a component outside top, middle or bottom'); continue; }
-      const C = ui.containers[scr], id = 'l' + n, base = {id, zone, line: n};
-      if (s === 'inbox') { C.components.push({...base, kind: 'inbox'}); Object.assign(L, {kind: 'comp', screen: scr, id}); continue; }
+      const C = ui.containers[scr], id = 'l' + n, base = {id, line: n};
+      if (s === 'inbox') { C.components.push({...base, zone: 'top', kind: 'inbox'}); Object.assign(L, {kind: 'comp', screen: scr, id}); continue; }
       if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+|atoms\s+of\s+\w+)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
-        const c = {...base, kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : m[2].startsWith('atoms') ? {atoms: m[2].replace(/^atoms\s+of\s+/, '')} : {pred: m[2].replace(/^of\s+/, '')}};
+        const c = {...base, zone: 'middle', kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : m[2].startsWith('atoms') ? {atoms: m[2].replace(/^atoms\s+of\s+/, '')} : {pred: m[2].replace(/^of\s+/, '')}};
         for (const part of m[3].split(';').map(x => x.trim()).filter(Boolean)) {
           if (part.startsWith('shows')) c.shows = part.slice(5).split(',').map(x => x.trim()).filter(Boolean);
           else c.opens = part.slice(5).trim();
@@ -47,15 +41,15 @@
         C.components.push(c); Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
       }
       if ((m = s.match(/^thread:\s*([\w,\s]+)$/))) {
-        C.components.push({...base, kind: 'thread', shows: m[1].split(',').map(x => x.trim()).filter(Boolean)});
+        C.components.push({...base, zone: 'middle', kind: 'thread', shows: m[1].split(',').map(x => x.trim()).filter(Boolean)});
         Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
       }
       if ((m = s.match(/^(me|[a-z]\w*):\s*([\w,\s]+)$/)) && (m[1] === 'me' || C.params.includes(m[1]))) {
-        C.components.push({...base, kind: 'details', about: m[1], shows: m[2].split(',').map(x => x.trim()).filter(Boolean)});
+        C.components.push({...base, zone: 'middle', kind: 'details', about: m[1], shows: m[2].split(',').map(x => x.trim()).filter(Boolean)});
         Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
       }
       if ((m = s.match(/^([A-Z][\w' -]*?)\s*(?::\s*(.*))?$/))) {
-        const c = {...base, kind: 'action', button: m[1].trim(), bind: {}};
+        const c = {...base, zone: 'bottom', kind: 'action', button: m[1].trim(), bind: {}};
         for (const part of (m[2] || '').split(',').map(x => x.trim()).filter(Boolean)) {
           const q = part.match(/^([A-Z]\w*)\s*=\s*(typed|pick everyone|pick of \w+|[a-z]\w*\.\d|[a-z]\w*)$/);
           if (!q) { err(n, 'expected: Role = field, pick everyone, pick of P, the parameter, or p.i'); continue; }
@@ -64,7 +58,7 @@
           else if (/\.\d$/.test(v)) { const [pp, i] = v.split('.'); if (!C.params.includes(pp)) { err(n, pp + ' is not the parameter of ' + scr); continue; } v = {param: pp, pos: +i}; }
           else if (v.startsWith('pick')) {
             const pid = 'pick' + (++picks);
-            C.components.push({id: pid, zone, line: n, kind: 'list', hidden: true, title: v, items: v === 'pick everyone' ? {named: true} : {pred: v.replace('pick of ', '')}});
+            C.components.push({id: pid, zone: 'middle', line: n, kind: 'list', hidden: true, title: v, items: v === 'pick everyone' ? {named: true} : {pred: v.replace('pick of ', '')}});
             v = {select: pid};
           } else if (!C.params.includes(v)) { err(n, v + ' is not the parameter of ' + scr); continue; }
           c.bind[q[1]] = v;
@@ -103,12 +97,12 @@
   function acts(sim) {
     return sim.schemas.filter(s => !s.auto).map(s => {
       const env = new Set();
-      for (const c of s.pre) if (!c.forall && sim.env.includes(c.p)) env.add(c.args[1]);
-      const names = s.persons.concat(Object.keys(s.one), s.values).filter(x => !env.has(x));
+      for (const c of s.pre) if (c.p === 'today') env.add(c.args[1]);
+      const names = [...new Set(s.persons.concat(Object.keys(s.one), s.values))].filter(x => !env.has(x));
       const me = s.by[0], loc = (c) => [c.p, c.args.slice(1).map(x => names.includes(x) ? names.indexOf(x) + 1 : null)];
-      const mine = s.pre.filter(c => !c.forall && c.args[0] === me && !sim.env.includes(c.p));
+      const mine = s.pre.filter(c => c.p && c.args[0] === me && !sim.env.includes(c.p));
       return {name: s.name, button: s.button, names, me: names.indexOf(me) + 1, args: names, roles: s.persons.map(x => names.indexOf(x) + 1),
-        values: s.values.filter(x => !env.has(x)), field: s.field, sentence: s.sentence, questions: s.questions,
+        values: s.values.filter(x => !env.has(x) && !s.persons.includes(x)), field: s.field, sentence: s.sentence, questions: s.questions,
         req: mine.filter(c => !c.neg).map(loc), forb: mine.filter(c => c.neg).map(loc)};
     });
   }
@@ -172,7 +166,10 @@
     const preds = new Set(Object.keys(spec.vocab).filter(p => !(spec.env || []).includes(p)));
     for (const a of spec.acts) for (const [p] of a.req.concat(a.forb)) preds.add(p);
     const shown = new Set();
-    for (const c of reach) for (const x of ui.containers[c].components) (x.shows || []).forEach(p => shown.add(p));
+    for (const c of reach) for (const x of ui.containers[c].components) {
+      (x.shows || []).forEach(p => shown.add(p));
+      if (x.kind === 'list' && !x.hidden && x.items.atoms) shown.add(x.items.atoms);
+    }
     const inbox = [...reach].some(c => ui.containers[c].components.some(x => x.kind === 'inbox'));
     const hidden = [...preds].filter(p => !shown.has(p)).sort();
     return {acts, comps, hidden, inbox, complete: inbox && Object.values(acts).every(a => a.covered), visible: !hidden.length};

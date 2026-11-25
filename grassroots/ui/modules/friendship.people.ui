@@ -1,19 +1,14 @@
 # People: one screen of people, one screen per person.
 screen Home
-  top
-    inbox
-  middle
-    me: identity, person
-    list Contacts: everyone; shows knows, friend; opens Person
-  bottom
-    Establish
-    Acquaint: Bob = field
+  inbox
+  me: identity, person
+  list Contacts: everyone; shows knows, friend; opens Person
+  Establish
+  Acquaint: Bob = field
 
 screen Person(p)
-  middle
-    p: knows, friend
-  bottom
-    Befriend: Bob = p
-    Unfriend: Bob = p
-    Introduce: Bob = p, Carol = pick of knows
-    Introduce: Carol = p, Bob = pick of knows
+  p: knows, friend
+  Befriend: Bob = p
+  Unfriend: Bob = p
+  Introduce: Bob = p, Carol = pick of knows
+  Introduce: Carol = p, Bob = pick of knows

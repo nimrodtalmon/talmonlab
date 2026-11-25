@@ -143,6 +143,7 @@
     "Alice"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -185,6 +186,7 @@
     "Bob"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -262,6 +264,7 @@
     "Carol"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -368,6 +371,7 @@
     "Bob"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -468,6 +472,7 @@
     "Bob"
    ],
    "one": {},
+   "types": {},
    "values": [],
    "effects": [
     {
@@ -585,6 +590,7 @@
     "Alice"
    ],
    "one": {},
+   "types": {},
    "values": [
     "Text"
    ],
@@ -646,6 +652,9 @@
     "Alice"
    ],
    "one": {},
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Grupo"
    ],
@@ -709,6 +718,9 @@
     "Alice"
    ],
    "one": {},
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Grupo"
    ],
@@ -821,6 +833,9 @@
     "Alice"
    ],
    "one": {},
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Grupo"
    ],
@@ -912,6 +927,9 @@
     "Alice"
    ],
    "one": {},
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Grupo"
    ],
@@ -993,6 +1011,9 @@
     "Alice"
    ],
    "one": {},
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Grupo"
    ],
@@ -1066,6 +1087,9 @@
     "Bob"
    ],
    "one": {},
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Text",
     "Grupo"
@@ -1132,6 +1156,9 @@
     "Alice"
    ],
    "one": {},
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Text",
     "Grupo"
@@ -1196,6 +1223,9 @@
      "Alice",
      "Carol"
     ]
+   },
+   "types": {
+    "Grupo": "const"
    },
    "values": [
     "Text",
@@ -1296,6 +1326,9 @@
      "Alice"
     ]
    },
+   "types": {
+    "Grupo": "const"
+   },
    "values": [
     "Text",
     "Grupo"
@@ -1379,5 +1412,6 @@
  },
  "env": [
   "today"
- ]
+ ],
+ "parametric": []
 }

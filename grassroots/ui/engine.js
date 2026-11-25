@@ -18,13 +18,18 @@
   World.prototype.today = function () { return 'day ' + this.day; };
   World.prototype.has = function (p, args) {
     if (this.spec.reflexive.includes(p) && args.length === 2 && args[0] === args[1] && args[0] !== undefined) return true;
-    if (this.spec.env.includes(p)) return args[1] === undefined || args[1] === this.today();
+    if (p === 'today') return args[1] === undefined || args[1] === this.today();
+    if (this.spec.env.includes(p)) return true;
     for (const a of this.atoms.values()) if (a.p === p && a.args.length === args.length && a.args.every((x, i) => args[i] === undefined || same(x, args[i]))) return true;
     return false;
   };
   /* the arguments of a pattern under a binding: undefined for a wildcard */
   const inst = (a, b) => a.args.map(x => x === '_' ? undefined : (x in b ? b[x] : x));
   World.prototype.holds = function (c, b) {
+    if (c.or) return c.or.some(cs => cs.every(x => this.holds(x, b)));
+    if (c.and) return c.and.every(x => this.holds(x, b));
+    if (c.not) return !this.holds(c.not, b);
+    if (c.exists) return this.solve(c.body, b).length > 0;
     if (c.forall) {
       for (const m of this.match(c.over, b)) if (!c.then.every(t => this.holds(t, m))) return false;
       return true;
@@ -35,7 +40,7 @@
   /* the bindings extending b under which the atom pattern a is in the state */
   World.prototype.match = function (a, b) {
     const out = [];
-    if (this.spec.env.includes(a.p)) {
+    if (a.p === 'today') {
       const m = {...b}, v = a.args[1];
       if (!(v in m)) m[v] = this.today(); else if (m[v] !== this.today()) return out;
       return [m];
@@ -52,6 +57,11 @@
       if (ok) out.push(m);
     }
     return out;
+  };
+  World.prototype.solve = function (cs, b) {
+    let bs = [b];
+    for (const c of cs) if (c.p && !c.neg) bs = bs.flatMap(x => this.match(c, x));
+    return bs.filter(x => cs.every(c => this.holds(c, x)));
   };
   World.prototype.distinct = function (s, b) {
     const ps = s.persons.map(p => b[p]);
@@ -78,7 +88,7 @@
       let done = false;
       for (const s of this.spec.schemas.filter(x => x.auto)) {
         let bs = [{}];
-        for (const c of s.pre) if (!c.neg && !c.forall) bs = bs.flatMap(b => this.match(c, b));
+        for (const c of s.pre) if (c.p && !c.neg) bs = bs.flatMap(b => this.match(c, b));
         for (const b of bs) if (this.allowed(s, b)) { this.apply(s, b); done = true; }
       }
       if (!done) return;
@@ -86,7 +96,7 @@
   };
   World.prototype.propose = function (s, b) {
     const who = s.by[0];
-    for (const c of s.pre) if (this.spec.env.includes(c.p) && !(c.args[1] in b)) b[c.args[1]] = this.today();
+    for (const c of s.pre) if (c.p === 'today' && !(c.args[1] in b)) b[c.args[1]] = this.today();
     if (!this.allowed(s, b)) { this.notes[b[who]].push({refused: s.button}); return false; }
     const wait = s.by.slice(1).map(r => b[r]);
     if (!wait.length) { this.apply(s, b); this.settle(); return true; }
