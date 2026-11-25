@@ -95,6 +95,18 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .bub .when { font-size:10.5px; color:var(--mute); margin-left:6px; }
 .thread { display:flex; flex-direction:column; }
 .compose { display:flex; gap:6px; }
+.compose textarea, .sheet textarea { flex:1; border:1px solid var(--line); border-radius:12px; padding:7px 12px; outline:none; min-width:0; font:inherit; resize:none; }
+.lst.grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
+.lst.grid .row { flex-direction:column; align-items:flex-start; margin:0; }
+.lst.chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+.lst.chips .row { width:auto; padding:4px 12px 4px 4px; border-radius:99px; margin:0; }
+.lst.chips .row .s, .lst.chips .row .chips { display:none; }
+.phone .pri.prim { box-shadow:0 0 0 2px var(--p-bg), 0 0 0 4px var(--p-acc); font-weight:700; }
+.slide { display:inline-flex; align-items:center; gap:6px; }
+.slide input[type=range] { width:120px; accent-color:var(--p-acc, var(--acc)); }
+.slide .num { width:5em; }
+.slide output { min-width:2.5em; font-weight:700; }
+.look-ok { color:var(--ok, #1a7f37); }
 .compose input { flex:1; border:1px solid var(--line); border-radius:99px; padding:7px 12px; outline:none; min-width:0; }
 .compose button { width:36px; height:36px; border-radius:50%; border:0; background:var(--acc); color:#fff; font-size:16px; flex:none; }
 .sheet { z-index:4; position:absolute; inset:auto 0 0 0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.15); padding:14px; max-height:75%; overflow-y:auto; }
@@ -224,6 +236,8 @@ const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', da
 const q = new URLSearchParams(location.search);
 let TAPPED = 0;
 let CN = q.get('c') in CONTRACTS ? q.get('c') : 'chat', MN = null, SIM = null, SPEC = null, P = null, R = null, B = null, W = null, EXPLAIN = false, TN = 0;
+/* the look's text, as read, and its checks */
+let LOOKTXT = '', LK = {of: {}, global: {}, lines: [], errors: []}, LR = {errors: [], ok: true};
 const ui = {};
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -317,7 +331,7 @@ function phone(p) {
   const v = view(p), u = ui[p], d = document.createElement('div');
   d.className = ['phone', LOOK.theme, LOOK.shape, LOOK.density].join(' ');
   if (!P.ui.containers[u.at]) { u.at = P.ui.start; u.env = {}; u.stack = []; }
-  const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: ''}, acts = [];
+  const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: '', menu: '', bar: ''}, acts = [];
   let composer = '', title = cap(p), avatar = av(p), info = null;
   const ident = v.atoms.filter(a => !a.args.length);
   const lists = comps.filter(c => c.kind === 'list' && !c.hidden && c.zone === 'middle'), tabbed = LOOK.home === 'tabs' && lists.length > 1;
@@ -368,25 +382,29 @@ function phone(p) {
       const anyItems = lists.some(l => items(l, v.atoms, p, env).length);
       if (!it.length && !tabbed && (anyItems || lists[0] !== c)) continue;
       if (!it.length && !tabbed) { zone[c.zone] += `<div class="empty sys">Nothing here yet.</div>`; continue; }
-      zone[c.zone] += (tabbed && c.zone === 'middle' ? '' : `<div class="h" ${K(lk)}>${esc(c.title)}</div>`) + it.map(x => {
+      const lv = (LK.of[c.title] || {}).as;
+      zone[c.zone] += (tabbed && c.zone === 'middle' ? '' : `<div class="h" ${K(lk)}>${esc(c.title)}</div>`) + `<div class="lst ${lv || 'rows'}">` + it.map(x => {
         const chips = (c.shows || []).flatMap(pr => v.atoms.filter(a => a.p === pr && mentions(a, x)).slice(0, 1).map(a => `<span class="chip" ${K(lk, 'pred:' + a.p)}>${esc(chipName(a.p))}</span>`)).join('');
         const wv = c.items.within ? (c.items.within.pos ? env[c.items.within.param][c.items.within.pos - 1] : env[c.items.within.param]) : undefined;
         const s = Array.isArray(x) ? x.filter(y => !isCoin(y) && !same(y, lead(x)) && !same(y, wv)).map(y => y === p ? 'yours' : show(y)).join(' · ') + (COUNT[plain(x)] > 1 ? ' · ×' + COUNT[plain(x)] : '') : '';
         const th = c.event ? P.ui.containers[c.event.navigate].components.find(y => y.kind === 'thread') : null;
         const last = th ? lastText(v.atoms.filter(a => th.shows.includes(a.p)), x, p) : '';
         return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
-      }).join('') + (it.length ? '' : `<div class="empty sys">None yet.</div>`);
+      }).join('') + '</div>' + (it.length ? '' : `<div class="empty sys">None yet.</div>`);
     } else if (c.kind === 'action' && c.act) {
       const act = SPEC.acts.find(x => x.name === c.act), {vals, open} = offers(act, c, v.atoms, p, env, comps);
       if (!vals.length) continue;
       const typedValue = open.length === 1 && act.values.includes(act.names[open[0] - 1]);
       if (typedValue && act.field === 'text' && vals.length === 1) {
-        composer += `<div class="compose" ${K(lk, 'act:' + act.name)}><input placeholder="${esc(act.button)}" data-compose="${acts.length}"><button data-send="${acts.length}">➤</button></div>` + (EXPLAIN ? `<div class="expl">${sentence(act, vals[0])}</div>` : '');
+        const long = lookOf(c, act, open[0]).as === 'long';
+        composer += `<div class="compose" ${K(lk, 'act:' + act.name)}>${long ? `<textarea rows="2" placeholder="${esc(act.button)}" data-compose="${acts.length}"></textarea>` : `<input placeholder="${esc(act.button)}" data-compose="${acts.length}">`}<button data-send="${acts.length}">➤</button></div>` + (EXPLAIN ? `<div class="expl">${sentence(act, vals[0])}</div>` : '');
         acts.push({act, vals, open, c}); continue;
       }
       const twin = comps.filter(x => x.kind === 'action' && x.button === c.button).length > 1;
       const sub = EXPLAIN || twin ? `<small>${sentence(act, vals.length === 1 && !open.length ? vals[0] : partial(act, c, env, p)).replace(/<\/?b>/g, '')}</small>` : '';
-      zone[c.zone] += `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}" ${K(lk, 'act:' + act.name)} data-act="${acts.length}">${esc(act.button)}${sub}</button>`;
+      /* the look puts an action in the menu or the bar, or first and marked */
+      const where = (LK.of[c.button] || {}).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + act.name)} data-act="${acts.length}">${esc(act.button)}${sub}</button>`;
+      if (where === 'menu') zone.menu += btn; else if (where === 'bar') zone.bar += btn; else if (where === 'primary') zone[c.zone] = btn + zone[c.zone]; else zone[c.zone] += btn;
       acts.push({act, vals, open, c});
     }
   }
@@ -396,11 +414,11 @@ function phone(p) {
   if (asks.length && LOOK.questions === 'top') zone.top = `<div class="qs">${asks.join('')}</div>`;
   const bell = LOOK.questions === 'bell' && asks.length ? `<button class="ib bell" data-bell="1">${asks.length}</button>` : '';
   const wchip = waiting.length ? `<span class="wait" title="${waiting.join(' · ')}"><span class="spin"></span>${waiting.length}</span>` : '';
-  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${info ? '<button class="ib" data-info="1">i</button>' : ''}${mode === 'menu' && zone.bottom ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
-  const bar = mode === 'bar' ? zone.bottom : '';
+  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${info ? '<button class="ib" data-info="1">i</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  const bar = (mode === 'bar' ? zone.bottom : '') + zone.bar, menu = (mode !== 'bar' ? zone.bottom : '') + zone.menu;
   const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
   h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
-  if (u.menu && zone.bottom && mode !== 'bar') h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${zone.bottom}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
+  if (u.menu && menu) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${menu}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
   else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
   d.innerHTML = h + '</div>';
@@ -425,13 +443,15 @@ function phone(p) {
   const fg = d.querySelector('[data-fgo]');
   if (fg) fg.onclick = () => {
     const {ks, opts, w} = u.sheet.form, val = {...w.vals[0]};
-    for (const k of ks) { const el = d.querySelector(`[data-f="${k}"]`), o = opts(k); val[k] = o ? o[+el.value] : w.act.people.includes(k) ? el.value.trim().toLowerCase() : el.value.trim(); }
+    for (const k of ks) { const el = d.querySelector(`[data-f="${k}"]`), o = opts(k); val[k] = o ? o[+el.value] : w.act.people.includes(k) ? el.value.trim().toLowerCase() : fieldValue(el); }
     if (ks.some(k => w.open.includes(k) && w.act.people.includes(k) && !PERSONS.includes(val[k]))) { d.querySelector('[data-ferr]').textContent = 'No one has this key.'; return; }
     if (ks.some(k => val[k] === '' || val[k] === undefined) || !enabled(w.act, view(p).atoms, val)) { d.querySelector('[data-ferr]').textContent = 'Not possible with these choices.'; return; }
     propose(p, w.act, val);
   };
   const nf = d.querySelector('[data-name]');
-  if (nf) { nf.focus(); const go = () => { if (!nf.value.trim()) return; const e = u.sheet.name(nf.value.trim()); if (e) d.querySelector('[data-ferr]').textContent = e; }; nf.onkeydown = e => { if (e.key === 'Enter') go(); }; d.querySelector('[data-namego]').onclick = go; }
+  if (nf) { nf.focus(); const go = () => { const x = fieldValue(nf); if (!x) return; const e = u.sheet.name(x); if (e) d.querySelector('[data-ferr]').textContent = e; }; nf.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); go(); } }; d.querySelector('[data-namego]').onclick = go; }
+  /* a slider and the box beside it show one value */
+  d.querySelectorAll('.slide').forEach(sl => { const r = sl.querySelector('input[type=range]'), o = sl.querySelector('output'), n = sl.querySelector('input[type=number]'); r.oninput = () => { o.textContent = r.value; if (n) n.value = r.value; }; if (n) n.oninput = () => { r.value = n.value; o.textContent = n.value; }; });
   const zm = d.querySelector('.zm'); if (zm.querySelector('.thread')) zm.scrollTop = zm.scrollHeight;
   return d;
 }
@@ -456,7 +476,7 @@ function act(p, w) {
   if (w.open.length) {
     /* an open place: a value is typed; a person is given by her key, as no phone can list everyone */
     const k = w.open[0], person = w.act.people.includes(k);
-    u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', `<input data-name="1" placeholder="${person ? 'their key' : esc(w.act.names[k - 1].toLowerCase())}">`)}</div>${person ? '<div class="expl">A key is shared in person or by a link; here, type a name.</div>' : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
+    u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"'))}</div>${person ? '<div class="expl">A key is shared in person or by a link; here, type a name.</div>' : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
       name: x => {
         const v = person ? x.toLowerCase() : x;
         if (person && !PERSONS.includes(v)) return 'No one has this key.';
@@ -469,15 +489,27 @@ function act(p, w) {
   const k = Object.keys(w.vals[0]).map(Number).find(i => i !== w.act.me && w.vals.some(v => !same(v[i], w.vals[0][i])));
   choose(p, w.act, w.vals, k);
 }
+/* the look of a typed place: by the name the description gives it */
+function lookOf(c, act, k) { const r = act.names[k - 1], n = c && c.names ? c.names[r] : r; return LK.of[n] || {}; }
+function field(act, c, k, attr) {
+  const lv = lookOf(c, act, k), r = act.names[k - 1], ph = act.people.includes(k) ? 'their key' : esc(r.toLowerCase());
+  const num = (act.types || {})[r] === 'num' || /^(Sum|Total|Day|Term|Votes)$/.test(r);
+  if (lv.as === 'long') return `<textarea ${attr} rows="3" placeholder="${ph}"></textarea>`;
+  if (lv.as === 'slider') return `<span class="slide"><input type="range" ${lv.typed ? '' : attr} min="${lv.from}" max="${lv.to}" value="${lv.from}"><output>${lv.from}</output>${lv.typed ? `<input type="number" ${attr} value="${lv.from}" class="num">` : ''}</span>`;
+  if (lv.as === 'date') return `<input type="date" ${attr} data-date="1">`;
+  return `<input ${attr} ${num ? 'type="number" value="1" class="num"' : `placeholder="${ph}"`}>`;
+}
+/* a date is the number of its day */
+function fieldValue(el) { return el.dataset.date ? (el.value ? String(Math.floor(Date.parse(el.value) / 864e5)) : '') : el.value.trim(); }
 /* a form: a list for each place to pick, a field for each place to type, the act's button to propose */
 function form(p, w, varying) {
   const u = ui[p], act = w.act, ks = [...varying, ...w.open].sort((a, b) => a - b);
   const opts = k => w.open.includes(k) ? null : [...new Map(w.vals.map(v => [JSON.stringify(v[k]), v[k]])).values()];
   /* the form is the clause's sentence, with a control in place of each name to choose */
   const ctl = k => {
-    const o = opts(k), num = (act.types || {})[act.names[k - 1]] === 'num' || /^(Sum|Total|Day|Term)$/.test(act.names[k - 1]);
+    const o = opts(k);
     return o ? `<select data-f="${k}">${o.map((x, i) => `<option value="${i}">${esc(show(Array.isArray(x) ? lead(x) : x))}</option>`).join('')}</select>`
-      : `<input data-f="${k}" ${num ? 'type="number" min="1" value="1" class="num"' : `placeholder="${act.people.includes(k) ? 'their key' : esc(act.names[k - 1].toLowerCase())}"`}>`;
+      : field(act, w.c, k, `data-f="${k}"`);
   };
   const val = w.vals[0], done = new Set();
   let body = act.sentence.replace(/\b[A-Z][A-Za-z]*\b/g, x => {
@@ -557,14 +589,20 @@ function codePanel() {
   h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact found from the start screen' : R.hidden.length ? '<span class="badm">✗ hidden</span>: ' + prs(R.hidden) : '<span class="part">◐ visible not proved</span>: shown only on inner screens: ' + prs(R.inner)}</div>`;
   if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
+  h += `<h3 style="margin-top:18px">The look</h3><p class="lg">How it is drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no look loses an option the contract allows.</p>`;
+  h += `<div class="sum"><div>${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗ ' + LR.errors.length + ' to fix</span>'}</div></div>`;
+  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(LOOK|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON)\b/g, '<span class="kw">$1</span>');
+    return `<div class="ln" ${L.name ? K('line:look' + L.n) : ''}><span class="no">${L.n}</span><span class="g">${e.length ? '<span class="badm">!</span>' : L.kind === 'rule' ? '<span class="ok">✓</span>' : ''}</span><span>${L.kind === 'comment' ? `<span class="cm">${t}</span>` : t}</span></div>` + e.map(x => `<div class="why">${esc(x.msg)}</div>`).join(''); }).join('') || '<div class="ln"><span class="no"></span><span class="g"></span><span class="cm">No look: the defaults.</span></div>'}</div>`;
   h += `<div class="ct">How to read it</div><div class="legend">
-    <div><code>SCREEN Chat ABOUT Bob:</code><span>a screen, about what was tapped to open it: a person or a value, or a fact of Alice's in the contract's words, <code>ABOUT "Alice is a member of Bob's Grupo"</code>. Alice is the person whose phone it is</span></div>
+    <div><code>SCREEN Chat ABOUT Bob:</code><span>a screen, about what was tapped to open it: a person or a value, or a fact of Alice's in the contract's words, <code>ABOUT "Alice is a member of Bob's Hikers"</code>; the start screen is <code>ABOUT Alice</code>, the person whose phone it is</span></div>
     <div><code>QUESTIONS</code><span>the questions put to Alice here</span></div>
     <div><code>SHOW Bob: knows, friend</code><span>these facts about Bob, about Alice, or (<code>SHOW:</code>) about the whole subject</span></div>
     <div><code>THREAD: message</code><span>the same, drawn as a conversation</span></div>
     <div><code>LIST Contacts: EVERYONE OPENS Chat</code><span>everyone Alice knows of; or Alice's facts of one kind, <code>"Alice holds Prop of Delos"</code>; or <code>FROM</code> a predicate, the values in its facts. On a screen about a fact, a name shared with it keeps the list to that fact. A tap opens a screen</span></div>
     <div><code>Introduce: Alice may introduce Carol to Bob, Carol FROM knows</code><span>a button, then the contract's sentence for its act, its names renamed at will, Alice the one who acts. A name of the subject takes its value from it; any other is <code>TYPED</code>, <code>FROM EVERYONE</code>, <code>FROM</code> a predicate, or <code>IS</code> a name of the subject</span></div>
     <div><code><span class="ok">✓</span> <span class="part">◐</span> <span class="badm">✗</span></code><span>covers its act · a shortcut, another line covers the act · the act is missing</span></div>
+    <div><code>Text IS LONG.</code><span>the look: a typed value is <code>LONG</code> or <code>SHORT</code>; a typed number <code>A SLIDER FROM 0 TO 100</code>, with <code>, OR TYPED</code> to keep every value, or <code>A DATE</code></span></div>
+    <div><code>Groups ARE A GRID.</code><span>a list is <code>A GRID</code>, <code>ROWS</code> or <code>CHIPS</code>; an action is <code>IN THE MENU</code>, <code>IN THE BAR</code> or <code>PRIMARY</code>; and <code>COLOR IS NIGHT.</code>, <code>CORNERS ARE SQUARE.</code> and the like, for the whole app</span></div>
   </div>`;
   $('#code').innerHTML = h;
 }
@@ -590,7 +628,7 @@ function segs() {
 /* the design tool: the structure, which the checks read, and the look, which they do not */
 function designPanel() {
   const ms = Object.entries(CONTRACTS[CN].modules);
-  let h = `<p class="lg">The look is free: nothing here changes what the app lets a person do, so the checks stay as they are. Only the UI code decides that.</p>`;
+  let h = `<p class="lg">The look changes how the app is drawn, never what it lets a person do: each button here rewrites a sentence of the look, which the checker reads too.</p>`;
   if (ms.length > 1) h += `<div class="drow"><div class="dl">Structure</div><div class="seg">${ms.map(([k, v]) => `<button class="${k === MN ? 'on' : ''}" data-m="${k}">${esc(v)}</button>`).join('')}</div></div>`;
   h += `<div class="drow"><div class="dl">Checks</div><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'} · ${R.visible ? '<span class="ok">✓ visible</span>' : '<span class="badm">✗ not visible</span>'}</div></div>`;
   h += `<div class="ct">Look</div>`;
@@ -603,7 +641,7 @@ function designPanel() {
   h += `<div class="drow"><div class="dl"></div><button class="hb" id="share">Copy a link to this design</button></div>`;
   $('#design').innerHTML = h;
   document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { MN = b.dataset.m; module(); });
-  document.querySelectorAll('[data-look]').forEach(b => b.onclick = () => { LOOK[b.dataset.look] = b.dataset.v; designPanel(); render(); });
+  document.querySelectorAll('[data-look]').forEach(b => b.onclick = () => { setGlobal(b.dataset.look, b.dataset.v); codePanel(); designPanel(); render(); });
   $('#share').onclick = () => {
     const u = new URL(location.href); u.search = '';
     u.searchParams.set('c', CN); u.searchParams.set('ui', MN);
@@ -619,9 +657,24 @@ document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => {
 });
 const cache = {};
 const get = async u => cache[u] || (cache[u] = await (await fetch(u)).text());
+const getOpt = async u => { if (u in cache) return cache[u]; try { const r = await fetch(u); return cache[u] = r.ok ? await r.text() : ''; } catch (e) { return cache[u] = ''; } };
+/* the look's sentences set the look; a button of the panel rewrites its sentence */
+function applyLook() {
+  LK = GUI.readLook(LOOKTXT); LR = GUI.checkLook(SPEC, P.ui, LK);
+  for (const [k, v] of Object.entries(LK.global)) LOOK[k] = v;
+}
+function setGlobal(k, v) {
+  const [word, g] = Object.entries(GUI.GLOBAL).find(([, g]) => g.key === k), val = Object.keys(g.vals).find(x => g.vals[x] === v);
+  const line = `${word} ${/S$/.test(word) ? 'ARE' : 'IS'} ${val}.`, ls = LOOKTXT ? LOOKTXT.replace(/\n$/, '').split('\n') : [], i = LK.lines.findIndex(L => L.global === k);
+  if (i >= 0) ls[i] = line; else ls.push(line);
+  LOOKTXT = ls.join('\n') + '\n';
+  applyLook();
+}
 async function module() {
   P = GUI.resolve(SPEC, GUI.read(MN === 'custom' ? mine(CN) : await get(`modules/${CN}.${MN}.ui`)));
   R = GUI.check(SPEC, P.ui);
+  LOOKTXT = MN === 'custom' ? (mineLook(CN) || '') : await getOpt(`modules/${CN}.${MN}.look`);
+  applyLook();
   B = CN === 'friendship' ? GUI.brute(SPEC, P.ui, PERSONS) : null;
   PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null});
   segs(); codePanel(); designPanel(); render();
@@ -633,6 +686,7 @@ function newWorld() {
 }
 /* a design made in the builder, kept in this browser */
 const mine = c => { try { return localStorage.getItem('grassroots-ui:' + c); } catch (e) { return null; } };
+const mineLook = c => { try { return localStorage.getItem('grassroots-look:' + c); } catch (e) { return null; } };
 async function start() {
   SIM = JSON.parse(await get(`sim-${CN}.json`));
   if (mine(CN)) CONTRACTS[CN].modules.custom = 'Yours (from the builder)';
@@ -643,6 +697,8 @@ async function start() {
   newWorld(); contractPanel();
   $('#scripts').innerHTML = SCRIPTED.map(p => av(p, 'sm')).join('') + '&nbsp;Carol and Dave have no phone here: a script answers yes to each of their questions.';
   await module();
+  /* a shared link's look, once */
+  if (!start.done) { start.done = true; let any = false; for (const [k, v] of Object.entries(LOOKS)) { const x = q.get(k); if (x in v.opts && x !== LOOK[k]) { setGlobal(k, x); any = true; } } if (any) { codePanel(); designPanel(); render(); } }
 }
 $('#reset').onclick = () => { newWorld(); PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null}); render(); };
 $('#explain').onclick = () => { EXPLAIN = !EXPLAIN; $('#explain').classList.toggle('on', EXPLAIN); render(); };

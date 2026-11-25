@@ -1,6 +1,6 @@
 # Market: markets and their walls, things, a wallet, and what one holds in escrow.
 
-SCREEN Agora:
+SCREEN Agora ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
     LIST Markets: "Alice is a member of the market Mart of Bob" OPENS Market

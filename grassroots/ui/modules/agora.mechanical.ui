@@ -1,6 +1,6 @@
 # Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
 
-SCREEN Home:
+SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
     LIST People: EVERYONE WITH knows, note, escrow_note, member, has_member, post, delivered_post, escrow_item OPENS Person

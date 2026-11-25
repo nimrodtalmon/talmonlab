@@ -1,6 +1,6 @@
 # Pages only: every act on a person's page. Not complete.
 
-SCREEN Home:
+SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
     LIST Contacts: EVERYONE WITH knows OPENS Person

@@ -1,6 +1,6 @@
 # Assembly: one's DAOs; in each DAO its proposals; a screen for each proposal to vote and decide on.
 
-SCREEN Home:
+SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
     LIST DAOs: "Alice is a member of Bob's Delos" OPENS Dao
