@@ -84,7 +84,7 @@ const API = 'https://peoplesweb.org/api/';
 const W = new URLSearchParams(location.search).get('c') || 'friendship';
 const PERSONS = ['alice', 'bob', 'carol', 'dave'];
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
-let SPEC = null, ST = null, VER = -1;
+let SPEC = null, ST = null, VER = -1, CHECK = null;
 const used = {};
 const ui = {}; PERSONS.forEach(p => ui[p] = {tab: 'people', person: null, sheet: null});
 const $ = s => document.querySelector(s);
@@ -155,6 +155,15 @@ function panel() {
   for (const c of SPEC.pragmas) {
     h += `<div class="ct">${esc(c.contract)}</div>`;
     for (const l of c.lines) h += `<div class="pl" data-keys="${esc(JSON.stringify(keys(l)))}">${esc(l)}</div>`;
+  }
+  if (CHECK) {
+    const r = CHECK['person-first'], v = CHECK['pages-only'];
+    h += `<div class="ct">Completeness of this interface</div><div class="lg" style="margin:4px 0 6px">An act is covered when the person to whose page it is attached, and every person picked from those you know, is one its precondition makes you know. Then every allowed answer can be given.</div>`;
+    for (const a of SPEC.acts) {
+      const x = r.acts[a.name];
+      h += `<div class="pl" data-keys='${JSON.stringify(['act:' + a.button])}'>${x.covered ? '✓' : '✗'} ${esc(a.button)}: ${x.free.length ? 'a person you may not know yet, picked from all' : x.anchored.length ? 'on the page of a person you know' : 'on its own'}</div>`;
+    }
+    h += `<div class="lg" style="margin-top:8px">Checked by brute force over all ${r.brute.states} states of Alice with three others: all ${r.brute.answers} allowed answers offered. A variant putting every act on a person's page misses ${v.brute.missed}, e.g. ${esc(v.brute.examples[0].answer)} when Alice knows no one.</div>`;
   }
   $('#lang').innerHTML = h;
 }
@@ -281,6 +290,7 @@ async function poll() {
   }
 }
 $('#reset').onclick = async () => { await fetch(API + W + '/reset', {method: 'POST'}); VER = -1; for (const k in used) delete used[k]; PERSONS.forEach(p => ui[p] = {tab: 'people', person: null, sheet: null}); };
+fetch(W + '.check.json').then(r => r.ok ? r.json() : null).then(c => { CHECK = c; if (SPEC) panel(); }).catch(() => {});
 fetch(W + '.json').then(r => r.json()).then(s => { SPEC = s; $('#cname').textContent = s.contract; panel(); poll(); });
 </script>
 </body>
