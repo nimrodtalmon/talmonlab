@@ -188,6 +188,7 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 <header>
   <b>Grassroots UI</b><span class="sub">A contract, two phones, and the UI between them</span>
   <span class="sp"></span>
+  <a class="hb" id="build" href="builder.html" style="text-decoration:none">Builder</a>
   <button class="hb" id="explain">Explain</button>
   <button class="hb" id="reset">Start over</button>
 </header>
@@ -619,7 +620,7 @@ document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => {
 const cache = {};
 const get = async u => cache[u] || (cache[u] = await (await fetch(u)).text());
 async function module() {
-  P = GUI.resolve(SPEC, GUI.read(await get(`modules/${CN}.${MN}.ui`)));
+  P = GUI.resolve(SPEC, GUI.read(MN === 'custom' ? mine(CN) : await get(`modules/${CN}.${MN}.ui`)));
   R = GUI.check(SPEC, P.ui);
   B = CN === 'friendship' ? GUI.brute(SPEC, P.ui, PERSONS) : null;
   PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null});
@@ -630,8 +631,12 @@ function newWorld() {
   const est = SIM.schemas.find(s => s.name === 'establish');
   for (const s of SCRIPTED) W.propose(est, {Alice: s});
 }
+/* a design made in the builder, kept in this browser */
+const mine = c => { try { return localStorage.getItem('grassroots-ui:' + c); } catch (e) { return null; } };
 async function start() {
   SIM = JSON.parse(await get(`sim-${CN}.json`));
+  if (mine(CN)) CONTRACTS[CN].modules.custom = 'Yours (from the builder)';
+  $('#build').href = 'builder.html?c=' + CN;
   SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env, personal: GUI.personal(SIM)};
   const qm = new URLSearchParams(location.search).get('ui');
   MN = MN || (qm in CONTRACTS[CN].modules ? qm : Object.keys(CONTRACTS[CN].modules)[0]);

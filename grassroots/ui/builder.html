@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grassroots UI · builder</title>
+<style>
+:root { --bg:#f3f3f1; --ink:#1c1f23; --mute:#6c7177; --line:#e5e5e1; --acc:#14806f; --acc2:#e6f3f0; --hit:#fff0b8; --bad:#c0392b; --good:#1d7a3e; --part:#b7791f;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+* { box-sizing:border-box; }
+body { margin:0; font:14px/1.45 -apple-system, "Segoe UI", Roboto, Heebo, sans-serif; background:var(--bg); color:var(--ink); }
+button, input, select, textarea { font:inherit; }
+button { cursor:pointer; }
+header { display:flex; align-items:center; gap:12px; padding:10px 22px; background:#fff; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+header b { font-size:16px; } .sub { color:var(--mute); } .sp { flex:1; }
+.hb { border:1px solid var(--line); background:#fff; padding:5px 12px; border-radius:99px; color:var(--ink); text-decoration:none; }
+.hb.pri { background:var(--acc); border-color:var(--acc); color:#fff; }
+select { border:1px solid var(--line); background:#fff; padding:5px 10px; border-radius:8px; }
+.grid { display:grid; grid-template-columns: 300px minmax(380px, 1fr) 400px; gap:18px; padding:18px 20px 30px; align-items:start; }
+@media (max-width:1200px) { .grid { grid-template-columns: 1fr; } }
+.panel { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+h4 { margin:0 0 8px; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mute); }
+.hint { color:var(--mute); font-size:12.5px; margin:0 0 10px; }
+.box { max-height:340px; overflow:auto; margin-bottom:14px; }
+.chip { display:block; width:100%; text-align:left; border:1px solid var(--line); background:#fafaf8; border-radius:8px; padding:6px 9px; margin:0 0 6px; cursor:grab; }
+.chip b { font-weight:600; } .chip small { display:block; color:var(--mute); font-size:12px; }
+.chip .st { float:right; font-size:12px; }
+.pchip { display:inline-block; border:1px solid var(--line); background:#f4f1fb; color:#5b3fa3; border-radius:99px; padding:2px 10px; margin:0 4px 6px 0; cursor:grab; font-family:var(--mono); font-size:12.5px; }
+.pchip.ev { background:var(--acc2); color:var(--acc); font-family:inherit; }
+.ok { color:var(--good); } .badm { color:var(--bad); } .part { color:var(--part); }
+.screens { display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; }
+.card { width:330px; background:#fff; border:1px solid var(--line); border-radius:22px; padding:12px 12px 10px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+.card.over { outline:2px dashed var(--acc); outline-offset:3px; }
+.card .ttl { font-weight:600; margin:2px 4px 2px; }
+.card .about { color:var(--mute); font-size:12.5px; margin:0 4px 8px; }
+.blk { position:relative; border:1px solid var(--line); border-radius:9px; padding:5px 26px 5px 9px; margin-bottom:6px; font-size:12.5px; background:#fcfcfa; }
+.blk .k { color:var(--mute); font-size:11px; letter-spacing:.04em; }
+.blk .x { position:absolute; right:4px; top:3px; border:0; background:none; color:var(--mute); padding:0 5px; }
+.blk .x:hover { color:var(--bad); }
+.blk .why { color:var(--bad); font-size:12px; } .blk .why.pw { color:var(--part); }
+.blk .add { border:1px solid var(--line); background:#fff; border-radius:99px; font-size:11.5px; padding:0 8px; margin-top:4px; }
+.blk.act { background:#f2f8f6; } .blk.err { border-color:#e8b4ae; background:#fdf3f2; }
+.drop { border:1px dashed var(--line); border-radius:9px; color:var(--mute); font-size:12px; text-align:center; padding:8px; }
+.goal { padding:6px 0; border-bottom:1px solid var(--line); font-size:13px; }
+.goal:last-child { border-bottom:0; }
+.goal .t { font-family:var(--mono); font-size:12px; }
+.qed { color:var(--good); font-weight:600; }
+textarea { width:100%; height:420px; font-family:var(--mono); font-size:12px; border:1px solid var(--line); border-radius:8px; padding:8px; white-space:pre; resize:vertical; }
+.row { display:flex; gap:8px; align-items:center; margin:8px 0 0; flex-wrap:wrap; }
+.hit { background:var(--hit) !important; }
+.picked { outline:2px solid var(--acc); }
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:7px 14px; border-radius:99px; font-size:13px; opacity:0; transition:opacity .3s; pointer-events:none; }
+.toast.on { opacity:.92; }
+</style>
+</head>
+<body>
+<header>
+  <b>Grassroots UI</b><span class="sub">Builder: drag the contract's acts and facts onto screens until no goals are left</span>
+  <span class="sp"></span>
+  <select id="csel"></select>
+  <select id="from"></select>
+  <a class="hb pri" id="try" href="index.html">Try it on the phones</a>
+</header>
+<div class="grid">
+  <section class="panel">
+    <h4>Acts</h4>
+    <p class="hint">Each is a sentence of the contract. Drag one onto a screen to offer it there (on a phone: tap it, then a screen).</p>
+    <div class="box" id="acts"></div>
+    <h4>Facts</h4>
+    <p class="hint">Drag a predicate onto a screen to show its facts; on the start screen, a list of them.</p>
+    <div id="preds"></div>
+  </section>
+  <section><div class="screens" id="screens"></div></section>
+  <section class="panel">
+    <h4 id="gh">Goals</h4>
+    <div class="box" id="goals"></div>
+    <h4>UI code</h4>
+    <textarea id="code" spellcheck="false"></textarea>
+    <div class="row"><button class="hb" id="dl">Download</button><span class="hint" style="margin:0">Edits here and on the screens are the same.</span></div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<script src="ui.js"></script>
+<script src="src/emit.js"></script>
+<script>
+const CONTRACTS = {
+  chat: {title: 'Chat', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
+  groups: {title: 'Groups', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
+  agora: {title: 'Agora (barter market)', modules: {market: 'Market', mechanical: 'Mechanical'}},
+  dao: {title: 'DAO', modules: {assembly: 'Assembly', mechanical: 'Mechanical'}},
+  friendship: {title: 'Friendship', modules: {people: 'People', mechanical: 'Mechanical', pages: 'Pages only'}},
+};
+const EMPTY = 'SCREEN Home:\n    QUESTIONS\n';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const q = new URLSearchParams(location.search);
+let PICKED = null, CN = q.get('c') in CONTRACTS ? q.get('c') : 'chat', SIM = null, SPEC = null, TEXT = '', P = null, R = null;
+const key = c => 'grassroots-ui:' + c;
+const load = c => { try { return localStorage.getItem(key(c)); } catch (e) { return null; } };
+const save = () => { try { localStorage.setItem(key(CN), TEXT); } catch (e) {} };
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2600); }
+
+/* ---------- the text, and changes to it ---------- */
+const lines = () => TEXT.replace(/\n$/, '').split('\n');
+const setLines = xs => { TEXT = xs.join('\n') + '\n'; update(); };
+/* after the last line of a screen */
+function insert(scr, text) {
+  const xs = lines(), last = Math.max(...P.lines.filter(L => L.screen === scr).map(L => L.n));
+  xs.splice(last, 0, ...[].concat(text).map(t => '    ' + t));
+  setLines(xs);
+}
+function addScreen(text) { const xs = lines(); if (xs[xs.length - 1].trim()) xs.push(''); setLines(xs.concat(text)); }
+function remove(id) { const ns = new Set(P.lines.filter(L => L.id === id).map(L => L.n)); setLines(lines().filter((_, i) => !ns.has(i + 1))); }
+const lineOf = id => P.lines.find(L => L.id === id).n;
+
+/* ---------- what to write for a drop ---------- */
+const arity = p => SIM.vocab[p] ? SIM.vocab[p].vars.length - 1 : (SPEC.acts.flatMap(a => a.req.concat(a.forb)).find(([x]) => x === p) || [null, []])[1].length;
+const fact = p => EMIT.factText(SIM.vocab, p, ['Alice'].concat(EMIT.factNames(SIM, p)));
+const screenName = p => cap(p.replace(/_(\w)/g, (m, c) => c.toUpperCase()));
+/* an action line for an act on a screen: Alice acts, the screen's subject fills what it can, the rest is picked or typed */
+function actionLine(a, C) {
+  const me = a.names[a.me - 1], map = {[me]: 'Alice'}, anc = {};
+  for (const [p, ks] of a.req) ks.forEach(k => { if (k !== null) (anc[k] = anc[k] || []).push(p); });
+  const byPos = Object.fromEntries(Object.entries(C.names || {}).map(([n, i]) => [i, n]));
+  if (C.aboutName) { const k = a.names.findIndex((r, i) => i + 1 !== a.me && anc[i + 1] && a.pnames.includes(r)); if (k >= 0) map[a.names[k]] = C.aboutName; }
+  if (C.aboutPred) { const at = a.req.find(([p]) => p === C.aboutPred); if (at) at[1].forEach((k, j) => { if (k !== null && k !== a.me && byPos[j + 1]) map[a.names[k - 1]] = byPos[j + 1]; }); }
+  const subject = new Set(Object.values(map).filter(x => x !== 'Alice')), speak = EMIT.sayable(a), inS = EMIT.said(a);
+  const taken = new Set(['Alice', ...subject]);
+  if (speak) for (const r of a.all.concat(a.names)) if (!(r in map)) { const n = !inS.has(r) ? r : taken.has(r) ? EMIT.fresh(taken, r, a.pnames.includes(r)) : r; map[r] = n; taken.add(n); }
+  const src = [];
+  a.names.forEach((r, i) => {
+    if (i + 1 === a.me) return;
+    const n = speak ? map[r] : r;
+    if (subject.has(map[r])) { if (!speak && map[r] !== r) src.push(r + ' IS ' + map[r]); return; }
+    src.push(n + (anc[i + 1] ? ' FROM ' + anc[i + 1][0] : ' TYPED'));
+  });
+  return a.button + (speak ? ': ' + EMIT.say(a, map) + (src.length ? ', ' + src.join(', ') : '') : src.length ? ': ' + src.join(', ') : '');
+}
+function drop(scr, d) {
+  const C = P.ui.containers[scr], start = scr === P.ui.start, comps = C.components;
+  if (d.kind === 'act') return insert(scr, actionLine(SPEC.acts.find(a => a.name === d.name), C));
+  const addTo = (c, p) => { const xs = lines(), i = lineOf(c.id) - 1; xs[i] = /\bWITH\b/.test(xs[i]) || c.kind !== 'list' ? xs[i].replace(/(:\s*[\w, ]+?|WITH\s+[\w, ]+?)(\s+OPENS\s+\w+)?\s*$/, (m, a, b) => a + ', ' + p + (b || '')) : xs[i].replace(/(EVERYONE)/, '$1 WITH ' + p); setLines(xs); };
+  if (d.kind === 'everyone') {
+    if (!start) return toast('Everyone is listed on the start screen');
+    if (!P.ui.containers.Person) addScreen(['SCREEN Person ABOUT Bob:', '    QUESTIONS']);
+    return insert(scr, 'LIST People: EVERYONE OPENS Person');
+  }
+  const p = d.p, n = arity(p);
+  if (n === 0) {
+    if (!start) return toast('Facts with no arguments are about Alice: show them on the start screen');
+    const c = comps.find(x => x.kind === 'details' && x.about === 'me');
+    if (c) { if (c.shows.includes(p)) return toast(p + ' is shown here already'); return addTo(c, p); }
+    return insert(scr, 'SHOW Alice: ' + p);
+  }
+  if (start) {
+    const ev = comps.find(x => x.kind === 'list' && !x.hidden && x.items.named);
+    if (SPEC.personal.includes(p) && ev) { if ((ev.shows || []).includes(p)) return toast(p + ' is shown here already'); return addTo(ev, p); }
+    return insert(scr, 'LIST ' + screenName(p) + 's: "' + fact(p) + '"');
+  }
+  const c = comps.find(x => x.kind === 'details' && x.about === 'it' && !x.pos);
+  if (c) { if (c.shows.includes(p)) return toast(p + ' is shown here already'); return addTo(c, p); }
+  insert(scr, (C.aboutName ? 'SHOW ' + C.aboutName : 'SHOW') + ': ' + p);
+}
+/* a screen for the items of a list, opened from it */
+function openScreen(id) {
+  const c = Object.values(P.ui.containers).flatMap(d => d.components).find(x => x.id === id), xs = lines(), i = lineOf(id) - 1;
+  let name, head;
+  if (c.items.atoms) { name = screenName(c.items.atoms); head = `SCREEN ${name} ABOUT "${xs[i].match(/"([^"]+)"/)[1]}":`; }
+  else { name = c.items.named ? 'Person' : screenName(c.items.pred); head = `SCREEN ${name} ABOUT ${c.items.named ? 'Bob' : 'It'}:`; }
+  while (P.ui.containers[name]) name += '2';
+  xs[i] = xs[i] + ' OPENS ' + name;
+  if (xs[xs.length - 1].trim()) xs.push('');
+  setLines(xs.concat([head.replace(/SCREEN \w+/, 'SCREEN ' + name), '    QUESTIONS'].concat(c.items.atoms ? ['    SHOW: ' + c.items.atoms] : [])));
+}
+
+/* ---------- drawing ---------- */
+function update() {
+  P = GUI.resolve(SPEC, GUI.read(TEXT));
+  R = GUI.check(SPEC, P.ui);
+  save();
+  if (document.activeElement !== $('#code')) $('#code').value = TEXT;
+  palette(); screens(); goals();
+}
+function palette() {
+  $('#acts').innerHTML = SPEC.acts.map(a => {
+    const st = R.acts[a.name] && R.acts[a.name].covered ? '<span class="st ok">✓</span>' : '<span class="st badm">✗</span>';
+    return `<div class="chip" draggable="true" data-drag='${esc(JSON.stringify({kind: 'act', name: a.name}))}' data-k="act:${a.name}">${st}<b>${esc(a.button)}</b><small>${esc(EMIT.template(a))}</small></div>`;
+  }).join('');
+  const preds = [...new Set(Object.keys(SIM.vocab).filter(p => !(SIM.env || []).includes(p)).concat(SPEC.acts.flatMap(a => a.req.concat(a.forb).map(([p]) => p))))].filter(p => p !== 'today').sort();
+  const hid = new Set(R.hidden);
+  $('#preds').innerHTML = `<span class="pchip ev" draggable="true" data-drag='{"kind":"everyone"}'>Everyone</span>` + preds.map(p => `<span class="pchip" draggable="true" data-drag='${esc(JSON.stringify({kind: 'pred', p}))}' data-k="pred:${p}" title="${esc(SIM.vocab[p] ? SIM.vocab[p].phrase : p)}">${hid.has(p) ? '<span class="badm">✗</span> ' : ''}${esc(p)}</span>`).join('');
+  document.querySelectorAll('[data-drag]').forEach(x => {
+    x.ondragstart = e => e.dataTransfer.setData('text/plain', x.dataset.drag);
+    /* on a phone, tap a chip, then a screen */
+    x.onclick = () => { PICKED = PICKED === x.dataset.drag ? null : x.dataset.drag; document.querySelectorAll('[data-drag]').forEach(y => y.classList.toggle('picked', y.dataset.drag === PICKED)); if (PICKED) toast('Now tap a screen'); };
+  });
+}
+function screens() {
+  let h = '';
+  for (const [name, C] of Object.entries(P.ui.containers)) {
+    h += `<div class="card" data-scr="${esc(name)}"><div class="ttl">${esc(name)}${name === P.ui.start ? ' <span class="hint">· start</span>' : ''}</div>${C.aboutText || C.aboutName ? `<div class="about">about ${esc(C.aboutText ? '“' + C.aboutText + '”' : C.aboutName)}</div>` : ''}`;
+    const ids = [...new Set(P.lines.filter(L => L.screen === name && L.id).map(L => L.id))];
+    for (const id of ids) {
+      const c = C.components.find(x => x.id === id), raw = P.lines.filter(L => L.id === id).map(L => L.raw.trim()).join(' ');
+      const errs = P.errors.filter(e => e.line === lineOf(id)).map(e => e.msg);
+      let cls = 'blk', mark = '', why = errs.map(m => `<div class="why">${esc(m)}</div>`).join(''), k = c ? c.kind : '', keys = [];
+      if (c && c.kind === 'action' && c.act) {
+        cls += ' act'; keys.push('act:' + c.act);
+        const v = R.comps[c.id];
+        if (v && v.ok) mark = '<span class="ok">✓</span> ';
+        else if (v && R.acts[c.act].covered) { mark = '<span class="part">◐</span> '; why += `<div class="why pw">${esc('a shortcut; another line offers the act. ' + v.why.join('; '))}</div>`; }
+        else if (v) { mark = '<span class="badm">✗</span> '; why += v.why.map(m => `<div class="why">${esc(m)}</div>`).join(''); }
+      }
+      if (c) (c.shows || []).concat(c.items && c.items.atoms ? [c.items.atoms] : []).forEach(p => keys.push('pred:' + p));
+      if (errs.length) cls += ' err';
+      const label = {inbox: 'questions', details: 'shows', thread: 'conversation', list: 'list', action: 'act'}[k] || '';
+      const open = c && c.kind === 'list' && !c.opens && !errs.length ? `<button class="add" data-open="${id}">＋ a screen for each</button>` : '';
+      h += `<div class="${cls}" data-k="${keys.join(' ')}"><button class="x" data-del="${id}" title="Remove">×</button><div class="k">${label}</div>${k === 'inbox' ? '' : mark + esc(raw.replace(/^(SHOW|THREAD|LIST)\b\s*/, '').replace(/^:\s*/, ''))}${why}${open}</div>`;
+    }
+    h += `<div class="drop">drop an act or a fact here</div></div>`;
+  }
+  $('#screens').innerHTML = h;
+  document.querySelectorAll('[data-scr]').forEach(card => {
+    card.ondragover = e => { e.preventDefault(); card.classList.add('over'); };
+    card.ondragleave = () => card.classList.remove('over');
+    card.onclick = e => { if (PICKED && !e.target.closest('button')) { const d = JSON.parse(PICKED); PICKED = null; drop(card.dataset.scr, d); } };
+    card.ondrop = e => { e.preventDefault(); card.classList.remove('over'); try { drop(card.dataset.scr, JSON.parse(e.dataTransfer.getData('text/plain'))); } catch (x) { console.error(x); } };
+  });
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => remove(b.dataset.del));
+  document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openScreen(b.dataset.open));
+}
+/* the open goals, as a proof assistant lists them: what keeps the description from being complete and visible */
+function goals() {
+  const gs = [];
+  for (const e of P.errors) gs.push(`<div class="goal"><span class="badm">line ${e.line}</span> ${esc(e.msg)}</div>`);
+  if (!R.inbox) gs.push(`<div class="goal"><span class="badm">✗</span> No screen has QUESTIONS: Alice cannot answer what she is asked</div>`);
+  for (const a of SPEC.acts) {
+    if (R.acts[a.name].covered) continue;
+    const ls = Object.values(P.ui.containers).flatMap(d => d.components).filter(c => c.kind === 'action' && c.act === a.name);
+    const why = ls.length ? ls.map(c => R.comps[c.id]).filter(Boolean).flatMap(v => v.why)[0] || 'not offered' : 'offered nowhere: drag it onto a screen';
+    gs.push(`<div class="goal" data-k="act:${a.name}"><span class="badm">✗</span> <b>${esc(a.button)}</b>: ${esc(why)}<div class="t">${esc(EMIT.template(a))}</div></div>`);
+  }
+  for (const p of R.hidden) gs.push(`<div class="goal" data-k="pred:${p}"><span class="badm">✗</span> <span class="t">${esc(p)}</span> is shown nowhere: drag it onto a screen</div>`);
+  const soft = R.inner.length ? `<div class="goal"><span class="part">◐</span> Shown only on inner screens, so not proved visible: <span class="t">${R.inner.map(esc).join(', ')}</span></div>` : '';
+  $('#gh').textContent = gs.length ? `Goals · ${gs.length}` : 'Goals';
+  $('#goals').innerHTML = gs.length ? gs.join('') + soft : `<div class="goal qed">No goals: complete${R.visible ? ' and visible' : ''}. ∎</div>` + soft;
+}
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('[data-k]'), ks = el && el.dataset.k ? el.dataset.k.split(' ') : [];
+  document.querySelectorAll('[data-k]').forEach(x => x.classList.toggle('hit', ks.length > 0 && x.dataset.k.split(' ').some(k => ks.includes(k))));
+});
+$('#code').oninput = () => { clearTimeout(update.h); update.h = setTimeout(() => { TEXT = $('#code').value; update(); }, 250); };
+$('#dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([TEXT], {type: 'text/plain'})); a.download = CN + '.ui'; a.click(); };
+
+/* ---------- starting ---------- */
+async function start(from) {
+  SIM = await (await fetch(`sim-${CN}.json`)).json();
+  SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env, personal: GUI.personal(SIM)};
+  const ms = CONTRACTS[CN].modules;
+  $('#from').innerHTML = `<option value="">Start from…</option><option value="empty">An empty start screen</option>` + Object.entries(ms).map(([k, v]) => `<option value="${k}">The ${esc(v)} design</option>`).join('');
+  if (from === 'empty') TEXT = EMPTY;
+  else if (from) TEXT = await (await fetch(`modules/${CN}.${from}.ui`)).text();
+  else TEXT = load(CN) || EMPTY;
+  $('#try').href = `index.html?c=${CN}&ui=custom`;
+  update();
+}
+$('#csel').innerHTML = Object.entries(CONTRACTS).map(([k, v]) => `<option value="${k}"${k === CN ? ' selected' : ''}>${esc(v.title)}</option>`).join('');
+$('#csel').onchange = () => { CN = $('#csel').value; history.replaceState(null, '', '?c=' + CN); start(); };
+$('#from').onchange = () => { const v = $('#from').value; if (v && (TEXT === EMPTY || confirmReplace())) start(v); else $('#from').value = ''; };
+function confirmReplace() { return window.confirm('Replace your design with this one?'); }
+start();
+</script>
+</body>
+</html>

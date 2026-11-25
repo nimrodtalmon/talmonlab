@@ -1,6 +1,7 @@
 /* Writing the UI language: a contract's sentence and its facts, with names of one's choosing.
  * Used by mechanical.js, which writes a description of any contract.
  */
+(function (G) {
 const FEMALE = ['Alice', 'Carol', 'Erin', 'Grace'], PERSONS = ['Bob', 'Carol', 'Dave', 'Erin', 'Frank', 'Grace'];
 
 /* a name not yet taken: the next person's name, or the value's name with a number */
@@ -54,4 +55,6 @@ function factNames(sim, pred) {
 }
 /* the act's names its sentence says */
 const said = a => { const xs = new Set(a.all.concat(a.names)); return new Set((template(a).match(/\b[A-Za-z]\w*\b/g) || []).filter(w => xs.has(w))); };
-module.exports = {said, sayable, say, factText, factNames, fresh, template, PERSONS};
+const api = {said, sayable, say, factText, factNames, fresh, template, PERSONS};
+if (typeof module !== 'undefined') module.exports = api; else G.EMIT = api;
+})(this);
