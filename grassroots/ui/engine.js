@@ -147,9 +147,20 @@
     for (const c of s.pre) if (c.p === 'today' && !(c.args[1] in b)) b[c.args[1]] = this.today();
     if (!this.allowed(s, b)) { this.notes[b[who]].push({refused: s.button}); return false; }
     const wait = s.by.slice(1).map(r => b[r]);
-    if (!wait.length) { this.apply(s, b); this.settle(); return true; }
+    if (!wait.length) { this.apply(s, b); this.settle(); this.prune(); return true; }
     this.props.push({id: ++this.nid, s, b, wait: new Set(wait), from: b[who]});
     return true;
+  };
+  /* after an act, each proposer looks at its own part of the precondition again, and withdraws a proposal
+     that its own state no longer allows: a check each agent makes on its own facts */
+  World.prototype.prune = function () {
+    this.props = this.props.filter(x => {
+      this.cur = x.s;
+      const who = x.s.by[0], own = x.s.pre.filter(c => c.p && c.args[0] === who && !(this.spec.env || []).includes(c.p));
+      const ok = own.every(c => this.holds(c, {...x.b}));
+      if (!ok) this.notes[x.from].push({withdrawn: x.s.button});
+      return ok;
+    });
   };
   World.prototype.answer = function (id, p, yes) {
     const x = this.props.find(y => y.id === id);
@@ -158,7 +169,7 @@
     x.wait.delete(p);
     if (x.wait.size) return;
     this.props = this.props.filter(y => y !== x);
-    if (this.allowed(x.s, x.b)) { this.apply(x.s, x.b); this.settle(); } else this.notes[x.from].push({refused: x.s.button});
+    if (this.allowed(x.s, x.b)) { this.apply(x.s, x.b); this.settle(); this.prune(); } else this.notes[x.from].push({refused: x.s.button});
   };
   /* what a person sees: the atoms they hold, without themselves; the questions to them; what they wait for */
   World.prototype.view = function (p) {

@@ -23,7 +23,19 @@ header b { font-size:16px; }
 .hb { border:1px solid var(--line); background:#fff; padding:5px 12px; border-radius:99px; color:var(--ink); }
 .hb.on { background:var(--acc2); border-color:var(--acc); color:var(--acc); }
 .grid { display:grid; grid-template-columns: 320px auto 400px; gap:20px; justify-content:center; align-items:start; padding:18px 20px 30px; }
-@media (max-width:1380px) { .grid { grid-template-columns: auto; } }
+@media (max-width:1380px) { .grid { grid-template-columns: auto; } .grid > .col { order:-1; } }
+.pswitch { display:none; }
+.dot { display:inline-block; min-width:16px; height:16px; border-radius:8px; background:var(--acc); color:#fff; font-size:10.5px; line-height:16px; text-align:center; padding:0 4px; margin-left:4px; }
+@media (max-width:760px) {
+  header { padding:8px 12px; gap:8px; } header .sub { display:none; }
+  .grid { padding:10px 8px 20px; gap:12px; }
+  .pswitch { display:inline-flex; }
+  .phones { width:100%; justify-content:center; }
+  .phones .phone { display:none; width:100%; max-width:420px; height:calc(100vh - 150px); min-height:520px; padding:6px; border-radius:30px; }
+  .phones .phone.shown { display:block; }
+  .panel { height:auto; max-height:75vh; }
+  .scripts { font-size:12px; padding:0 6px; }
+}
 .panel { background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 16px; height:calc(100vh - 100px); min-height:560px; overflow-y:auto; }
 .panel h3 { margin:0 0 2px; font-size:14px; }
 .lg { color:var(--mute); font-size:12.5px; margin:0 0 10px; }
@@ -109,6 +121,8 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .why.pw { color:#8a6d12; }
 .why { font:12px/1.4 -apple-system, "Segoe UI", sans-serif; color:var(--bad); padding:0 6px 4px 52px; }
 .ok { color:var(--good); } .badm { color:var(--bad); } .part { color:#b08a1a; }
+.legend > div { display:flex; flex-direction:column; gap:1px; margin:0 0 8px; font-size:12.5px; color:var(--mute); }
+.legend code { font:12px var(--mono); color:var(--ink); }
 .sum { display:flex; flex-direction:column; gap:3px; margin:6px 0 10px; font-size:13px; }
 
 /* the page's pickers */
@@ -153,19 +167,30 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .phone .fab { position:absolute; right:16px; bottom:84px; width:48px; height:48px; border:0; color:#fff; font-size:24px; box-shadow:0 4px 12px rgba(0,0,0,.2); z-index:2; }
 .phone .acts.col1 { flex-direction:column; align-items:stretch; }
 .phone .line { font-size:13.5px; padding:3px 2px; }
+.phone .qs { max-height:150px; overflow-y:auto; padding:2px 0 6px; }
+.phone .ask { display:flex; align-items:center; gap:8px; padding:8px 10px; margin-bottom:6px; font-size:13px; }
+.phone .ask .q { flex:1; display:flex; gap:8px; align-items:flex-start; min-width:0; }
+.phone .ask .btns { margin:0; gap:2px; flex:none; }
+.phone .ask .pri { padding:5px 11px; }
+.phone .wait { display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--p-mute); border:1px solid var(--p-line); border-radius:99px; padding:2px 8px; }
+.phone .bell { width:auto; min-width:24px; padding:0 7px; background:var(--p-acc); color:#fff; border-color:var(--p-acc); }
+.phone .toasts { position:absolute; left:12px; right:12px; bottom:78px; display:flex; flex-direction:column; gap:6px; align-items:center; pointer-events:none; z-index:2; }
+.phone .toast { background:var(--p-ink); color:var(--p-bg); font-size:12.5px; padding:6px 12px; border-radius:99px; opacity:.92; animation:fade 3.5s forwards; }
+.phone .toast .sys { text-decoration:none; }
+@keyframes fade { 0% { opacity:0; transform:translateY(6px); } 8% { opacity:.92; transform:none; } 85% { opacity:.92; } 100% { opacity:0; } }
 .phone .line .when { margin-left:6px; font-size:10.5px; }
 </style>
 </head>
 <body>
 <header>
-  <b>Grassroots UI</b><span class="sub">prototype, simulated in the page</span>
+  <b>Grassroots UI</b><span class="sub">A contract, two phones, and the UI between them</span>
   <span class="sp"></span>
   <button class="hb" id="explain">Explain</button>
   <button class="hb" id="reset">Start over</button>
 </header>
 <div class="grid">
   <section class="panel"><select class="pick" id="csel"></select><div id="contract"></div></section>
-  <section class="col"><div class="phones" id="phones"></div><div class="scripts" id="scripts"></div></section>
+  <section class="col"><div class="seg pswitch" id="pswitch"><button class="on" data-ph="0">Alice's phone</button><button data-ph="1">Bob's phone</button></div><div class="phones" id="phones"></div><div class="scripts" id="scripts"></div></section>
   <section class="panel"><div class="tabs"><button class="on" data-tab="design">Design</button><button data-tab="code">UI code</button></div><div id="design"></div><div id="code" style="display:none"></div></section>
 </div>
 <script src="ui.js"></script>
@@ -183,6 +208,7 @@ const LOOKS = {
   home: {label: 'Lists', opts: {sections: 'Sections', tabs: 'Tabs'}},
   convo: {label: 'Conversations', opts: {bubbles: 'Bubbles', plain: 'Plain'}},
   actions: {label: 'Actions', opts: {bar: 'Bar', menu: 'Menu', button: 'Button'}},
+  questions: {label: 'Questions', opts: {top: 'On top', bell: 'Bell'}},
   shape: {label: 'Shape', opts: {round: 'Round', square: 'Square'}},
   density: {label: 'Density', opts: {cozy: 'Cozy', compact: 'Compact'}},
 };
@@ -191,6 +217,7 @@ for (const [k, v] of Object.entries(LOOKS)) { const x = new URLSearchParams(loca
 const PERSONS = ['alice', 'bob', 'carol', 'dave'], PHONES = ['alice', 'bob'], SCRIPTED = ['carol', 'dave'];
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
 const q = new URLSearchParams(location.search);
+let TAPPED = 0;
 let CN = q.get('c') in CONTRACTS ? q.get('c') : 'chat', MN = null, SIM = null, SPEC = null, P = null, R = null, B = null, W = null, EXPLAIN = false, TN = 0;
 const ui = {};
 const $ = s => document.querySelector(s);
@@ -255,7 +282,9 @@ function offers(act, c, atoms, me, env, comps) {
   }
   let vals = [{}];
   for (let k = 1; k <= act.args.length; k++) { if (!ch[k]) return {vals: [], open}; vals = vals.flatMap(v => ch[k].map(x => ({...v, [k]: x}))); }
-  return {vals: vals.filter(v => enabled(act, atoms, v)), open};
+  /* a binding the person has already proposed, and waits on, is not offered again */
+  const mine = view(me).pending.filter(x => x.s.name === act.name).map(x => JSON.stringify(valOf(act, x.b)));
+  return {vals: vals.filter(v => enabled(act, atoms, v) && !(open.length === 0 && mine.includes(JSON.stringify(Object.fromEntries(Object.entries(v).map(([k, x]) => [k, x])))))), open};
 }
 
 /* ---------- acting ---------- */
@@ -280,8 +309,11 @@ function phone(p) {
   let composer = '', title = cap(p), avatar = av(p), info = null;
   const ident = v.atoms.filter(a => !a.args.length);
   const lists = comps.filter(c => c.kind === 'list' && !c.hidden && c.zone === 'middle'), tabbed = LOOK.home === 'tabs' && lists.length > 1;
-  for (const x of v.pending) zone.top += `<div class="note"><span class="spin"></span>${esc(x.s.button)}<span class="sys">: waiting for ${[...x.wait].map(cap).join(', ')}</span></div>`;
-  for (const n of v.notes) zone.top += `<div class="note bad"><span class="sys">${n.refused ? 'Not done: ' + esc(n.refused) : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`;
+  /* what the person waits for is a small mark in the header; what just happened, a note that fades */
+  const waiting = v.pending.map(x => `${esc(x.s.button)}: ${[...x.wait].map(cap).join(', ')}`);
+  const toasts = v.notes.map(n => `<div class="toast"><span class="sys">${n.refused ? esc(n.refused) + ': not done' : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
+  if (v.notes.length) { clearTimeout(u.fade); u.fade = setTimeout(() => { W.notes[p].length = 0; render(); }, 3500); }
+  const asks = [];
   for (const c of comps) {
     if (c.hidden) continue;
     const lk = 'line:' + c.line;
@@ -289,7 +321,7 @@ function phone(p) {
       for (const a of v.asks) {
         const role = Object.keys(a.b).find(r => a.b[r] === p), act = SPEC.acts.find(x => x.name === a.s.name);
         const qt = (a.s.questions[role] || '').replace(/\b[A-Z][a-z]+\b/g, w => w in a.b ? `<b>${esc(show(a.b[w]))}</b>` : w);
-        zone[c.zone] += `<div class="ask" ${K(lk, 'act:' + a.s.name)}>${qt || sentence(act, valOf(act, a.b)) + '?'}${EXPLAIN && qt ? `<div class="expl">${sentence(act, valOf(act, a.b))}</div>` : ''}<div class="btns"><button class="pri" data-ans="1" data-id="${a.id}">Yes</button><button class="ghost" data-ans="0" data-id="${a.id}">No</button></div></div>`;
+        asks.push(`<div class="ask" ${K(lk, 'act:' + a.s.name)}><div class="q">${av(a.b[a.s.by[0]], 'sm')}<div>${qt || sentence(act, valOf(act, a.b)) + '?'}${EXPLAIN && qt ? `<div class="expl">${sentence(act, valOf(act, a.b))}</div>` : ''}</div></div><div class="btns"><button class="pri" data-ans="1" data-id="${a.id}">Yes</button><button class="ghost" data-ans="0" data-id="${a.id}">No</button></div></div>`);
       }
     } else if (c.kind === 'details') {
       const who = c.about === 'me' ? null : c.pos ? env[c.about][c.pos - 1] : env[c.about];
@@ -309,7 +341,9 @@ function phone(p) {
     } else if (c.kind === 'list') {
       if (tabbed && c.zone === 'middle' && lists[u.tab || 0] !== c) continue;
       const it = items(c, v.atoms, p);
-      if (!it.length && !tabbed && lists.some(l => items(l, v.atoms, p).length)) continue;
+      const anyItems = lists.some(l => items(l, v.atoms, p).length);
+      if (!it.length && !tabbed && (anyItems || lists[0] !== c)) continue;
+      if (!it.length && !tabbed) { zone[c.zone] += `<div class="empty sys">Nothing here yet.</div>`; continue; }
       zone[c.zone] += (tabbed && c.zone === 'middle' ? '' : `<div class="h" ${K(lk)}>${esc(c.title)}</div>`) + it.map(x => {
         const chips = (c.shows || []).flatMap(pr => v.atoms.filter(a => a.p === pr && mentions(a, x)).slice(0, 1).map(a => `<span class="chip" ${K(lk, 'pred:' + a.p)}>${esc(chipName(a.p))}</span>`)).join('');
         const s = Array.isArray(x) ? x.filter(y => !isCoin(y) && !same(y, lead(x))).map(y => y === p ? 'yours' : show(y)).join(' · ') + (COUNT[plain(x)] > 1 ? ' · ×' + COUNT[plain(x)] : '') : '';
@@ -332,19 +366,25 @@ function phone(p) {
     }
   }
   if (info && !info.fs.length) info = null;
-  let h = `<div class="scr"><div class="top">${u.at !== P.ui.start ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${info ? '<button class="ib" data-info="1">i</button>' : ''}${LOOK.actions === 'menu' && zone.bottom ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  if (asks.length && LOOK.questions === 'top') zone.top = `<div class="qs">${asks.join('')}</div>`;
+  const bell = LOOK.questions === 'bell' && asks.length ? `<button class="ib bell" data-bell="1">${asks.length}</button>` : '';
+  const wchip = waiting.length ? `<span class="wait" title="${waiting.join(' · ')}"><span class="spin"></span>${waiting.length}</span>` : '';
+  let h = `<div class="scr"><div class="top">${u.at !== P.ui.start ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${info ? '<button class="ib" data-info="1">i</button>' : ''}${LOOK.actions === 'menu' && zone.bottom ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   const bar = LOOK.actions === 'bar' ? zone.bottom : '';
   const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
-  h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${LOOK.actions === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
+  h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${LOOK.actions === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
   if (u.menu && zone.bottom && LOOK.actions !== 'bar') h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${zone.bottom}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
+  else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
   else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
   d.innerHTML = h + '</div>';
-  const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => f(b));
+  /* a tap right after the screen changed is not taken: a double tap must not hit what moved under the finger */
+  const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => { if (Date.now() - TAPPED < 350) return; TAPPED = Date.now(); f(b); });
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
   on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.sheet = null; render(); });
   on('[data-back]', () => { u.at = P.ui.start; u.env = {}; u.sheet = null; u.menu = false; render(); });
-  on('[data-close]', () => { u.sheet = null; u.menu = false; render(); });
+  on('[data-close]', () => { u.sheet = null; u.menu = false; u.bell = false; render(); });
   on('[data-menu]', () => { u.menu = true; render(); });
+  on('[data-bell]', () => { u.bell = true; render(); });
   on('[data-tabi]', b => { u.tab = +b.dataset.tabi; render(); });
   on('[data-info]', () => { u.sheet = {html: `<div class="sh">${esc(info.title)}</div><div class="facts">${info.fs.map(a => `<div class="fact" ${K(info.lk, 'pred:' + a.p)}>${fact(a, p, p)}</div>`).join('')}</div>`}; render(); });
   on('[data-act]', b => { u.menu = false; act(p, acts[+b.dataset.act]); });
@@ -357,12 +397,13 @@ function phone(p) {
   const fg = d.querySelector('[data-fgo]');
   if (fg) fg.onclick = () => {
     const {ks, opts, w} = u.sheet.form, val = {...w.vals[0]};
-    for (const k of ks) { const el = d.querySelector(`[data-f="${k}"]`), o = opts(k); val[k] = o ? o[+el.value] : el.value.trim(); }
+    for (const k of ks) { const el = d.querySelector(`[data-f="${k}"]`), o = opts(k); val[k] = o ? o[+el.value] : w.act.people.includes(k) ? el.value.trim().toLowerCase() : el.value.trim(); }
+    if (ks.some(k => w.open.includes(k) && w.act.people.includes(k) && !PERSONS.includes(val[k]))) { d.querySelector('[data-ferr]').textContent = 'No one has this key.'; return; }
     if (ks.some(k => val[k] === '' || val[k] === undefined) || !enabled(w.act, view(p).atoms, val)) { d.querySelector('[data-ferr]').textContent = 'Not possible with these choices.'; return; }
     propose(p, w.act, val);
   };
   const nf = d.querySelector('[data-name]');
-  if (nf) { nf.focus(); const go = () => { if (nf.value.trim()) u.sheet.name(nf.value.trim()); }; nf.onkeydown = e => { if (e.key === 'Enter') go(); }; d.querySelector('[data-namego]').onclick = go; }
+  if (nf) { nf.focus(); const go = () => { if (!nf.value.trim()) return; const e = u.sheet.name(nf.value.trim()); if (e) d.querySelector('[data-ferr]').textContent = e; }; nf.onkeydown = e => { if (e.key === 'Enter') go(); }; d.querySelector('[data-namego]').onclick = go; }
   const zm = d.querySelector('.zm'); if (zm.querySelector('.thread')) zm.scrollTop = zm.scrollHeight;
   return d;
 }
@@ -383,14 +424,17 @@ function act(p, w) {
   const varying = Object.keys(w.vals[0]).map(Number).filter(i => i !== w.act.me && !w.open.includes(i) && w.vals.some(v => !same(v[i], w.vals[0][i])));
   if (w.open.length + varying.length > 1) return form(p, w, varying);
   if (w.open.length) {
-    const k = w.open[0];
-    if (!w.act.people.includes(k)) {
-      u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div>${EXPLAIN ? `<div class="expl" style="margin-bottom:8px">${sentence(w.act, w.vals[0])}</div>` : ''}<input data-name="1" placeholder="${esc(w.act.field || '')}"><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
-        name: x => propose(p, w.act, {...w.vals[0], [k]: x})};
-      return render();
-    }
-    const opts = PERSONS.filter(x => x !== p || !w.act.roles.includes(k)).map(x => ({...w.vals[0], [k]: x})).filter(v => enabled(w.act, view(p).atoms, v));
-    return choose(p, w.act, opts, k);
+    /* an open place: a value is typed; a person is given by her key, as no phone can list everyone */
+    const k = w.open[0], person = w.act.people.includes(k);
+    u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', `<input data-name="1" placeholder="${person ? 'their key' : esc(w.act.names[k - 1].toLowerCase())}">`)}</div>${person ? '<div class="expl">A key is shared in person or by a link; here, type a name.</div>' : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
+      name: x => {
+        const v = person ? x.toLowerCase() : x;
+        if (person && !PERSONS.includes(v)) return 'No one has this key.';
+        const val = {...w.vals[0], [k]: v};
+        if (!enabled(w.act, view(p).atoms, val)) return 'Not possible now.';
+        propose(p, w.act, val);
+      }};
+    return render();
   }
   const k = Object.keys(w.vals[0]).map(Number).find(i => i !== w.act.me && w.vals.some(v => !same(v[i], w.vals[0][i])));
   choose(p, w.act, w.vals, k);
@@ -398,12 +442,12 @@ function act(p, w) {
 /* a form: a list for each place to pick, a field for each place to type, the act's button to propose */
 function form(p, w, varying) {
   const u = ui[p], act = w.act, ks = [...varying, ...w.open].sort((a, b) => a - b);
-  const opts = k => w.open.includes(k) ? (act.people.includes(k) ? PERSONS.filter(x => x !== p || !act.roles.includes(k)) : null) : [...new Map(w.vals.map(v => [JSON.stringify(v[k]), v[k]])).values()];
+  const opts = k => w.open.includes(k) ? null : [...new Map(w.vals.map(v => [JSON.stringify(v[k]), v[k]])).values()];
   /* the form is the clause's sentence, with a control in place of each name to choose */
   const ctl = k => {
     const o = opts(k), num = (act.types || {})[act.names[k - 1]] === 'num' || /^(Sum|Total|Day|Term)$/.test(act.names[k - 1]);
     return o ? `<select data-f="${k}">${o.map((x, i) => `<option value="${i}">${esc(show(Array.isArray(x) ? lead(x) : x))}</option>`).join('')}</select>`
-      : `<input data-f="${k}" ${num ? 'type="number" min="1" value="1" class="num"' : `placeholder="${esc(act.names[k - 1].toLowerCase())}"`}>`;
+      : `<input data-f="${k}" ${num ? 'type="number" min="1" value="1" class="num"' : `placeholder="${act.people.includes(k) ? 'their key' : esc(act.names[k - 1].toLowerCase())}"`}>`;
   };
   const val = w.vals[0], done = new Set();
   let body = act.sentence.replace(/\b[A-Z][A-Za-z]*\b/g, x => {
@@ -480,12 +524,27 @@ function codePanel() {
   h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact shown' : '<span class="badm">✗ hidden</span>: ' + R.hidden.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ')}</div>`;
   if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
-  h += `<div class="ct">The language</div><div class="lg"><b>screen</b> Name, or Name(p) opened from a list with the item as p · <b>inbox</b> · <b>me</b>: facts, or <b>p</b>: facts · <b>thread</b>: facts · <b>list</b> Title: <b>everyone</b>, <b>of</b> fact, or <b>atoms of</b> fact; <b>shows</b> facts; <b>opens</b> Screen · Button: Role = p, p.i, <b>field</b>, <b>pick everyone</b> or <b>pick of</b> fact.</div>`;
+  h += `<div class="ct">How to read it</div><div class="legend">
+    <div><code>screen Chat(p)</code><span>a screen; <code>p</code> is what was tapped to open it: a person, a group, a coin</span></div>
+    <div><code>inbox</code><span>the questions this person is asked here</span></div>
+    <div><code>p: knows, friend</code><span>these facts about <code>p</code> (or <code>me</code>), behind the ⓘ</span></div>
+    <div><code>thread: message</code><span>the same, drawn as a conversation</span></div>
+    <div><code>list Contacts: everyone; opens Chat</code><span>a list of everyone the person knows of, of a fact's values (<code>of</code>), or of whole facts (<code>atoms of</code>); a tap opens a screen</span></div>
+    <div><code>Message: Bob = p, Text = field</code><span>a button for an act of the contract; each role is filled from <code>p</code> (or a part, <code>g.1</code>), a <code>field</code> the person types, or a <code>pick of</code> a list</span></div>
+    <div><code><span class="ok">✓</span> <span class="part">◐</span> <span class="badm">✗</span></code><span>covers its act · a shortcut, another line covers the act · the act is missing</span></div>
+  </div>`;
   $('#code').innerHTML = h;
 }
+let SHOWN = 0;
 function render() {
   $('#phones').innerHTML = '';
-  PHONES.forEach(p => $('#phones').appendChild(phone(p)));
+  PHONES.forEach((p, i) => { const d = phone(p); if (i === SHOWN) d.classList.add('shown'); $('#phones').appendChild(d); });
+  document.querySelectorAll('[data-ph]').forEach(b => {
+    const p = PHONES[+b.dataset.ph], n = view(p).asks.length;
+    b.classList.toggle('on', +b.dataset.ph === SHOWN);
+    b.innerHTML = `${cap(p)}'s phone${n ? ` <span class="dot">${n}</span>` : ''}`;
+    b.onclick = () => { SHOWN = +b.dataset.ph; render(); };
+  });
 }
 document.addEventListener('mouseover', e => {
   const el = e.target.closest('[data-k]'), ks = el ? el.dataset.k.split(' ') : [];
