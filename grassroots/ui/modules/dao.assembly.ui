@@ -1,9 +1,8 @@
-# Assembly: one's DAOs, their proposals, a screen for each proposal to vote and decide on.
+# Assembly: one's DAOs; in each DAO its proposals; a screen for each proposal to vote and decide on.
 screen Home
   inbox
   me: identity, person
   list DAOs: atoms of member; opens Dao
-  list Proposals: atoms of proposal; shows passed, rejected; opens Proposal
   list People: everyone; shows knows, listed; opens Person
   Establish
   Acquaint: Bob = field
@@ -12,6 +11,7 @@ screen Home
 screen Dao(d)
   inbox
   d.1: steward, listed
+  list Proposals: atoms of proposal with d.1; shows passed, rejected; opens Proposal
   Propose: Delos = d.1, Alice = d.2, Prop = field
   Propose own: Delos = d.1, Prop = field
 

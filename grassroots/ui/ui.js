@@ -4,6 +4,8 @@
  *       inbox                    the pending questions of the person, with yes and no
  *       me: P, Q                 details: the facts of predicates P, Q about the person, or about the parameter (p: P, Q)
  *       list T: everyone|of P; shows P, Q; opens S     a list of every person named in the state, or of those in P's facts
+ *       list T: atoms of P [with p | p.i]; ...           a list of the person's P facts; on a screen with a parameter,
+ *                                                      `with` keeps those that name the parameter (or its i-th part)
  *       BUTTON: Role = SOURCE, ...                     an action for the act of that button; SOURCE is the parameter,
  *                                                      field (an open field), or pick everyone | pick of P
  */
@@ -32,8 +34,10 @@
       if (!scr) { err(n, 'a line before the first screen'); continue; }
       const C = ui.containers[scr], id = 'l' + n, base = {id, line: n};
       if (s === 'inbox') { C.components.push({...base, zone: 'top', kind: 'inbox'}); Object.assign(L, {kind: 'comp', screen: scr, id}); continue; }
-      if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+|atoms\s+of\s+\w+)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
-        const c = {...base, zone: 'middle', kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : m[2].startsWith('atoms') ? {atoms: m[2].replace(/^atoms\s+of\s+/, '')} : {pred: m[2].replace(/^of\s+/, '')}};
+      if ((m = s.match(/^list\s+([^:]+):\s*(everyone|of\s+\w+|atoms\s+of\s+\w+(?:\s+with\s+[a-z]\w*(?:\.\d)?)?)\s*((?:;\s*(?:shows\s+[\w,\s]+|opens\s+[\w-]+)\s*)*)$/))) {
+        const w = m[2].match(/^atoms\s+of\s+(\w+)(?:\s+with\s+([a-z]\w*)(?:\.(\d))?)?$/);
+        const c = {...base, zone: 'middle', kind: 'list', title: m[1].trim(), items: m[2] === 'everyone' ? {named: true} : w ? {atoms: w[1]} : {pred: m[2].replace(/^of\s+/, '')}};
+        if (w && w[2]) { if (!C.params.includes(w[2])) { err(n, w[2] + ' is not the parameter of ' + scr); continue; } c.items.within = {param: w[2], pos: w[3] ? +w[3] : null}; }
         for (const part of m[3].split(';').map(x => x.trim()).filter(Boolean)) {
           if (part.startsWith('shows')) c.shows = part.slice(5).split(',').map(x => x.trim()).filter(Boolean);
           else c.opens = part.slice(5).trim();
@@ -70,7 +74,6 @@
     for (const [name, d] of Object.entries(ui.containers)) for (const c of d.components) if (c.opens) {
       const to = ui.containers[c.opens];
       if (!to) err(c.line, 'no screen ' + c.opens);
-      else if (name !== ui.start) err(c.line, 'only a list of the start screen opens a screen');
       else c.event = {navigate: c.opens, bind: {[to.params[0]]: 'item'}};
     }
     if (!ui.start) err(1, 'no screen');
@@ -115,22 +118,27 @@
     return out;
   }
   const itemKinds = l => l.items.named ? ['named'] : l.items.atoms ? ['atom:' + l.items.atoms] : ['pred:' + l.items.pred];
-  function sources(ui) {
-    const src = {};
-    for (const [c, d] of Object.entries(ui.containers)) for (const p of d.params) src[c + ':' + p] = new Set();
-    for (const d of Object.values(ui.containers)) for (const c of d.components) if (c.event)
-      for (const [par, v] of Object.entries(c.event.bind)) if (v === 'item') itemKinds(c).forEach(k => src[c.event.navigate + ':' + par].add(k));
-    return src;
+  /* the ways into a screen: each a path of lists from the start screen, to a depth of four; a list `with`
+     its screen's parameter keeps, of its facts, those that name the value the path came with */
+  function paths(ui) {
+    const out = {[ui.start]: [null]}, todo = [[ui.start, null, 0]];
+    while (todo.length) {
+      const [c, d, depth] = todo.shift();
+      if (depth >= 4) continue;
+      for (const x of ui.containers[c].components) if (x.event) {
+        const nd = {kind: itemKinds(x)[0], list: x.id, via: x.items.within ? {desc: d, pos: x.items.within.pos} : null};
+        const to = x.event.navigate, key = JSON.stringify(nd);
+        out[to] = out[to] || [];
+        if (out[to].some(y => JSON.stringify(y) === key)) continue;
+        out[to].push(nd); todo.push([to, nd, depth + 1]);
+      }
+    }
+    return out;
   }
-  function reachable(ui) {
-    const seen = new Set([ui.start]), todo = [ui.start];
-    while (todo.length) { const c = todo.pop(); for (const x of ui.containers[c].components) if (x.event && !seen.has(x.event.navigate)) { seen.add(x.event.navigate); todo.push(x.event.navigate); } }
-    return seen;
-  }
-  function kindsOf(v, c, src, comps) {
+  function kindsOf(v, d, comps) {
     if (v === 'me') return ['me'];
-    if (typeof v === 'string') return [...(src[c + ':' + v] || [])].map(k => k.startsWith('atom:') ? 'whole:' + k : k);
-    if (v.param) return [...(src[c + ':' + v.param] || [])].map(k => k.startsWith('atom:') ? 'pos:' + k.slice(5) + ':' + v.pos : 'bad');
+    if (typeof v === 'string') return d ? [d.kind.startsWith('atom:') ? 'whole:' + d.kind : d.kind] : [];
+    if (v.param) return d && d.kind.startsWith('atom:') ? ['pos:' + d.kind.slice(5) + ':' + v.pos] : ['bad'];
     if (v.select) return itemKinds(comps.find(x => x.id === v.select));
     return ['any'];
   }
@@ -140,29 +148,51 @@
     const need = anc[k] || new Set();
     return kinds.every(kd => (kd === 'named' && need.size > 0 && (!roles || roles.includes(k))) || (kd.startsWith('pred:') && need.has(kd.slice(5))) || kd.startsWith('pos:'));
   }
+  /* a path through lists `with` a parameter reaches a fact only if the act also requires the facts the
+     earlier lists were made of: one of each, naming the value the next list keeps */
+  function chainOK(a, d, req) {
+    for (; d && d.via; ) {
+      const up = d.via.desc;
+      if (!up) return false;
+      if (up.kind === 'named') return d.via.pos === null;
+      if (!up.kind.startsWith('atom:')) return false;
+      const q = up.kind.slice(5), r = a.req.find(([p, pl]) => p === q && (d.via.pos === null ? pl.some(k => k !== null && req[1].includes(k)) : pl[d.via.pos - 1] !== null && req[1].includes(pl[d.via.pos - 1])));
+      if (!r) return false;
+      d = up; req = r;
+    }
+    return true;
+  }
   function check(spec, ui) {
-    const src = sources(ui), reach = reachable(ui), acts = {}, comps = {};
+    const ways = paths(ui), reach = new Set(Object.keys(ways)), acts = {}, comps = {};
     for (const a of spec.acts) acts[a.name] = {button: a.button, covered: false};
     for (const c of reach) for (const x of ui.containers[c].components) if (x.kind === 'action' && x.act) {
-      const a = spec.acts.find(y => y.name === x.act), anc = anchors(a), bind = {[a.me]: 'me'}, why = [];
+      const a = spec.acts.find(y => y.name === x.act), anc = anchors(a), bind = {[a.me]: 'me'};
       for (const [r, v] of Object.entries(x.bind)) bind[placeOf(a, r)] = v;
-      for (let k = 1; k <= a.args.length; k++) {
-        if (k === a.me) continue;
-        const r = a.names[k - 1];
-        if (!(k in bind)) why.push(r + ' gets no value');
-        else if (!reaches(kindsOf(bind[k], c, src, ui.containers[c].components), k, anc, a.roles)) why.push(r + ' may be someone this source does not reach');
-      }
-      /* places filled from the parameter's atom: all of them the positions of one required atom of its predicate */
-      const fromAtom = Object.entries(x.bind).filter(([, v]) => v && v.param);
-      if (fromAtom.length) {
-        const ks = kindsOf(fromAtom[0][1], c, src, []), pred = ks.length === 1 && ks[0].startsWith('pos:') ? ks[0].split(':')[1] : null;
-        const fits = pred && a.req.some(([p, pl]) => p === pred && fromAtom.every(([r, v]) => pl[v.pos - 1] === placeOf(a, r)));
-        if (!fits) why.push('the places taken from the parameter are not the positions of one required ' + (pred || 'atom') + ' fact');
-      }
       const ps = ui.containers[c].params;
-      if (ps.length && !Object.values(x.bind).some(v => ps.includes(v) || (v && ps.includes(v.param)))) why.push('this screen opens only from a list, and the action does not use its parameter');
-      comps[x.id] = {ok: !why.length, why};
-      if (!why.length) acts[a.name].covered = true;
+      /* the action covers its act if, on one way into its screen, every place is reached */
+      let best = null;
+      for (const d of ways[c]) {
+        const why = [];
+        for (let k = 1; k <= a.args.length; k++) {
+          if (k === a.me) continue;
+          const r = a.names[k - 1];
+          if (!(k in bind)) why.push(r + ' gets no value');
+          else if (!reaches(kindsOf(bind[k], d, ui.containers[c].components), k, anc, a.roles)) why.push(r + ' may be someone this source does not reach');
+        }
+        /* places filled from the parameter's atom: all of them the positions of one required atom of its predicate */
+        const fromAtom = Object.entries(x.bind).filter(([, v]) => v && v.param);
+        if (fromAtom.length) {
+          const ks = kindsOf(fromAtom[0][1], d, []), pred = ks.length === 1 && ks[0].startsWith('pos:') ? ks[0].split(':')[1] : null;
+          const fit = pred && a.req.find(([p, pl]) => p === pred && fromAtom.every(([r, v]) => pl[v.pos - 1] === placeOf(a, r)));
+          if (!fit) why.push('the places taken from the parameter are not the positions of one required ' + (pred || 'atom') + ' fact');
+          else if (!chainOK(a, d, fit)) why.push('the act does not require the facts of the lists that lead to this screen');
+        } else if (d && d.via) why.push('the act does not require the facts of the lists that lead to this screen');
+        if (ps.length && !Object.values(x.bind).some(v => ps.includes(v) || (v && ps.includes(v.param)))) why.push('this screen opens only from a list, and the action does not use its parameter');
+        if (!best || why.length < best.length) best = why;
+        if (!why.length) break;
+      }
+      comps[x.id] = {ok: !best.length, why: best};
+      if (!best.length) acts[a.name].covered = true;
     }
     for (const d of Object.values(ui.containers)) for (const x of d.components) if (x.kind === 'action' && !(x.id in comps)) comps[x.id] = {ok: false, why: ['no list opens this screen']};
     const preds = new Set(Object.keys(spec.vocab).filter(p => !(spec.env || []).includes(p)));

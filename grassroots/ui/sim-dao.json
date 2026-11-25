@@ -1665,6 +1665,15 @@
      "neg": false
     },
     {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Delos",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
      "p": "proposal",
      "args": [
       "Alice",
@@ -1864,6 +1873,15 @@
      "args": [
       "Alice",
       "Delos"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Delos",
+      "Alice"
      ],
      "neg": false
     },

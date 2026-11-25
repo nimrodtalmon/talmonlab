@@ -270,17 +270,17 @@ const named = (atoms, me) => [...new Set(atoms.flatMap(a => a.args).filter(x => 
 const isCoin = x => x && typeof x === 'object' && 'coin' in x;
 const plain = args => JSON.stringify(args.map(x => isCoin(x) ? '*' : x));
 const COUNT = {};
-function items(c, atoms, me) {
+function items(c, atoms, me, env) {
   if (c.items.named) return named(atoms, me);
   if (c.items.atoms) {
-    const seen = new Map();
-    for (const a of atoms.filter(a => a.p === c.items.atoms)) { const k = plain(a.args); if (!seen.has(k)) seen.set(k, a.args); COUNT[k] = (seen.get(k) === a.args ? 0 : COUNT[k]) + 1; }
+    const seen = new Map(), w = c.items.within, wv = w && env ? (w.pos ? env[w.param][w.pos - 1] : env[w.param]) : undefined;
+    for (const a of atoms.filter(a => a.p === c.items.atoms && (!w || mentions(a, wv)))) { const k = plain(a.args); if (!seen.has(k)) seen.set(k, a.args); COUNT[k] = (seen.get(k) === a.args ? 0 : COUNT[k]) + 1; }
     return [...seen.values()];
   }
   const out = []; for (const a of atoms) if (a.p === c.items.pred) for (const x of a.args) if (!isT(x) && !out.some(y => same(x, y))) out.push(x);
   return out;
 }
-const mentions = (a, v) => Array.isArray(v) ? v.filter(x => !isCoin(x)).every(x => a.args.some(y => same(x, y))) : a.args.some(y => same(v, y));
+function mentions(a, v) { return Array.isArray(v) ? v.filter(x => !isCoin(x)).every(x => a.args.some(y => same(x, y))) : a.args.some(y => same(v, y)); }
 /* the bindings an action offers, over the person's view; a typed place stays open */
 function offers(act, c, atoms, me, env, comps) {
   const ch = {[act.me]: [me]}, open = [];
@@ -315,7 +315,7 @@ function later() { clearTimeout(TN); TN = setTimeout(() => { let n = 0; for (con
 function phone(p) {
   const v = view(p), u = ui[p], d = document.createElement('div');
   d.className = ['phone', LOOK.theme, LOOK.shape, LOOK.density].join(' ');
-  if (!P.ui.containers[u.at]) { u.at = P.ui.start; u.env = {}; }
+  if (!P.ui.containers[u.at]) { u.at = P.ui.start; u.env = {}; u.stack = []; }
   const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: ''}, acts = [];
   let composer = '', title = cap(p), avatar = av(p), info = null;
   const ident = v.atoms.filter(a => !a.args.length);
@@ -343,11 +343,12 @@ function phone(p) {
         /* with no thread on the screen, the facts are its content: by predicate, with the people they name */
         if (!comps.some(x => x.kind === 'thread') && fs.length) {
           const subj = Array.isArray(who) ? who : [who];
-          zone[c.zone] += `<div class="facts card">` + c.shows.filter(pr => tabOf(pr)).map(pr => {
+          const rows = c.shows.filter(pr => tabOf(pr)).map(pr => {
             const xs = fs.filter(a => a.p === pr); if (!xs.length) return '';
             const ppl = [...new Set(xs.flatMap(a => a.args.filter(y => isP(y) && !subj.some(z => same(z, y)))))];
             return `<div class="frow" ${K(lk, 'pred:' + pr)}><span class="fl">${esc(chipName(pr))}</span>${ppl.length ? ppl.map(y => av(y, 'sm')).join('') + ' ' + ppl.map(y => y === p ? 'you' : cap(y)).join(', ') : fact(xs[0], p, p)}</div>`;
-          }).join('') + `</div>`;
+          }).join('');
+          if (rows) zone[c.zone] += `<div class="facts card">${rows}</div>`;
         }
       }
     } else if (c.kind === 'thread') {
@@ -362,13 +363,14 @@ function phone(p) {
       zone[c.zone] += `<div class="thread">${ts.join('') || `<div class="empty sys">No messages yet.</div>`}</div>`;
     } else if (c.kind === 'list') {
       if (tabbed && c.zone === 'middle' && lists[u.tab || 0] !== c) continue;
-      const it = items(c, v.atoms, p);
-      const anyItems = lists.some(l => items(l, v.atoms, p).length);
+      const it = items(c, v.atoms, p, env);
+      const anyItems = lists.some(l => items(l, v.atoms, p, env).length);
       if (!it.length && !tabbed && (anyItems || lists[0] !== c)) continue;
       if (!it.length && !tabbed) { zone[c.zone] += `<div class="empty sys">Nothing here yet.</div>`; continue; }
       zone[c.zone] += (tabbed && c.zone === 'middle' ? '' : `<div class="h" ${K(lk)}>${esc(c.title)}</div>`) + it.map(x => {
         const chips = (c.shows || []).flatMap(pr => v.atoms.filter(a => a.p === pr && mentions(a, x)).slice(0, 1).map(a => `<span class="chip" ${K(lk, 'pred:' + a.p)}>${esc(chipName(a.p))}</span>`)).join('');
-        const s = Array.isArray(x) ? x.filter(y => !isCoin(y) && !same(y, lead(x))).map(y => y === p ? 'yours' : show(y)).join(' · ') + (COUNT[plain(x)] > 1 ? ' · ×' + COUNT[plain(x)] : '') : '';
+        const wv = c.items.within ? (c.items.within.pos ? env[c.items.within.param][c.items.within.pos - 1] : env[c.items.within.param]) : undefined;
+        const s = Array.isArray(x) ? x.filter(y => !isCoin(y) && !same(y, lead(x)) && !same(y, wv)).map(y => y === p ? 'yours' : show(y)).join(' · ') + (COUNT[plain(x)] > 1 ? ' · ×' + COUNT[plain(x)] : '') : '';
         const th = c.event ? P.ui.containers[c.event.navigate].components.find(y => y.kind === 'thread') : null;
         const last = th ? lastText(v.atoms.filter(a => th.shows.includes(a.p)), x, p) : '';
         return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
@@ -387,23 +389,26 @@ function phone(p) {
       acts.push({act, vals, open, c});
     }
   }
+  /* in a conversation one can write, the other actions go in a menu beside the name */
+  const mode = composer && comps.some(x => x.kind === 'thread') ? 'menu' : LOOK.actions;
   if (info && !info.fs.length) info = null;
   if (asks.length && LOOK.questions === 'top') zone.top = `<div class="qs">${asks.join('')}</div>`;
   const bell = LOOK.questions === 'bell' && asks.length ? `<button class="ib bell" data-bell="1">${asks.length}</button>` : '';
   const wchip = waiting.length ? `<span class="wait" title="${waiting.join(' · ')}"><span class="spin"></span>${waiting.length}</span>` : '';
-  let h = `<div class="scr"><div class="top">${u.at !== P.ui.start ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${info ? '<button class="ib" data-info="1">i</button>' : ''}${LOOK.actions === 'menu' && zone.bottom ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
-  const bar = LOOK.actions === 'bar' ? zone.bottom : '';
+  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${info ? '<button class="ib" data-info="1">i</button>' : ''}${mode === 'menu' && zone.bottom ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  const bar = mode === 'bar' ? zone.bottom : '';
   const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
-  h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${LOOK.actions === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
-  if (u.menu && zone.bottom && LOOK.actions !== 'bar') h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${zone.bottom}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
+  h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
+  if (u.menu && zone.bottom && mode !== 'bar') h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${zone.bottom}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
   else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
   d.innerHTML = h + '</div>';
   /* a tap right after the screen changed is not taken: a double tap must not hit what moved under the finger */
   const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => { if (Date.now() - TAPPED < 350) return; TAPPED = Date.now(); f(b); });
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
-  on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.sheet = null; render(); });
-  on('[data-back]', () => { u.at = P.ui.start; u.env = {}; u.sheet = null; u.menu = false; render(); });
+  on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.tab = 0; u.sheet = null; render(); });
+  /* back goes to the screen one came from */
+  on('[data-back]', () => { const b = (u.stack || []).pop() || {at: P.ui.start, env: {}, tab: 0}; Object.assign(u, b); u.sheet = null; u.menu = false; render(); });
   on('[data-close]', () => { u.sheet = null; u.menu = false; u.bell = false; render(); });
   on('[data-menu]', () => { u.menu = true; render(); });
   on('[data-bell]', () => { u.bell = true; render(); });
@@ -554,6 +559,7 @@ function codePanel() {
     <div><code>p: knows, friend</code><span>these facts about <code>p</code> (or <code>me</code>), behind the ⓘ</span></div>
     <div><code>thread: message</code><span>the same, drawn as a conversation</span></div>
     <div><code>list Contacts: everyone; opens Chat</code><span>a list of everyone the person knows of, of a fact's values (<code>of</code>), or of whole facts (<code>atoms of</code>); a tap opens a screen</span></div>
+    <div><code>list Proposals: atoms of proposal with d.1</code><span>on a screen about something, only the facts that name it</span></div>
     <div><code>Message: Bob = p, Text = field</code><span>a button for an act of the contract; each role is filled from <code>p</code> (or a part, <code>g.1</code>), a <code>field</code> the person types, or a <code>pick of</code> a list</span></div>
     <div><code><span class="ok">✓</span> <span class="part">◐</span> <span class="badm">✗</span></code><span>covers its act · a shortcut, another line covers the act · the act is missing</span></div>
   </div>`;
