@@ -85,12 +85,19 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .compose { display:flex; gap:6px; }
 .compose input { flex:1; border:1px solid var(--line); border-radius:99px; padding:7px 12px; outline:none; min-width:0; }
 .compose button { width:36px; height:36px; border-radius:50%; border:0; background:var(--acc); color:#fff; font-size:16px; flex:none; }
-.sheet { position:absolute; inset:auto 0 0 0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.15); padding:14px; max-height:75%; overflow-y:auto; }
-.shade { position:absolute; inset:0; background:rgba(0,0,0,.25); }
+.sheet { z-index:4; position:absolute; inset:auto 0 0 0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.15); padding:14px; max-height:75%; overflow-y:auto; }
+.shade { position:absolute; inset:0; background:rgba(0,0,0,.25); z-index:3; }
 .sheet .sh { font-weight:700; margin-bottom:8px; }
 .opt { display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:1px solid var(--line); background:#fff; border-radius:12px; padding:8px 10px; margin-bottom:6px; font-size:13.5px; }
 .sheet input { width:100%; border:1px solid var(--line); border-radius:10px; padding:8px 10px; margin-bottom:8px; }
 .expl { font-size:11.5px; color:var(--mute); }
+.fl { font-size:12px; color:var(--mute); }
+.sent { font-size:14px; line-height:2.1; margin:4px 0 8px; }
+.sent select, .sent input { width:auto !important; display:inline-block; margin:0 2px !important; padding:3px 6px !important; border-radius:8px !important; font-size:13.5px; }
+.sent input.num { width:64px !important; }
+.sent input { width:110px !important; }
+.sheet select { border:1px solid var(--line); border-radius:10px; padding:7px 9px; background:#fff; }
+.err { font-size:12px; color:var(--bad); min-height:16px; margin:4px 2px; }
 .sys { text-decoration:underline dotted var(--bad); text-underline-offset:3px; }
 .scripts { display:flex; align-items:center; gap:6px; color:var(--mute); font-size:12.5px; }
 .code { font:12px/1.6 var(--mono); }
@@ -99,8 +106,9 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .ln .g { width:14px; flex:none; text-align:center; }
 .ln .no { width:22px; flex:none; text-align:right; color:#b4b6b9; }
 .kw { color:#8a8f95; } .bt { color:var(--acc); font-weight:600; } .pr { color:#7a4fc0; } .cm { color:#a6a9ad; font-style:italic; }
+.why.pw { color:#8a6d12; }
 .why { font:12px/1.4 -apple-system, "Segoe UI", sans-serif; color:var(--bad); padding:0 6px 4px 52px; }
-.ok { color:var(--good); } .badm { color:var(--bad); }
+.ok { color:var(--good); } .badm { color:var(--bad); } .part { color:#b08a1a; }
 .sum { display:flex; flex-direction:column; gap:3px; margin:6px 0 10px; font-size:13px; }
 
 /* the page's pickers */
@@ -139,8 +147,8 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .phone .compose input, .phone .sheet input { background:var(--p-bg); color:var(--p-ink); border-color:var(--p-line); border-radius:var(--p-pill); }
 .phone .ib { background:var(--p-card); border-color:var(--p-line); color:var(--p-mute); }
 .phone .av.grp { border-radius:calc(var(--p-r) - 4px); }
-.phone .tbar { display:flex; gap:4px; padding:6px 10px 0; background:var(--p-card); border-bottom:1px solid var(--p-line); }
-.phone .tbar button { border:0; background:none; padding:6px 10px; color:var(--p-mute); border-bottom:2px solid transparent; font-weight:600; font-size:13px; }
+.phone .tbar { display:flex; gap:2px; padding:6px 8px 0; overflow-x:auto; white-space:nowrap; scrollbar-width:none; background:var(--p-card); border-bottom:1px solid var(--p-line); }
+.phone .tbar button { flex:none; border:0; background:none; padding:6px 8px; color:var(--p-mute); border-bottom:2px solid transparent; font-weight:600; font-size:13px; }
 .phone .tbar button.on { color:var(--p-acc); border-bottom-color:var(--p-acc); }
 .phone .fab { position:absolute; right:16px; bottom:84px; width:48px; height:48px; border:0; color:#fff; font-size:24px; box-shadow:0 4px 12px rgba(0,0,0,.2); z-index:2; }
 .phone .acts.col1 { flex-direction:column; align-items:stretch; }
@@ -166,6 +174,7 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 const CONTRACTS = {
   chat: {title: 'Chat (proposed)', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
   groups: {title: 'Groups', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
+  agora: {title: 'Agora (barter market)', modules: {market: 'Market', mechanical: 'Mechanical'}},
   friendship: {title: 'Friendship', modules: {people: 'People', mechanical: 'Mechanical', pages: 'Pages only (not complete)'}},
 };
 /* the look: modules that change how the app is drawn and nothing of what it lets a person do */
@@ -189,8 +198,8 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;',
 const cap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 const isP = x => PERSONS.includes(x);
 const isT = x => x && typeof x === 'object' && 't' in x;
-const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : String(x);
-const lead = x => Array.isArray(x) ? (x.find(y => !isP(y)) ?? x[0]) : x;
+const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x === 'object' && 'coin' in x ? '#' + x.coin : String(x);
+const lead = x => Array.isArray(x) ? (x.find(y => !isP(y) && !(y && typeof y === 'object' && 'coin' in y)) ?? x[0]) : x;
 const av = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc(String(p)[0].toUpperCase())}</span>`;
 const K = (...ks) => `data-k="${ks.filter(Boolean).join(' ')}"`;
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -219,13 +228,21 @@ function enabled(act, atoms, val) {
   return new Set(ps).size === ps.length;
 }
 const named = (atoms, me) => [...new Set(atoms.flatMap(a => a.args).filter(x => isP(x) && x !== me))];
+/* coins: atoms that differ only in a coin are one item, with how many there are */
+const isCoin = x => x && typeof x === 'object' && 'coin' in x;
+const plain = args => JSON.stringify(args.map(x => isCoin(x) ? '*' : x));
+const COUNT = {};
 function items(c, atoms, me) {
   if (c.items.named) return named(atoms, me);
-  if (c.items.atoms) return atoms.filter(a => a.p === c.items.atoms).map(a => a.args);
+  if (c.items.atoms) {
+    const seen = new Map();
+    for (const a of atoms.filter(a => a.p === c.items.atoms)) { const k = plain(a.args); if (!seen.has(k)) seen.set(k, a.args); COUNT[k] = (seen.get(k) === a.args ? 0 : COUNT[k]) + 1; }
+    return [...seen.values()];
+  }
   const out = []; for (const a of atoms) if (a.p === c.items.pred) for (const x of a.args) if (!isT(x) && !out.some(y => same(x, y))) out.push(x);
   return out;
 }
-const mentions = (a, v) => Array.isArray(v) ? v.every(x => a.args.some(y => same(x, y))) : a.args.some(y => same(v, y));
+const mentions = (a, v) => Array.isArray(v) ? v.filter(x => !isCoin(x)).every(x => a.args.some(y => same(x, y))) : a.args.some(y => same(v, y));
 /* the bindings an action offers, over the person's view; a typed place stays open */
 function offers(act, c, atoms, me, env, comps) {
   const ch = {[act.me]: [me]}, open = [];
@@ -275,7 +292,7 @@ function phone(p) {
         zone[c.zone] += `<div class="ask" ${K(lk, 'act:' + a.s.name)}>${qt || sentence(act, valOf(act, a.b)) + '?'}${EXPLAIN && qt ? `<div class="expl">${sentence(act, valOf(act, a.b))}</div>` : ''}<div class="btns"><button class="pri" data-ans="1" data-id="${a.id}">Yes</button><button class="ghost" data-ans="0" data-id="${a.id}">No</button></div></div>`;
       }
     } else if (c.kind === 'details') {
-      const who = c.about === 'me' ? null : env[c.about];
+      const who = c.about === 'me' ? null : c.pos ? env[c.about][c.pos - 1] : env[c.about];
       const fs = v.atoms.filter(a => c.shows.includes(a.p) && (c.about === 'me' ? !a.args.length : mentions(a, who)));
       if (c.about === 'me') info = info || {title: cap(p), fs, lk};
       else { title = show(lead(who)); avatar = av(lead(who)); info = {title, fs, lk}; }
@@ -292,9 +309,10 @@ function phone(p) {
     } else if (c.kind === 'list') {
       if (tabbed && c.zone === 'middle' && lists[u.tab || 0] !== c) continue;
       const it = items(c, v.atoms, p);
+      if (!it.length && !tabbed && lists.some(l => items(l, v.atoms, p).length)) continue;
       zone[c.zone] += (tabbed && c.zone === 'middle' ? '' : `<div class="h" ${K(lk)}>${esc(c.title)}</div>`) + it.map(x => {
         const chips = (c.shows || []).flatMap(pr => v.atoms.filter(a => a.p === pr && mentions(a, x)).slice(0, 1).map(a => `<span class="chip" ${K(lk, 'pred:' + a.p)}>${esc(chipName(a.p))}</span>`)).join('');
-        const s = Array.isArray(x) ? x.filter(isP).map(y => y === p ? 'yours' : cap(y)).join(', ') : '';
+        const s = Array.isArray(x) ? x.filter(y => !isCoin(y) && !same(y, lead(x))).map(y => y === p ? 'yours' : show(y)).join(' · ') + (COUNT[plain(x)] > 1 ? ' · ×' + COUNT[plain(x)] : '') : '';
         const th = c.event ? P.ui.containers[c.event.navigate].components.find(y => y.kind === 'thread') : null;
         const last = th ? lastText(v.atoms.filter(a => th.shows.includes(a.p)), x, p) : '';
         return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
@@ -302,8 +320,8 @@ function phone(p) {
     } else if (c.kind === 'action' && c.act) {
       const act = SPEC.acts.find(x => x.name === c.act), {vals, open} = offers(act, c, v.atoms, p, env, comps);
       if (!vals.length) continue;
-      const typedValue = open.length && act.values.includes(act.names[open[0] - 1]);
-      if (typedValue && act.field === 'text') {
+      const typedValue = open.length === 1 && act.values.includes(act.names[open[0] - 1]);
+      if (typedValue && act.field === 'text' && vals.length === 1) {
         composer += `<div class="compose" ${K(lk, 'act:' + act.name)}><input placeholder="${esc(act.button)}" data-compose="${acts.length}"><button data-send="${acts.length}">➤</button></div>` + (EXPLAIN ? `<div class="expl">${sentence(act, vals[0])}</div>` : '');
         acts.push({act, vals, open, c}); continue;
       }
@@ -336,6 +354,13 @@ function phone(p) {
     if (u.focus === i) { inp.focus(); u.focus = null; }
   });
   d.querySelectorAll('[data-opt]').forEach(b => b.onclick = () => u.sheet.go[+b.dataset.opt]());
+  const fg = d.querySelector('[data-fgo]');
+  if (fg) fg.onclick = () => {
+    const {ks, opts, w} = u.sheet.form, val = {...w.vals[0]};
+    for (const k of ks) { const el = d.querySelector(`[data-f="${k}"]`), o = opts(k); val[k] = o ? o[+el.value] : el.value.trim(); }
+    if (ks.some(k => val[k] === '' || val[k] === undefined) || !enabled(w.act, view(p).atoms, val)) { d.querySelector('[data-ferr]').textContent = 'Not possible with these choices.'; return; }
+    propose(p, w.act, val);
+  };
   const nf = d.querySelector('[data-name]');
   if (nf) { nf.focus(); const go = () => { if (nf.value.trim()) u.sheet.name(nf.value.trim()); }; nf.onkeydown = e => { if (e.key === 'Enter') go(); }; d.querySelector('[data-namego]').onclick = go; }
   const zm = d.querySelector('.zm'); if (zm.querySelector('.thread')) zm.scrollTop = zm.scrollHeight;
@@ -355,18 +380,43 @@ function partial(act, c, env, p) {
 function act(p, w) {
   const u = ui[p];
   if (!w.open.length && w.vals.length === 1) return propose(p, w.act, w.vals[0]);
+  const varying = Object.keys(w.vals[0]).map(Number).filter(i => i !== w.act.me && !w.open.includes(i) && w.vals.some(v => !same(v[i], w.vals[0][i])));
+  if (w.open.length + varying.length > 1) return form(p, w, varying);
   if (w.open.length) {
     const k = w.open[0];
-    if (w.act.values.includes(w.act.names[k - 1])) {
+    if (!w.act.people.includes(k)) {
       u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div>${EXPLAIN ? `<div class="expl" style="margin-bottom:8px">${sentence(w.act, w.vals[0])}</div>` : ''}<input data-name="1" placeholder="${esc(w.act.field || '')}"><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
         name: x => propose(p, w.act, {...w.vals[0], [k]: x})};
       return render();
     }
-    const opts = PERSONS.filter(x => x !== p).map(x => ({...w.vals[0], [k]: x})).filter(v => enabled(w.act, view(p).atoms, v));
+    const opts = PERSONS.filter(x => x !== p || !w.act.roles.includes(k)).map(x => ({...w.vals[0], [k]: x})).filter(v => enabled(w.act, view(p).atoms, v));
     return choose(p, w.act, opts, k);
   }
   const k = Object.keys(w.vals[0]).map(Number).find(i => i !== w.act.me && w.vals.some(v => !same(v[i], w.vals[0][i])));
   choose(p, w.act, w.vals, k);
+}
+/* a form: a list for each place to pick, a field for each place to type, the act's button to propose */
+function form(p, w, varying) {
+  const u = ui[p], act = w.act, ks = [...varying, ...w.open].sort((a, b) => a - b);
+  const opts = k => w.open.includes(k) ? (act.people.includes(k) ? PERSONS.filter(x => x !== p || !act.roles.includes(k)) : null) : [...new Map(w.vals.map(v => [JSON.stringify(v[k]), v[k]])).values()];
+  /* the form is the clause's sentence, with a control in place of each name to choose */
+  const ctl = k => {
+    const o = opts(k), num = (act.types || {})[act.names[k - 1]] === 'num' || /^(Sum|Total|Day|Term)$/.test(act.names[k - 1]);
+    return o ? `<select data-f="${k}">${o.map((x, i) => `<option value="${i}">${esc(show(Array.isArray(x) ? lead(x) : x))}</option>`).join('')}</select>`
+      : `<input data-f="${k}" ${num ? 'type="number" min="1" value="1" class="num"' : `placeholder="${esc(act.names[k - 1].toLowerCase())}"`}>`;
+  };
+  const val = w.vals[0], done = new Set();
+  let body = act.sentence.replace(/\b[A-Z][A-Za-z]*\b/g, x => {
+    const k = act.names.indexOf(x) + 1;
+    if (!k) return esc(x);
+    if (ks.includes(k) && !done.has(k)) { done.add(k); return ctl(k); }
+    return `<b>${esc(val[k] === undefined ? x : show(val[k]))}</b>`;
+  });
+  for (const k of ks) if (!done.has(k)) body += ` <span class="fl">${esc(act.names[k - 1])}</span> ${ctl(k)}`;
+  let h = `<div class="sh">${esc(act.button)}</div><div class="sent">${body}</div>`;
+  h += `<div class="err sys" data-ferr></div><button class="pri" data-fgo="1">${esc(act.button)}</button>`;
+  u.sheet = {html: h, form: {ks, opts, w}};
+  render();
 }
 function choose(p, act, vals, k) {
   ui[p].sheet = {html: `<div class="sh">${esc(act.button)}</div>` + (vals.length ? '' : `<div class="empty sys">No one to choose.</div>`) + vals.map((v, i) => `<button class="opt" data-opt="${i}">${av(lead(v[k]))}<div><div>${esc(show(v[k]))}</div>${EXPLAIN ? `<div class="expl">${sentence(act, v)}</div>` : ''}</div></button>`).join(''),
@@ -403,7 +453,12 @@ function codeLine(L) {
   const comp = L.screen && L.id ? P.ui.containers[L.screen].components.find(c => c.id === L.id) : null;
   let keys = ['line:' + L.n], g = '', why = [];
   if (comp) {
-    if (comp.kind === 'action' && comp.act) { keys.push('act:' + comp.act); const v = R.comps[comp.id]; if (v) { g = v.ok ? '<span class="ok">✓</span>' : '<span class="badm">✗</span>'; why = v.why; } }
+    if (comp.kind === 'action' && comp.act) {
+      keys.push('act:' + comp.act); const v = R.comps[comp.id];
+      if (v && v.ok) g = '<span class="ok">✓</span>';
+      else if (v && R.acts[comp.act].covered) { g = '<span class="part">◐</span>'; why = ['A shortcut: it offers some answers, and another line covers the act. ' + v.why.join('; ')]; }
+      else if (v) { g = '<span class="badm">✗</span>'; why = v.why; }
+    }
     (comp.shows || []).forEach(p => keys.push('pred:' + p));
   }
   const err = P.errors.filter(e => e.line === L.n);
@@ -416,7 +471,7 @@ function codeLine(L) {
     t = t.replace(/\b([a-z]\w*)\b/g, w => preds.has(w) ? `<span class="pr">${w}</span>` : w).replace(KW, '<span class="kw">$1</span>');
     if (L.kind === 'screen') t = `<b>${t}</b>`;
   }
-  return `<div class="ln" ${K(...keys)}><span class="no">${L.n}</span><span class="g">${g}</span><span>${t}</span></div>` + why.map(w => `<div class="why">${esc(w)}</div>`).join('');
+  return `<div class="ln" ${K(...keys)}><span class="no">${L.n}</span><span class="g">${g}</span><span>${t}</span></div>` + why.map(w => `<div class="why${g.includes('part') ? ' pw' : ''}">${esc(w)}</div>`).join('');
 }
 function codePanel() {
   let h = `<h3>${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Each screen lists what it shows and which acts it offers. Each action is an act of the contract, with a source for each role. The checker reads it against the contract; where things go on the screen is the look's.</p>`;

@@ -10,8 +10,11 @@
   const key = a => JSON.stringify([a.p, a.args]);
   const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
 
+  /* literal words of the schemas, {lit: w}, are the values w */
+  const lits = x => Array.isArray(x) ? x.map(lits) : x && typeof x === 'object' ? ('lit' in x ? x.lit : Object.fromEntries(Object.entries(x).map(([k, v]) => [k, lits(v)]))) : x;
   function World(spec, persons) {
-    this.spec = spec; this.persons = persons;
+    spec.schemas = lits(spec.schemas);
+    this.spec = spec; this.persons = persons; this.cur = null; this.coin = 0;
     this.atoms = new Map(); this.seq = 0; this.props = []; this.notes = {}; this.day = 1; this.nid = 0;
     persons.forEach(p => this.notes[p] = []);
   }
@@ -34,11 +37,41 @@
       for (const m of this.match(c.over, b)) if (!c.then.every(t => this.holds(t, m))) return false;
       return true;
     }
-    const h = this.has(c.p, inst(c, b));
+    const h = this.setVar(c) >= 0 ? this.match(c, b).length > 0 : this.has(c.p, inst(c, b));
     return c.neg ? !h : h;
   };
   /* the bindings extending b under which the atom pattern a is in the state */
+  /* a set: the variable S of type set stands for several atoms that differ only in that place, each a coin */
+  World.prototype.setVar = function (a) {
+    const s = this.cur;
+    if (!s || !s.types) return -1;
+    return a.args.findIndex(x => typeof x === 'string' && s.types[x] === 'set');
+  };
+  World.prototype.sizeOf = function (v, b) {
+    const n = this.cur && this.cur.sizes ? this.cur.sizes[v] : undefined;
+    if (typeof n === 'number') return n;
+    if (n !== undefined && b[n] !== undefined) return +b[n];
+    return undefined;
+  };
   World.prototype.match = function (a, b) {
+    const si = this.setVar(a);
+    if (si >= 0) {
+      const v = a.args[si], rest = {...a, args: a.args.map((x, i) => i === si ? '_' : x)};
+      if (Array.isArray(b[v])) return b[v].every(id => this.has(a.p, inst({...a, args: a.args.map((x, i) => i === si ? '_' : x)}, b).map((x, i) => i === si ? id : x))) ? [b] : [];
+      const groups = new Map();
+      for (const m of this.match(rest, b)) {
+        const k = JSON.stringify(Object.entries(m).filter(([x]) => !(x in b)));
+        if (!groups.has(k)) groups.set(k, m);
+      }
+      const out = [];
+      for (const m of groups.values()) {
+        const ids = [...this.atoms.values()].filter(x => x.p === a.p && x.args.length === a.args.length && x.args.every((y, i) => i === si || same(y, inst(a, m)[i]) || inst(a, m)[i] === undefined)).map(x => x.args[si]);
+        const k = this.sizeOf(v, m);
+        if (k === undefined || ids.length < k) continue;
+        out.push({...m, [v]: ids.slice(0, k)});
+      }
+      return out;
+    }
     const out = [];
     if (a.p === 'today') {
       const m = {...b}, v = a.args[1];
@@ -68,12 +101,26 @@
     return ps.every(p => this.persons.includes(p)) && new Set(ps).size === ps.length;
   };
   World.prototype.allowed = function (s, b) {
-    return this.distinct(s, b) && s.pre.every(c => this.holds(c, b));
+    this.cur = s;
+    if (!this.distinct(s, b)) return false;
+    /* bind the sets, in order, from the preconditions that hold them */
+    for (const c of s.pre) if (c.p && !c.neg && this.setVar(c) >= 0 && !Array.isArray(b[c.args[this.setVar(c)]])) {
+      const ms = this.match(c, b); if (!ms.length) return false; Object.assign(b, ms[0]);
+    }
+    return s.pre.every(c => this.holds(c, b));
   };
   World.prototype.apply = function (s, b) {
+    this.cur = s;
     const add = [], del = [];
     const eff = (c, m) => {
       if (c.forall) { for (const n of this.match(c.over, m)) c.then.forEach(t => eff(t, n)); return; }
+      const si = this.setVar(c);
+      if (si >= 0) {
+        const v = c.args[si];
+        if (!Array.isArray(m[v])) { const k = this.sizeOf(v, m) || 0; m[v] = Array.from({length: k}, () => ({coin: ++this.coin})); }
+        for (const id of m[v]) eff({...c, args: c.args.map((x, i) => i === si ? '#' : x)}, {...m, '#': id});
+        return;
+      }
       const args = inst(c, m);
       if (c.neg) { for (const [k, a] of this.atoms) if (a.p === c.p && a.args.length === args.length && a.args.every((x, i) => args[i] === undefined || same(x, args[i]))) del.push(k); }
       else add.push({p: c.p, args});
@@ -87,6 +134,7 @@
     for (let round = 0; round < 50; round++) {
       let done = false;
       for (const s of this.spec.schemas.filter(x => x.auto)) {
+        this.cur = s;
         let bs = [{}];
         for (const c of s.pre) if (c.p && !c.neg) bs = bs.flatMap(b => this.match(c, b));
         for (const b of bs) if (this.allowed(s, b)) { this.apply(s, b); done = true; }

@@ -1,0 +1,3408 @@
+{
+ "contract": "Agora",
+ "chain": [
+  {
+   "contract": "Knowledge",
+   "text": [
+    "Knowledge",
+    "An *identity* is a unique cryptographic key pair.",
+    "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+    "Alice, Bob and Carol are persons.",
+    "1. ○ Establish: Alice may establish an identity once. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it.",
+    "2. ■ Acquaint: Alice and Bob may jointly come to know each other, provided Alice does not know Bob.",
+    "3. ■ Introduce: Alice may introduce Carol to Bob with the consent of Bob, provided Alice and Bob know each other, Alice knows Carol and Bob does not know Carol."
+   ],
+   "changed": [
+    "2",
+    "3"
+   ]
+  },
+  {
+   "contract": "Notes",
+   "text": [
+    "Notes",
+    "Notes extends Knowledge.",
+    "A *note* includes its issuer's public key and a unique note identifier, is signed by their private key, and gives its holder a right against its issuer. An *Alice-note* is a note issued by Alice.",
+    "Alice, Bob and Carol are parties.",
+    "1. ■ Issue: Alice may issue Alice-notes.",
+    "2. ■ Swap: Alice and Bob, who know each other, may jointly swap notes they hold.",
+    "3. ■ Pay: Alice may pay notes she holds to Bob, whom she knows, with his consent.",
+    "4. ○ Escrow. Deposit: Alice may deposit notes with Carol for Bob, on a condition the three agree, with the consent of Carol. Release: Carol and Bob may jointly release them to Bob. Return: Carol and Alice may jointly return them to Alice. Carol will release them only if the condition is met, and return them only if it fails. Each act is between two parties who know each other."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Coins",
+   "text": [
+    "Coins",
+    "Coins extends Notes.",
+    "A *coin* is a note that is a unit of its issuer's debt. An *Alice-coin* is a coin issued by Alice.",
+    "Alice and Bob are parties.",
+    "1. ■ Pay issuer: Notes:3, without the consent of Bob, if the coins are Bob-coins.",
+    "2. ■ Redeem: Alice may redeem a Bob-coin she holds against any coin held by Bob, whom she knows.",
+    "3. ○ Pricing. Alice will price her offerings in Alice-coins and accept them in payment at those prices."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Bonds",
+   "text": [
+    "Bonds",
+    "Bonds extends Coins.",
+    "A *bond* is a note that is a unit of its issuer's debt, due at its maturity date, which it includes. An *Alice-bond* is a bond issued by Alice. A bond is *mature* when its maturity date is at most the current date.",
+    "Alice and Bob are parties.",
+    "1. ■ Redeem: Alice may redeem a Bob-coin, or a mature Bob-bond, she holds against any coin or bond held by Bob, whom she knows."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Agora",
+   "text": [
+    "Agora",
+    "Agora extends Bonds.",
+    "An *item* is a one-of-a-kind thing named by its maker.",
+    "Alice and Bob are persons.",
+    "1. ■ Make: Alice may make an item, which she then holds.",
+    "2. ■ Open: Alice may open a market under a new name of hers; Alice is then its keeper and first member.",
+    "3. ■ Join: Alice, the keeper of a market, may admit Bob, whom she knows, with the consent of Bob.",
+    "4. ■ Posting. Offer, Want: A member of a market may post to its wall an item they hold, or something they want, each once; its keeper sees the post on their own wall. Deliver: The keeper delivers it to every member but the keeper, the poster included; each member then knows its poster.",
+    "5. ■ Withdraw: A member may withdraw a post of theirs; the keeper removes it from their own wall and from the wall of every member it was delivered to, and the member may not post it to that market again.",
+    "6. ○ Swap, Escrow: Notes:2 and Notes:4 apply to items as to notes."
+   ],
+   "changed": []
+  }
+ ],
+ "vocab": {
+  "identity": {
+   "phrase": "x has an identity",
+   "vars": [
+    "x"
+   ]
+  },
+  "person": {
+   "phrase": "x is a person",
+   "vars": [
+    "x"
+   ]
+  },
+  "knows": {
+   "phrase": "x knows y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "note": {
+   "phrase": "x holds n y-bonds due e",
+   "vars": [
+    "x",
+    "y",
+    "bond(e"
+   ]
+  },
+  "escrow_note": {
+   "phrase": "z holds n w-bonds due e in escrow from x for y on k",
+   "vars": [
+    "z",
+    "w",
+    "bond(e"
+   ]
+  },
+  "today": {
+   "phrase": "the current date is e",
+   "vars": [
+    "x",
+    "e"
+   ]
+  },
+  "made": {
+   "phrase": "x has made i",
+   "vars": [
+    "x",
+    "i"
+   ]
+  },
+  "item": {
+   "phrase": "x holds the item i",
+   "vars": [
+    "x",
+    "i"
+   ]
+  },
+  "keeper": {
+   "phrase": "x is the keeper of m",
+   "vars": [
+    "x",
+    "m"
+   ]
+  },
+  "member": {
+   "phrase": "x is a member of the market m of y",
+   "vars": [
+    "x",
+    "m",
+    "y"
+   ]
+  },
+  "has_member": {
+   "phrase": "x has y as a member of m",
+   "vars": [
+    "x",
+    "y",
+    "m"
+   ]
+  },
+  "posted": {
+   "phrase": "y has posted i to m",
+   "vars": [
+    "y",
+    "i",
+    "m"
+   ]
+  },
+  "post": {
+   "phrase": "x sees y's post of i on the wall of m",
+   "vars": [
+    "x",
+    "y",
+    "i",
+    "m"
+   ]
+  },
+  "delivered_post": {
+   "phrase": "x has delivered y's post of i in m to z",
+   "vars": [
+    "x",
+    "y",
+    "i",
+    "m",
+    "z"
+   ]
+  },
+  "escrow_item": {
+   "phrase": "z holds the item i in escrow from x for y on k",
+   "vars": [
+    "z",
+    "i",
+    "x",
+    "y",
+    "k"
+   ]
+  }
+ },
+ "reflexive": [
+  "knows"
+ ],
+ "schemas": [
+  {
+   "name": "establish",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Establish",
+   "sentence": "Alice may establish an identity. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "acquaint",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Acquaint",
+   "sentence": "Alice and Bob may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "introduce",
+   "persons": [
+    "Bob",
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Introduce",
+   "sentence": "Alice may introduce Carol to Bob",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to introduce Carol to you."
+   },
+   "field": null
+  },
+  {
+   "name": "issue",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Type": "const",
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Type",
+    "SumSet",
+    "Sum"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Alice",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Issue",
+   "sentence": "Alice may issue Sum Alice-notes of type Type",
+   "auto": false,
+   "questions": {},
+   "field": "type"
+  },
+  {
+   "name": "swap",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ],
+    "Dave": [
+     "Alice",
+     "Bob",
+     "Carol"
+    ]
+   },
+   "types": {
+    "Type": "const",
+    "SumSet": "set",
+    "Other": "const",
+    "TotalSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum",
+    "TotalSet": "Total"
+   },
+   "values": [
+    "Type",
+    "SumSet",
+    "Sum",
+    "Other",
+    "TotalSet",
+    "Total"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      "Type",
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Dave",
+      "Other",
+      "TotalSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Dave",
+      "Other",
+      "TotalSet"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Dave",
+      "Other",
+      "TotalSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Swap",
+   "sentence": "Alice and Bob may jointly swap Sum Carol-notes of type Type for Total Dave-notes of type Other",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to swap coins or bonds with you."
+   },
+   "field": "amount given"
+  },
+  {
+   "name": "pay",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "Type": "const",
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Type",
+    "SumSet",
+    "Sum"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      "Type",
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Pay",
+   "sentence": "Alice may pay Bob Sum Carol-notes of type Type",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to pay you coins or bonds."
+   },
+   "field": "amount"
+  },
+  {
+   "name": "pay_issuer",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Type": "const",
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Type",
+    "SumSet",
+    "Sum"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      "Type",
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Bob",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Pay issuer",
+   "sentence": "Notes:3, without the consent of Bob, if Carol is Bob",
+   "auto": false,
+   "questions": {},
+   "field": "amount"
+  },
+  {
+   "name": "deposit",
+   "persons": [
+    "Alice",
+    "Carol"
+   ],
+   "one": {
+    "Dave": [
+     "Alice",
+     "Carol"
+    ],
+    "Bob": [
+     "Dave"
+    ]
+   },
+   "types": {
+    "Type": "const",
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Type",
+    "SumSet",
+    "Sum",
+    "Cond"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Dave",
+      "Type",
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "escrow_note",
+     "args": [
+      "Carol",
+      "Dave",
+      "Type",
+      "Alice",
+      "Bob",
+      "Cond",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Carol",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Dave",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Carol"
+   ],
+   "button": "Deposit",
+   "sentence": "Alice may deposit Sum Dave-notes of type Type with Carol for Bob on Cond",
+   "auto": false,
+   "questions": {
+    "Carol": "Alice asks to deposit coins or bonds with you."
+   },
+   "field": "amount"
+  },
+  {
+   "name": "release",
+   "persons": [
+    "Carol",
+    "Bob"
+   ],
+   "one": {
+    "Dave": [
+     "Carol",
+     "Bob"
+    ],
+    "Alice": [
+     "Dave"
+    ]
+   },
+   "types": {
+    "Type": "const",
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Type",
+    "Cond",
+    "SumSet",
+    "Sum"
+   ],
+   "effects": [
+    {
+     "p": "escrow_note",
+     "args": [
+      "Carol",
+      "Dave",
+      "Type",
+      "Alice",
+      "Bob",
+      "Cond",
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Dave",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Dave"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Carol",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "escrow_note",
+     "args": [
+      "Carol",
+      "Dave",
+      "Type",
+      "Alice",
+      "Bob",
+      "Cond",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol",
+    "Bob"
+   ],
+   "button": "Release",
+   "sentence": "Carol and Bob may jointly release Sum Dave-notes of type Type that Alice deposited on Cond",
+   "auto": false,
+   "questions": {
+    "Bob": "Carol asks to release coins or bonds to you."
+   },
+   "field": "amount"
+  },
+  {
+   "name": "return",
+   "persons": [
+    "Carol",
+    "Alice"
+   ],
+   "one": {
+    "Dave": [
+     "Carol",
+     "Alice"
+    ],
+    "Bob": [
+     "Dave"
+    ]
+   },
+   "types": {
+    "Type": "const",
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Type",
+    "Cond",
+    "SumSet",
+    "Sum"
+   ],
+   "effects": [
+    {
+     "p": "escrow_note",
+     "args": [
+      "Carol",
+      "Dave",
+      "Type",
+      "Alice",
+      "Bob",
+      "Cond",
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Dave",
+      "Type",
+      "SumSet"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Carol",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "escrow_note",
+     "args": [
+      "Carol",
+      "Dave",
+      "Type",
+      "Alice",
+      "Bob",
+      "Cond",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol",
+    "Alice"
+   ],
+   "button": "Return",
+   "sentence": "Carol and Alice may jointly return Sum Dave-notes of type Type deposited for Bob on Cond",
+   "auto": false,
+   "questions": {
+    "Alice": "Carol asks to return coins or bonds to you."
+   },
+   "field": "amount"
+  },
+  {
+   "name": "redeem",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "BobCoin1Set": "set",
+    "CarolCoin1Set": "set"
+   },
+   "sizes": {
+    "BobCoin1Set": 1,
+    "CarolCoin1Set": 1
+   },
+   "values": [
+    "BobCoin1Set",
+    "CarolCoin1Set"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      {
+       "lit": "coin"
+      },
+      "BobCoin1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Bob",
+      {
+       "lit": "coin"
+      },
+      "BobCoin1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      {
+       "lit": "coin"
+      },
+      "CarolCoin1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      {
+       "lit": "coin"
+      },
+      "CarolCoin1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      {
+       "lit": "coin"
+      },
+      "BobCoin1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      {
+       "lit": "coin"
+      },
+      "CarolCoin1Set"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Redeem",
+   "sentence": "Alice may redeem a Bob-coin against a Carol-coin",
+   "auto": false,
+   "questions": {},
+   "field": "issuer wanted"
+  },
+  {
+   "name": "redeem_coin_against_bond",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "BobCoin1Set": "set",
+    "bond(Day)": "val",
+    "CarolBondDay1Set": "set"
+   },
+   "sizes": {
+    "BobCoin1Set": 1,
+    "CarolBondDay1Set": 1
+   },
+   "values": [
+    "BobCoin1Set",
+    "CarolBondDay1Set"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      {
+       "lit": "coin"
+      },
+      "BobCoin1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Bob",
+      {
+       "lit": "coin"
+      },
+      "BobCoin1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      "bond(Day)",
+      "CarolBondDay1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      "bond(Day)",
+      "CarolBondDay1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      {
+       "lit": "coin"
+      },
+      "BobCoin1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      "bond(Day)",
+      "CarolBondDay1Set"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Redeem coin against bond",
+   "sentence": "Alice may redeem a Bob-coin against a Carol-bond due Day",
+   "auto": false,
+   "questions": {},
+   "field": "issuer wanted"
+  },
+  {
+   "name": "redeem_bond",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "bond(Day)": "val",
+    "BobBondDay1Set": "set",
+    "CarolCoin1Set": "set",
+    "Today": "num"
+   },
+   "sizes": {
+    "BobBondDay1Set": 1,
+    "CarolCoin1Set": 1
+   },
+   "values": [
+    "BobBondDay1Set",
+    "CarolCoin1Set",
+    "Today",
+    "Day"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      "bond(Day)",
+      "BobBondDay1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Bob",
+      "bond(Day)",
+      "BobBondDay1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      {
+       "lit": "coin"
+      },
+      "CarolCoin1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      {
+       "lit": "coin"
+      },
+      "CarolCoin1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "today",
+     "args": [
+      "Bob",
+      "Today"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      "bond(Day)",
+      "BobBondDay1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      {
+       "lit": "coin"
+      },
+      "CarolCoin1Set"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Redeem bond",
+   "sentence": "Alice may redeem a Bob-bond due Day against a Carol-coin",
+   "auto": false,
+   "questions": {},
+   "field": "issuer wanted"
+  },
+  {
+   "name": "redeem_bond_against_bond",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "bond(Day)": "val",
+    "BobBondDay1Set": "set",
+    "bond(Term)": "val",
+    "CarolBondTerm1Set": "set",
+    "Today": "num"
+   },
+   "sizes": {
+    "BobBondDay1Set": 1,
+    "CarolBondTerm1Set": 1
+   },
+   "values": [
+    "BobBondDay1Set",
+    "CarolBondTerm1Set",
+    "Today",
+    "Day"
+   ],
+   "effects": [
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      "bond(Day)",
+      "BobBondDay1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Bob",
+      "bond(Day)",
+      "BobBondDay1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      "bond(Term)",
+      "CarolBondTerm1Set"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Carol",
+      "bond(Term)",
+      "CarolBondTerm1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "today",
+     "args": [
+      "Bob",
+      "Today"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Bob",
+      "bond(Day)",
+      "BobBondDay1Set"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Carol",
+      "bond(Term)",
+      "CarolBondTerm1Set"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Redeem bond against bond",
+   "sentence": "Alice may redeem a Bob-bond due Day against a Carol-bond due Term",
+   "auto": false,
+   "questions": {},
+   "field": "issuer wanted"
+  },
+  {
+   "name": "make",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [
+    "Item"
+   ],
+   "effects": [
+    {
+     "p": "made",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "made",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Make",
+   "sentence": "Alice may make the item Item",
+   "auto": false,
+   "questions": {},
+   "field": "item"
+  },
+  {
+   "name": "open",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Mart",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_member",
+     "args": [
+      "Alice",
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Open",
+   "sentence": "Alice may open Mart under a new name of hers",
+   "auto": false,
+   "questions": {},
+   "field": "market"
+  },
+  {
+   "name": "join",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Mart",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_member",
+     "args": [
+      "Alice",
+      "Bob",
+      "Mart"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Bob",
+      "Mart",
+      "_"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Join",
+   "sentence": "Alice may admit Bob to Mart",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice invites you to her market."
+   },
+   "field": null
+  },
+  {
+   "name": "offer",
+   "persons": [
+    "Carol",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Item",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "posted",
+     "args": [
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Carol",
+      "Mart",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Carol",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Offer",
+   "sentence": "Carol may post Item to the wall of Alice's Mart",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "offer_own",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Item",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Alice",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Mart",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Item",
+      "Mart"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Offer own",
+   "sentence": "Alice may post Item to the wall of Alice's Mart",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "want",
+   "persons": [
+    "Carol",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Wish": "const",
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Wish",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "posted",
+     "args": [
+      "Carol",
+      "Wish",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Wish",
+      "Mart"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Carol",
+      "Mart",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Carol",
+      "Wish",
+      "Mart"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Want",
+   "sentence": "Carol may post Wish to the wall of Alice's Mart",
+   "auto": false,
+   "questions": {},
+   "field": "description"
+  },
+  {
+   "name": "want_own",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Wish": "const",
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Wish",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Wish",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Alice",
+      "Wish",
+      "Mart"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "member",
+     "args": [
+      "Alice",
+      "Mart",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "posted",
+     "args": [
+      "Alice",
+      "Wish",
+      "Mart"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Want own",
+   "sentence": "Alice may post Wish to the wall of Alice's Mart",
+   "auto": false,
+   "questions": {},
+   "field": "description"
+  },
+  {
+   "name": "deliver",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Carol": [
+     "Alice"
+    ]
+   },
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Item",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "delivered_post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Bob",
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_member",
+     "args": [
+      "Alice",
+      "Bob",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "delivered_post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver",
+   "sentence": "Alice delivers Carol's post of Item in Mart to Bob",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "deliver_to_poster",
+   "persons": [
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Item",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "delivered_post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Carol",
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Alice",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "p": "keeper",
+     "args": [
+      "Carol",
+      "Mart"
+     ],
+     "neg": true
+    },
+    {
+     "p": "delivered_post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart",
+      "Carol"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [],
+   "button": "Deliver to poster",
+   "sentence": "Alice delivers Carol's post of Item in Mart back to Carol",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "withdraw",
+   "persons": [
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Item",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": true
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "delivered_post",
+      "args": [
+       "Alice",
+       "Carol",
+       "Item",
+       "Mart",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "post",
+       "args": [
+        "E1",
+        "Carol",
+        "Item",
+        "Mart"
+       ],
+       "neg": true
+      }
+     ]
+    },
+    {
+     "p": "delivered_post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart",
+      "_"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Carol",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "delivered_post",
+      "args": [
+       "Alice",
+       "Carol",
+       "Item",
+       "Mart",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "E1"
+       ],
+       "neg": false
+      },
+      {
+       "p": "post",
+       "args": [
+        "E1",
+        "Carol",
+        "Item",
+        "Mart"
+       ],
+       "neg": false
+      }
+     ]
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Withdraw",
+   "sentence": "Carol may withdraw her post of Item in Alice's Mart",
+   "auto": false,
+   "questions": {},
+   "field": "keeper"
+  },
+  {
+   "name": "withdraw_own",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mart": "const"
+   },
+   "sizes": {},
+   "values": [
+    "Item",
+    "Mart"
+   ],
+   "effects": [
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Alice",
+      "Item",
+      "Mart"
+     ],
+     "neg": true
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "delivered_post",
+      "args": [
+       "Alice",
+       "Alice",
+       "Item",
+       "Mart",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "post",
+       "args": [
+        "E1",
+        "Alice",
+        "Item",
+        "Mart"
+       ],
+       "neg": true
+      }
+     ]
+    },
+    {
+     "p": "delivered_post",
+     "args": [
+      "Alice",
+      "Alice",
+      "Item",
+      "Mart",
+      "_"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "post",
+     "args": [
+      "Alice",
+      "Alice",
+      "Item",
+      "Mart"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "delivered_post",
+      "args": [
+       "Alice",
+       "Alice",
+       "Item",
+       "Mart",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "E1"
+       ],
+       "neg": false
+      },
+      {
+       "p": "post",
+       "args": [
+        "E1",
+        "Alice",
+        "Item",
+        "Mart"
+       ],
+       "neg": false
+      }
+     ]
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Withdraw own",
+   "sentence": "Alice may withdraw her post of Item in Alice's Mart. Carol may not post Item to Mart again",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "swap_item_for_coin",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Dave": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Item",
+    "SumSet",
+    "Sum"
+   ],
+   "effects": [
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": true
+    },
+    {
+     "p": "item",
+     "args": [
+      "Bob",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Dave",
+      {
+       "lit": "coin"
+      },
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Dave",
+      {
+       "lit": "coin"
+      },
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Dave",
+      {
+       "lit": "coin"
+      },
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Swap item for coin",
+   "sentence": "Alice and Bob may jointly swap the item Item for Sum Dave-coins",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to swap an item with you."
+   },
+   "field": "issuer wanted"
+  },
+  {
+   "name": "swap_item_for_bond",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {
+    "Dave": [
+     "Alice",
+     "Bob"
+    ]
+   },
+   "types": {
+    "bond(Day)": "val",
+    "SumSet": "set"
+   },
+   "sizes": {
+    "SumSet": "Sum"
+   },
+   "values": [
+    "Item",
+    "SumSet",
+    "Sum"
+   ],
+   "effects": [
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": true
+    },
+    {
+     "p": "item",
+     "args": [
+      "Bob",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Dave",
+      "bond(Day)",
+      "SumSet"
+     ],
+     "neg": true
+    },
+    {
+     "p": "note",
+     "args": [
+      "Alice",
+      "Dave",
+      "bond(Day)",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "note",
+     "args": [
+      "Bob",
+      "Dave",
+      "bond(Day)",
+      "SumSet"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Swap item for bond",
+   "sentence": "Alice and Bob may jointly swap the item Item for Sum Dave-bonds due Day",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to swap an item with you."
+   },
+   "field": "issuer wanted"
+  },
+  {
+   "name": "swap_items",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [
+    "Item",
+    "Thing"
+   ],
+   "effects": [
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": true
+    },
+    {
+     "p": "item",
+     "args": [
+      "Bob",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Bob",
+      "Thing"
+     ],
+     "neg": true
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Thing"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Bob",
+      "Thing"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Swap items",
+   "sentence": "Alice and Bob may jointly swap the item Item for the item Thing",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to swap an item with you."
+   },
+   "field": "item wanted"
+  },
+  {
+   "name": "deposit_item",
+   "persons": [
+    "Alice",
+    "Carol",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [
+    "Item",
+    "Bob",
+    "Cond"
+   ],
+   "effects": [
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": true
+    },
+    {
+     "p": "escrow_item",
+     "args": [
+      "Carol",
+      "Item",
+      "Alice",
+      "Bob",
+      "Cond"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Carol",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Carol"
+   ],
+   "button": "Deposit item",
+   "sentence": "Alice may deposit the item Item with Carol for Bob on Cond",
+   "auto": false,
+   "questions": {
+    "Carol": "Alice asks to deposit an item with you."
+   },
+   "field": "condition"
+  },
+  {
+   "name": "release_item",
+   "persons": [
+    "Carol",
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [
+    "Item",
+    "Alice",
+    "Cond"
+   ],
+   "effects": [
+    {
+     "p": "escrow_item",
+     "args": [
+      "Carol",
+      "Item",
+      "Alice",
+      "Bob",
+      "Cond"
+     ],
+     "neg": true
+    },
+    {
+     "p": "item",
+     "args": [
+      "Bob",
+      "Item"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Carol",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "escrow_item",
+     "args": [
+      "Carol",
+      "Item",
+      "Alice",
+      "Bob",
+      "Cond"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol",
+    "Bob"
+   ],
+   "button": "Release item",
+   "sentence": "Carol and Bob may jointly release the item Item that Alice deposited on Cond",
+   "auto": false,
+   "questions": {
+    "Bob": "Carol asks to release an item to you."
+   },
+   "field": null
+  },
+  {
+   "name": "return_item",
+   "persons": [
+    "Carol",
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "values": [
+    "Item",
+    "Bob",
+    "Cond"
+   ],
+   "effects": [
+    {
+     "p": "escrow_item",
+     "args": [
+      "Carol",
+      "Item",
+      "Alice",
+      "Bob",
+      "Cond"
+     ],
+     "neg": true
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Carol",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "escrow_item",
+     "args": [
+      "Carol",
+      "Item",
+      "Alice",
+      "Bob",
+      "Cond"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol",
+    "Alice"
+   ],
+   "button": "Return item",
+   "sentence": "Carol and Alice may jointly return the item Item deposited for Bob on Cond",
+   "auto": false,
+   "questions": {
+    "Alice": "Carol asks to return an item to you."
+   },
+   "field": null
+  }
+ ],
+ "tabs": {
+  "Contacts": "those Alice knows",
+  "Notes": "the notes Alice holds",
+  "Coins": "the notes Alice holds",
+  "Bonds": "the notes Alice holds",
+  "Items": "the items Alice holds",
+  "Markets": "the markets Alice is a member of"
+ },
+ "env": [
+  "today"
+ ],
+ "parametric": []
+}

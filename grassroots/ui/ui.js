@@ -44,8 +44,8 @@
         C.components.push({...base, zone: 'middle', kind: 'thread', shows: m[1].split(',').map(x => x.trim()).filter(Boolean)});
         Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
       }
-      if ((m = s.match(/^(me|[a-z]\w*):\s*([\w,\s]+)$/)) && (m[1] === 'me' || C.params.includes(m[1]))) {
-        C.components.push({...base, zone: 'middle', kind: 'details', about: m[1], shows: m[2].split(',').map(x => x.trim()).filter(Boolean)});
+      if ((m = s.match(/^(me|[a-z]\w*)(?:\.(\d))?:\s*([\w,\s]+)$/)) && (m[1] === 'me' || C.params.includes(m[1]))) {
+        C.components.push({...base, zone: 'middle', kind: 'details', about: m[1], pos: m[2] ? +m[2] : null, shows: m[3].split(',').map(x => x.trim()).filter(Boolean)});
         Object.assign(L, {kind: 'comp', screen: scr, id}); continue;
       }
       if ((m = s.match(/^([A-Z][\w' -]*?)\s*(?::\s*(.*))?$/))) {
@@ -98,11 +98,12 @@
     return sim.schemas.filter(s => !s.auto).map(s => {
       const env = new Set();
       for (const c of s.pre) if (c.p === 'today') env.add(c.args[1]);
-      const names = [...new Set(s.persons.concat(Object.keys(s.one), s.values))].filter(x => !env.has(x));
+      const sets = new Set(Object.keys(s.types || {}).filter(x => s.types[x] === 'set'));
+      const names = [...new Set(s.persons.concat(Object.keys(s.one), s.values))].filter(x => !env.has(x) && !sets.has(x));
       const me = s.by[0], loc = (c) => [c.p, c.args.slice(1).map(x => names.includes(x) ? names.indexOf(x) + 1 : null)];
       const mine = s.pre.filter(c => c.p && c.args[0] === me && !sim.env.includes(c.p));
-      return {name: s.name, button: s.button, names, me: names.indexOf(me) + 1, args: names, roles: s.persons.map(x => names.indexOf(x) + 1),
-        values: s.values.filter(x => !env.has(x) && !s.persons.includes(x)), field: s.field, sentence: s.sentence, questions: s.questions,
+      return {name: s.name, button: s.button, names, me: names.indexOf(me) + 1, args: names, roles: s.persons.map(x => names.indexOf(x) + 1), people: s.persons.concat(Object.keys(s.one)).map(x => names.indexOf(x) + 1),
+        values: s.values.filter(x => !env.has(x) && !s.persons.includes(x) && !sets.has(x)), types: s.types || {}, field: s.field, sentence: s.sentence, questions: s.questions,
         req: mine.filter(c => !c.neg).map(loc), forb: mine.filter(c => c.neg).map(loc)};
     });
   }

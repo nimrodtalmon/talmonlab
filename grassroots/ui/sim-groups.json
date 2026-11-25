@@ -144,6 +144,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -187,6 +188,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -265,6 +267,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -372,6 +375,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -473,6 +477,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -591,6 +596,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [
     "Text"
    ],
@@ -655,6 +661,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -721,6 +728,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -836,6 +844,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -930,6 +939,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -1014,6 +1024,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -1090,6 +1101,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"
@@ -1159,6 +1171,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"
@@ -1227,6 +1240,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"
@@ -1329,6 +1343,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"

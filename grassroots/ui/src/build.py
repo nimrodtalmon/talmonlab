@@ -89,11 +89,33 @@ TYPES = {}
 
 
 def arg(x):
-    """A typed argument, const(V), num(V), set(V), text(V) or val(V), is its variable; the type is kept in TYPES."""
+    """A typed argument, const(V), num(V), set(V), text(V) or val(V), is its variable; the type is kept in TYPES.
+    val(w) of a word is that word, as a value; val(f(...)) is the term f(...), {f, a}."""
     if isinstance(x, dict) and x.get('f') in ('const', 'num', 'set', 'text', 'val') and len(x['a']) == 1 and isinstance(x['a'][0], str):
         TYPES.setdefault(x['a'][0], x['f'])
         return x['a'][0]
+    if isinstance(x, dict) and x.get('f') == 'val' and len(x['a']) == 1:
+        v = x['a'][0]
+        if isinstance(v, dict) and 'w' in v:
+            return {'lit': v['w']}
+        if isinstance(v, dict) and 'f' in v:
+            return {'f': v['f'], 'a': [arg(y) for y in v['a']]}
+    if isinstance(x, dict) and 'w' in x:
+        return {'lit': x['w']}
     return x
+
+
+def sizes(g, out):
+    """The sizes the guard gives the sets: eq(size(S), num(N)) or eq(size(S), K)."""
+    if isinstance(g, dict) and g.get('f') == 'and':
+        for y in g['a']:
+            sizes(y, out)
+    elif isinstance(g, dict) and g.get('f') == 'eq':
+        l, r = g['a']
+        if isinstance(l, dict) and l.get('f') == 'size':
+            v = r['a'][0] if isinstance(r, dict) and r.get('f') == 'num' else r
+            out[l['a'][0]] = v
+    return out
 
 
 def conds(t):
@@ -115,7 +137,7 @@ def schemas(text):
     ss = t
     out = []
     for s in ss:
-        name, persons, values, eff, pre, _, by = s['a']
+        name, persons, values, eff, pre, guard, by = s['a']
         name = name['w'] if isinstance(name, dict) else name
         ps, one = [], {}
         for p in persons:
@@ -125,7 +147,7 @@ def schemas(text):
                 ps.append(p)
         TYPES.clear()
         eff_, pre_ = conds(eff), conds(pre)
-        out.append({'name': name, 'persons': ps, 'one': one, 'types': dict(TYPES), 'values': [v for v in values if v not in one],
+        out.append({'name': name, 'persons': ps, 'one': one, 'types': dict(TYPES), 'sizes': sizes(guard, {}), 'values': [v for v in values if v not in one],
                     'effects': eff_, 'pre': pre_, 'by': by})
     w = lambda xs: [r['w'] if isinstance(r, dict) else r for r in xs]
     return w(refl), w(env), w(param), out

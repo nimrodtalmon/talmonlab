@@ -180,6 +180,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -223,6 +224,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -301,6 +303,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -408,6 +411,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -509,6 +513,7 @@
    ],
    "one": {},
    "types": {},
+   "sizes": {},
    "values": [],
    "effects": [
     {
@@ -629,6 +634,7 @@
    "types": {
     "Today": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Today"
@@ -722,6 +728,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -788,6 +795,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -903,6 +911,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -997,6 +1006,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -1081,6 +1091,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Grupo"
    ],
@@ -1157,6 +1168,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"
@@ -1226,6 +1238,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"
@@ -1294,6 +1307,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"
@@ -1396,6 +1410,7 @@
    "types": {
     "Grupo": "const"
    },
+   "sizes": {},
    "values": [
     "Text",
     "Grupo"

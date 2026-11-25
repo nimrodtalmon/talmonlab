@@ -1,0 +1,42 @@
+# Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
+screen Home
+  inbox
+  me: identity, person
+  list People: everyone; shows knows, note, escrow_note, member, has_member, post, delivered_post, escrow_item; opens Person
+  list made: atoms of made
+  list item: atoms of item
+  list keeper: atoms of keeper
+  list posted: atoms of posted
+  Establish
+  Acquaint: Bob = field
+  Introduce: Bob = pick of knows, Carol = pick of knows
+  Issue: Type = field, Sum = field
+  Swap: Bob = pick of knows, Carol = pick of note, Dave = field, Type = pick of note, Sum = field, Other = field, Total = field
+  Pay: Bob = pick of knows, Carol = pick of note, Type = pick of note, Sum = field
+  Pay issuer: Bob = pick of knows, Type = pick of note, Sum = field
+  Deposit: Carol = pick of knows, Dave = pick of note, Bob = pick of knows, Type = pick of note, Sum = field, Cond = field
+  Release: Bob = pick of knows, Dave = pick of escrow_note, Alice = pick of escrow_note, Type = pick of escrow_note, Cond = pick of escrow_note, Sum = field
+  Return: Alice = pick of knows, Dave = pick of escrow_note, Bob = pick of escrow_note, Type = pick of escrow_note, Cond = pick of escrow_note, Sum = field
+  Redeem: Bob = pick of knows, Carol = field
+  Redeem coin against bond: Bob = pick of knows, Carol = field
+  Redeem bond: Bob = pick of knows, Carol = field, Day = field
+  Redeem bond against bond: Bob = pick of knows, Carol = field, Day = field
+  Make: Item = field
+  Open: Mart = field
+  Join: Bob = pick of knows, Mart = pick of keeper
+  Offer: Alice = pick of member, Item = pick of item, Mart = pick of member
+  Offer own: Item = pick of item, Mart = pick of member
+  Want: Alice = pick of member, Wish = field, Mart = pick of member
+  Want own: Wish = field, Mart = pick of member
+  Withdraw: Alice = field, Item = field, Mart = field
+  Withdraw own: Item = pick of post, Mart = pick of post
+  Swap item for coin: Bob = pick of knows, Dave = field, Item = pick of item, Sum = field
+  Swap item for bond: Bob = pick of knows, Dave = field, Item = pick of item, Sum = field
+  Swap items: Bob = pick of knows, Item = pick of item, Thing = field
+  Deposit item: Carol = pick of knows, Bob = pick of knows, Item = pick of item, Cond = field
+  Release item: Bob = pick of knows, Alice = pick of escrow_item, Item = pick of escrow_item, Cond = pick of escrow_item
+  Return item: Alice = pick of knows, Bob = pick of escrow_item, Item = pick of escrow_item, Cond = pick of escrow_item
+
+screen Person(p)
+  inbox
+  p: knows, note, escrow_note, member, has_member, post, delivered_post, escrow_item

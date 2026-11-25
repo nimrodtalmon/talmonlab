@@ -1,0 +1,70 @@
+# Market: markets and their walls, things, a wallet, and what one holds in escrow.
+screen Agora
+  inbox
+  me: identity, person
+  list Markets: atoms of member; opens Market
+  list Wall: atoms of post; opens Post
+  list Things: of item; shows made; opens Thing
+  list Wallet: atoms of note; opens Note
+  list In escrow: atoms of escrow_note; opens Escrow
+  list Items in escrow: atoms of escrow_item; opens Held
+  list People: everyone; shows knows, has_member, delivered_post; opens Person
+  Establish
+  Acquaint: Bob = field
+  Make: Item = field
+  Open: Mart = field
+  Issue: Type = field, Sum = field
+  Withdraw: Alice = field, Item = field, Mart = field
+
+screen Market(m)
+  inbox
+  m.1: keeper, has_member, posted
+  Offer: Mart = m.1, Alice = m.2, Item = pick of item
+  Offer own: Mart = m.1, Item = pick of item
+  Want: Mart = m.1, Alice = m.2, Wish = field
+  Want own: Mart = m.1, Wish = field
+
+screen Post(w)
+  inbox
+  w: post, delivered_post
+  Withdraw own: Item = w.2, Mart = w.3
+  Swap items: Bob = w.1, Thing = w.2, Item = pick of item
+
+screen Thing(t)
+  inbox
+  t: item, made
+  Swap items: Item = t, Bob = pick of knows, Thing = field
+  Swap item for coin: Item = t, Bob = pick of knows, Dave = field, Sum = field
+  Swap item for bond: Item = t, Bob = pick of knows, Dave = field, Sum = field
+  Deposit item: Item = t, Carol = pick of knows, Bob = pick of knows, Cond = field
+
+screen Note(n)
+  inbox
+  n: note
+  Pay: Carol = n.1, Type = n.2, Bob = pick of knows, Sum = field
+  Pay issuer: Bob = n.1, Type = n.2, Sum = field
+  Swap: Carol = n.1, Type = n.2, Sum = field, Bob = pick of knows, Dave = field, Other = field, Total = field
+  Deposit: Dave = n.1, Type = n.2, Sum = field, Carol = pick of knows, Bob = pick of knows, Cond = field
+  Redeem: Bob = n.1, Carol = field
+  Redeem coin against bond: Bob = n.1, Carol = field
+  Redeem bond: Bob = n.1, Carol = field, Day = field
+  Redeem bond against bond: Bob = n.1, Carol = field, Day = field
+
+screen Escrow(e)
+  inbox
+  e: escrow_note
+  Release: Dave = e.1, Type = e.2, Alice = e.3, Bob = e.4, Cond = e.5, Sum = field
+  Return: Dave = e.1, Type = e.2, Alice = e.3, Bob = e.4, Cond = e.5, Sum = field
+
+screen Held(h)
+  inbox
+  h: escrow_item
+  Release item: Item = h.1, Alice = h.2, Bob = h.3, Cond = h.4
+  Return item: Item = h.1, Alice = h.2, Bob = h.3, Cond = h.4
+
+screen Person(p)
+  inbox
+  p: knows, has_member, delivered_post
+  Introduce: Bob = p, Carol = pick of knows
+  Introduce: Carol = p, Bob = pick of knows
+  Join: Bob = p, Mart = pick of keeper
