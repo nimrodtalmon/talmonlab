@@ -119,6 +119,9 @@ def check(spec, ui):
                         why.append(f"{a['names'][k-1]} gets no value")
                     elif not covers_place(kinds_of(bind[k], c, src, lists), k, anc):
                         why.append(f"{a['names'][k-1]} may be someone this source does not reach")
+                params = ui['containers'][c].get('params', [])
+                if params and not any(isinstance(v, str) and v in params for v in bind.values()):
+                    why.append("this screen opens only from a list, and the action does not use its parameter")
                 verdicts.append({'component': comp['id'], 'container': c, 'ok': not why, 'why': why})
         res[a['name']] = {'button': a['button'], 'covered': any(v['ok'] for v in verdicts), 'components': verdicts}
     preds = set(spec.get('vocab', {}))
@@ -126,7 +129,9 @@ def check(spec, ui):
         preds |= {p for p, _ in a['req'] + a['forb']}
     shown = {p for c in reach for comp in ui['containers'][c]['components'] for p in comp.get('shows', [])}
     inbox = any(comp['kind'] == 'inbox' for c in reach for comp in ui['containers'][c]['components'])
-    return {'acts': res, 'visibility': {'shown': sorted(shown & preds), 'hidden': sorted(preds - shown)},
+    subset = all(len(d.get('params', [])) <= 1 for d in ui['containers'].values()) and all(
+        c == ui['start'] for c, d in ui['containers'].items() for comp in d['components'] if comp.get('event'))
+    return {'subset': subset, 'acts': res, 'visibility': {'shown': sorted(shown & preds), 'hidden': sorted(preds - shown)},
             'inbox': inbox, 'complete': inbox and all(r['covered'] for r in res.values()), 'visible': not (preds - shown)}
 
 

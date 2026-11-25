@@ -1,6 +1,7 @@
 {
  "person-first": {
   "name": "Person-first",
+  "subset": true,
   "acts": {
    "establish": {
     "button": "Establish",
@@ -90,6 +91,7 @@
  },
  "pages-only": {
   "name": "Pages only",
+  "subset": true,
   "acts": {
    "establish": {
     "button": "Establish",
