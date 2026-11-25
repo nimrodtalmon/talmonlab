@@ -147,7 +147,7 @@ def offered(spec, ui, st, me, persons):
         seen.add(key)
         comps = ui['containers'][c]['components']
         items = {comp['id']: (named if comp['items'].get('named') else
-                              sorted({args[0] for p, args in st if p == comp['items']['pred'] and args}))
+                              sorted({x for p, args in st if p == comp['items']['pred'] for x in args}))
                  for comp in comps if comp['kind'] == 'list'}
         for comp in comps:
             if comp['kind'] == 'list' and comp.get('event'):
