@@ -5,3 +5,35 @@ Sum IS PICKED ON tens.
 Item IS LONG.
 Wish IS LONG.
 Item IS NEW AS Item1.
+Establish IS CALLED "Set up my identity".
+Acquaint IS CALLED "Add a contact".
+Acquaint IS IN THE MENU.
+Open IS CALLED "Open a market".
+Open IS PRIMARY.
+Mart IS NEW AS Market1.
+Make IS CALLED "Make an item".
+Issue IS CALLED "Issue my own notes".
+Issue IS IN THE MENU.
+Withdraw IS CALLED "Withdraw a post".
+Withdraw IS IN THE MENU.
+Offer IS CALLED "Post an item".
+Offer own IS CALLED "Post an item".
+Want IS CALLED "Post a wish".
+Want own IS CALLED "Post a wish".
+Withdraw own IS CALLED "Withdraw my post".
+Swap items IS CALLED "Offer a swap".
+Swap items IS PRIMARY.
+Swap item for coin IS CALLED "Sell for coins".
+Swap item for bond IS CALLED "Sell for bonds".
+Swap item for bond IS IN THE MENU.
+Deposit item IS CALLED "Put in escrow".
+Deposit item IS IN THE MENU.
+Pay issuer IS CALLED "Pay back the issuer".
+Deposit IS CALLED "Put in escrow".
+Deposit IS IN THE MENU.
+Redeem IS IN THE MENU.
+Redeem coin against bond IS IN THE MENU.
+Redeem bond IS IN THE MENU.
+Redeem bond against bond IS IN THE MENU.
+Introduce IS CALLED "Introduce to a contact".
+Join IS CALLED "Admit to my market".

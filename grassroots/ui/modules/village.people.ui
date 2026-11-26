@@ -62,6 +62,31 @@ SCREEN Village ABOUT Alice:
     Notice forward: Alice may forward the notice Cast to Bob in Orga, Bob TYPED, Orga TYPED, Cast FROM broadcast
     Emergency forward: Alice may forward the village emergency Cast to Bob in Orga, Bob TYPED, Orga TYPED, Cast FROM broadcast
 
+SCREEN Orgs ABOUT Alice:
+    LIST Member of: FROM participant OPENS Org
+    LIST Officer of: FROM officer OPENS Org
+    Found: Orga TYPED, Role TYPED
+    Join: Alice may become a participant of Orga, Orga TYPED, Decider TYPED, Codecider TYPED
+    Found by an organisation: Alice may found Orga with Gov in the role Role, Orga TYPED, Gov TYPED, G2 TYPED, Role TYPED
+
+SCREEN Org ABOUT Orga:
+    QUESTIONS
+    SHOW Orga: officer, participant, role, has_officer, has_participant, has_role, first_officer, founder, creator
+    Propose: Alice may propose Motion in Orga, Motion TYPED
+    Vote: Alice may vote on Motion in Orga, Motion TYPED
+    Act: Alice may take Motion for Orga, Motion TYPED
+    Amend: Alice may amend the bylaws of Orga as Motion says, Motion TYPED
+    Notice: Alice may broadcast Cast as a notice of Orga, Cast TYPED
+    Village emergency: Alice may broadcast Cast as a village emergency of Orga, Cast TYPED
+    Appoint: Decider FROM friend, Codecider TYPED, Role TYPED
+    End officer: Bob TYPED, Codecider TYPED
+    Expel: Those who expel participants of Orga may end Bob's participation in Orga, Bob TYPED, Codecider TYPED
+    Officer expel: Those who expel participants of Orga may end Bob's participation and Bob's office in Orga, Bob TYPED, Codecider TYPED
+    Resign: Alice may end her guardianship of Orga, Orga FROM officer
+    Retire: Those who decide for Orga may retire Orga, Orga FROM officer, Codecider TYPED
+    Leave: Alice may end her participation in Orga
+    Officer leave: Alice may end her participation and her office in Orga
+
 SCREEN More ABOUT Alice:
     LIST Has guardian: "Alice has Y2 as a guardian"
     LIST Guardian: "Alice is a guardian of X2"
@@ -99,9 +124,6 @@ SCREEN More ABOUT Alice:
     Resign: Alice may end her guardianship of Orga, Orga FROM officer
     Unfriend: Alice may end her friendship with Orga, Orga FROM friend
     Retire: Those who decide for Orga may retire Orga, Orga FROM officer, Codecider TYPED
-    Found: Orga TYPED, Role TYPED
-    Appoint: Orga FROM participant, Decider FROM friend, Codecider TYPED, Role TYPED
-    End officer: Bob TYPED, Orga FROM officer, Codecider TYPED
     Officer unfriend: Orga FROM friend
     Organisation acquaint: Bob TYPED, Alice FROM has_officer
     Organisation befriend: Bob FROM knows, Alice FROM has_officer
@@ -110,13 +132,3 @@ SCREEN More ABOUT Alice:
     Organisations acquaint: Will TYPED, Alice FROM has_officer, Bob TYPED
     Organisations befriend: Will FROM knows, Alice FROM has_officer, Bob TYPED
     Organisations of one officer befriend: Will FROM knows, Alice FROM has_officer
-    Found by an organisation: Alice may found Orga with Gov in the role Role, Orga TYPED, Gov TYPED, G2 TYPED, Role TYPED
-    Propose: Alice may propose Motion in Orga, Orga FROM officer, Motion TYPED
-    Vote: Alice may vote on Motion in Orga, Orga FROM participant, Motion TYPED
-    Act: Alice may take Motion for Orga, Orga FROM officer, Motion TYPED
-    Join: Alice may become a participant of Orga, Orga TYPED, Decider TYPED, Codecider TYPED
-    Leave: Alice may end her participation in Orga, Orga FROM participant
-    Officer leave: Alice may end her participation and her office in Orga, Orga FROM participant
-    Expel: Those who expel participants of Orga may end Bob's participation in Orga, Bob TYPED, Orga FROM officer, Codecider TYPED
-    Officer expel: Those who expel participants of Orga may end Bob's participation and Bob's office in Orga, Bob TYPED, Orga FROM officer, Codecider TYPED
-    Amend: Alice may amend the bylaws of Orga as Motion says, Orga FROM officer, Motion TYPED

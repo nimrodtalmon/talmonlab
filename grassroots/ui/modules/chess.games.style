@@ -3,3 +3,11 @@ COLOR IS PAPER.
 Board IS DRAWN BY chessboard.
 Move IS PICKED ON chessboard FROM Board.
 Game IS NEW AS Game1.
+Make friends IS PRIMARY.
+Start IS CALLED "New game".
+Start IS PRIMARY.
+Establish IS CALLED "Set up my identity".
+Acquaint IS CALLED "Add a contact (no friendship)".
+Acquaint IS IN THE MENU.
+Unfriend IS CALLED "End friendship".
+Unfriend IS IN THE MENU.

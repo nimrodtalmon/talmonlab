@@ -11,7 +11,7 @@ Item IS NEW AS Item1.
 Feed ARE NEWEST FIRST.
 Grupo IS NEW AS Group1.
 Establish IS CALLED "Set up my identity".
-Acquaint IS CALLED "Add someone".
+Acquaint IS CALLED "Add a contact".
 Acquaint IS PRIMARY.
 Befriend IS CALLED "Make friends".
 Befriend IS PRIMARY.
@@ -48,14 +48,71 @@ Notice IS CALLED "Post a notice".
 Village emergency IS CALLED "Raise a village alarm".
 Notice forward IS IN THE MENU.
 Emergency forward IS IN THE MENU.
-Found IS CALLED "Start an organisation".
+Found IS CALLED "Start an organization".
+Found IS PRIMARY.
 Enter IS CALLED "Add a child".
 Child unfriend IS CALLED "End a child's friendship".
-Organisation unfriend IS CALLED "End an organisation's friendship".
-Found by an organisation IS CALLED "Start an organisation for an organisation".
+Organisation unfriend IS CALLED "End an organization's friendship".
+Found by an organisation IS CALLED "Start one for an organization".
+Found by an organisation IS IN THE MENU.
 Of age IS CALLED "Declare a child of age".
 Propose IS CALLED "Propose a motion".
 Vote IS CALLED "Vote on a motion".
 Act IS CALLED "Carry out a motion".
 Amend IS CALLED "Amend the bylaws".
 Post own IS CALLED "Write to the group".
+Appoint IS CALLED "Appoint an officer".
+End officer IS CALLED "End an officer's term".
+End officer IS IN THE MENU.
+Expel IS CALLED "Expel a participant".
+Expel IS IN THE MENU.
+Officer expel IS CALLED "Expel an officer".
+Officer expel IS IN THE MENU.
+Resign IS IN THE MENU.
+Retire IS IN THE MENU.
+Officer leave IS CALLED "Leave, giving up office".
+Officer leave IS IN THE MENU.
+Motion IS LONG.
+Orga IS NEW AS Org1.
+Join ON Orgs IS CALLED "Join an organization".
+Join ON Orgs IS IN THE MENU.
+Join ON Person IS CALLED "Add to a group of mine".
+Leave ON Group IS CALLED "Leave the group".
+Leave ON Group IS IN THE MENU.
+Leave ON Org IS CALLED "Leave the organization".
+Leave ON Org IS IN THE MENU.
+Remove IS CALLED "Remove from the group".
+Introduce IS CALLED "Introduce to a contact".
+Encounter IS CALLED "Meet someone in person".
+Make parent IS CALLED "Become a child's parent".
+Make parent IS IN THE MENU.
+End parent IS CALLED "End a parent's role".
+End parent IS IN THE MENU.
+Parent unfriend IS CALLED "End friendship with my child".
+Parent unfriend IS IN THE MENU.
+Child acquaint IS CALLED "For my child: add a contact".
+Child acquaint IS IN THE MENU.
+Child befriend IS CALLED "For my child: make friends".
+Child befriend IS IN THE MENU.
+Child end IS CALLED "For my child: end a friendship".
+Child end IS IN THE MENU.
+Child unfriend IS IN THE MENU.
+Children acquaint IS CALLED "Introduce two children".
+Children acquaint IS IN THE MENU.
+Children befriend IS CALLED "Make two children friends".
+Children befriend IS IN THE MENU.
+Children of one parent befriend IS CALLED "Make two of my children friends".
+Children of one parent befriend IS IN THE MENU.
+Child message IS CALLED "For my child: write".
+Child message IS IN THE MENU.
+Child post IS CALLED "For my child: post to a group".
+Child post IS IN THE MENU.
+Child post own IS CALLED "For my child: post to their group".
+Child post own IS IN THE MENU.
+Unfriend IS CALLED "End friendship".
+Unfriend IS IN THE MENU.
+Resign ON More IS CALLED "Stop being a child's parent".
+Retire ON More IS CALLED "Retire a child's account".
+Resign ON Org IS CALLED "Give up my office".
+Retire ON Org IS CALLED "Close the organization".
+Organisation unfriend IS IN THE MENU.

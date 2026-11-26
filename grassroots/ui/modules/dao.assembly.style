@@ -2,3 +2,19 @@ STYLE Assembly:
 COLOR IS FRESH.
 Prop IS LONG.
 Vote for IS PRIMARY.
+Establish IS CALLED "Set up my identity".
+Acquaint IS CALLED "Add a contact".
+Found IS CALLED "Start a DAO".
+Found IS PRIMARY.
+Delos IS NEW AS Dao1.
+Propose IS CALLED "Make a proposal".
+Propose own IS CALLED "Make a proposal".
+Vote for IS CALLED "Vote for".
+Vote own for IS CALLED "Vote for".
+Vote own for IS PRIMARY.
+Vote against IS CALLED "Vote against".
+Vote own against IS CALLED "Vote against".
+Pass IS CALLED "Declare passed".
+Reject IS CALLED "Declare rejected".
+Introduce IS CALLED "Introduce to a contact".
+Join IS CALLED "Admit to my DAO".

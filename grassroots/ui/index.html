@@ -270,12 +270,12 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js?v=1795731731"></script>
-<script src="engine.js?v=1795731731"></script>
-<script src="real.js?v=1795731731"></script>
-<script src="chess.js?v=1795731731"></script>
-<script src="pictures.js?v=1795731731"></script>
-<script src="qr.js?v=1795731731"></script>
+<script src="ui.js?v=1795735036"></script>
+<script src="engine.js?v=1795735036"></script>
+<script src="real.js?v=1795735036"></script>
+<script src="chess.js?v=1795735036"></script>
+<script src="pictures.js?v=1795735036"></script>
+<script src="qr.js?v=1795735036"></script>
 <script>
 const CONTRACTS = {
   app: {title: 'The Grassroots App (home: install and open apps)', modules: {home: 'Home', mechanical: 'Mechanical'}},
@@ -304,7 +304,10 @@ for (const [k, v] of Object.entries(LOOKS)) { const x = new URLSearchParams(loca
 const MYLOOK = (() => { try { return JSON.parse(localStorage.getItem('grassroots-mylook') || '{}'); } catch (e) { return {}; } })();
 let CURP = null;
 /* the name a button is drawn by: the UI style's, if it calls it something, else the contract's */
-const lab = b => (LK && LK.of[b] && LK.of[b].label) || b;
+/* a button's look: the UI style's sentences on it, and those kept to the screen it is on ("Join ON Group") */
+let CURAT = null;
+const lookOn = (b, at) => Object.assign({}, (LK && LK.of[b]) || {}, (LK && LK.of[b + ' ON ' + (at || CURAT)]) || {});
+const lab = (b, p) => lookOn(b, p && ui[p] ? ui[p].at : null).label || b;
 const PERSONS = ['alice', 'bob', 'carol', 'dave'], PHONES = ['alice', 'bob'], SCRIPTED = ['carol', 'dave'];
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
 const q = new URLSearchParams(location.search);
@@ -350,8 +353,14 @@ async function ctxOf(name) {
    such as establishing her identity, taken for her by a script in each app she opens.  The layer asks her once,
    after she takes such an act on Home; nothing is taken for her unless she said yes. */
 const RULES = {}, RULEASKED = {};
+/* an act every other act of the contract needs: it adds a fact that each of them requires */
+function needed(act) {
+  const s = SIM.schemas.find(x => x.name === act.name); if (!s) return false;
+  const adds = new Set((s.effects || []).filter(e => e && e.p && !e.neg).map(e => e.p));
+  return SIM.schemas.every(b => b === s || (b.pre || []).some(c => c && adds.has(c.p) && !c.neg));
+}
 function ruleOffer(p, act) {
-  if (!HOME || CN !== MAINCN || act.names.length !== 1 || RULEASKED[p + ':' + act.name]) return;
+  if (!HOME || CN !== MAINCN || act.names.length !== 1 || !needed(act) || RULEASKED[p + ':' + act.name]) return;
   RULEASKED[p + ':' + act.name] = true;
   ui[p].rule = {act: act.name, button: act.button};
 }
@@ -399,12 +408,20 @@ function fact(a, holder, me) {
   if (!v) return esc(a.p);
   const val = {[v.vars[0]]: holder}; v.vars.slice(1).forEach((x, j) => val[x] = a.args[j]);
   return v.phrase.split(/\b/).map(w => w in val ? `<b>${esc(val[w] === me ? 'you' : show(val[w]))}</b>` : esc(w)).join('')
-    .replace(/^<b>you<\/b> has /, '<b>you</b> have ').replace(/^<b>you<\/b> is /, '<b>you</b> are ').replace(/^<b>you<\/b> counts /, '<b>you</b> count ').replace(/^<b>you<\/b> knows /, '<b>you</b> know ').replace(/^<b>you<\/b> (holds|sees|sends|keeps) /, (m, v) => '<b>you</b> ' + v.slice(0, -1) + ' ');
+    .replace(/^<b>you<\/b> has /, '<b>you</b> have ').replace(/^<b>you<\/b> is /, '<b>you</b> are ')
+    /* a verb after "you" takes no s: "you trust", "you watch" */
+    .replace(/^<b>you<\/b> ([a-z]+?)(e?s) /, (m, v, e) => '<b>you</b> ' + (e === 'es' && !/(sh|ch|x|ss|z|o)$/.test(v) ? v + 'e' : v) + ' ');
 }
 function sentence(act, val) {
   const map = {}; act.names.forEach((n, j) => { map[n] = val[j + 1] !== undefined ? show(val[j + 1]) : '…'; });
   return act.sentence.replace(/\b[A-Z][a-z]+\b/g, w => w in map ? `<b>${esc(map[w])}</b>` : esc(w));
 }
+function newcomer(v) {
+  PERSONS.push(v); SCRIPTED.push(v); COL[v] = 'var(--dave)'; W.notes[v] = [];
+  ui[v] = {at: P.ui.start, env: {}, sheet: null, stack: [], told: new Set(), seen: new Set()};
+}
+/* a place the act requires to have no identity yet, as an organization or a child it creates: a new name, not a key */
+const isNew = (act, k) => { const s = SIM.schemas.find(x => x.name === act.name); return !!s && s.pre.some(c => c.p === 'identity' && c.neg && c.args[0] === act.names[k - 1]); };
 const valOf = (act, b) => act.names.reduce((o, n, j) => (o[j + 1] = b[n], o), {});
 /* Help, from the contract alone: each act the person can take, in the contract's words, where the UI structure
    offers it, and, if it cannot be taken now, the first fact of the contract in its way. */
@@ -497,7 +514,7 @@ function offers(act, c, atoms, me, env, comps) {
     const k = act.names.indexOf(r) + 1;
     if (typeof v === 'string') ch[k] = [env[v]];
     else if (v.param) ch[k] = [env[v.param][v.pos - 1]];
-    else if (v.select) ch[k] = items(comps.find(x => x.id === v.select), atoms, me).filter(x => !v.same || !env.it || same(x, env.it[v.same - 1]));
+    else if (v.select) ch[k] = items(comps.find(x => x.id === v.select), atoms, me).filter(x => v.same === undefined || env.it === undefined || same(x, v.same === 0 ? env.it : env.it[v.same - 1]));
     else { open.push(k); ch[k] = [undefined]; }
   }
   let vals = [{}];
@@ -517,6 +534,8 @@ function propose(p, act, val) {
   }
   const s = SIM.schemas.find(x => x.name === act.name), b = {};
   act.names.forEach((n, j) => b[n] = val[j + 1]);
+  /* a new organization or child gets an agent of its own, as its guardians run it: a scripted one here */
+  act.names.forEach((n, j) => { const v = val[j + 1]; if (!REAL && isNew(act, j + 1) && typeof v === 'string' && v && !PERSONS.includes(v)) newcomer(v); });
   W.notes[p].length = 0;
   W.propose(s, b);
   if (ui[p]) ui[p].sheet = null;
@@ -529,11 +548,45 @@ function later() { clearTimeout(TN); TN = setTimeout(() => {
   let n = 0;
   const once = () => {
     for (const s of SCRIPTED) for (const a of view(s).asks) { W.answer(a.id, s, true); n++; }
+    for (const s of SCRIPTED) n += playByPicture(s);
     if (CN === 'app') n += developer();
   };
   if (HOME) { keep(); for (const c of Object.values(CTX)) { use(c); once(); keep(); } use(CTX[MAINCN]); } else once();
   if (n) { render(); later(); }
 }, 700); }
+/* A scripted person also plays: on each screen about a fact of hers, an action whose open place is picked on a
+   picture is taken, when the contract offers it to her, with a value the picture's taps give and the contract
+   allows, tried in a random order.  So in a game, Carol answers a move with one of hers. */
+function playByPicture(s) {
+  const atoms = view(s).atoms;
+  for (const C of Object.values(P.ui.containers)) {
+    if (!C.aboutPred) continue;
+    for (const c of C.components.filter(x => x.kind === 'action' && x.act)) {
+      const act = SPEC.acts.find(a => a.name === c.act);
+      const r = act && Object.keys(c.bind).find(r => c.bind[r].field && (LK.of[(c.names || {})[r] || r] || {}).as === 'picked');
+      if (!r) continue;
+      const look = LK.of[(c.names || {})[r] || r], prog = PICTURES[look.on], k = act.names.indexOf(r) + 1;
+      if (!prog) continue;
+      for (const a of atoms.filter(x => x.p === C.aboutPred)) {
+        const {vals, open} = offers(act, c, atoms, s, {it: a.args}, C.components);
+        if (!vals.length || !open.includes(k)) continue;
+        const pv = look.from && C.names[look.from] ? a.args[C.names[look.from] - 1] : undefined;
+        const taps = prog.draw(pv).cells.map(x => x.tap).sort(() => Math.random() - .5);
+        const tries = [];
+        for (const t of taps) { const r1 = prog.pick([t], pv); if (r1.value !== undefined) tries.push(r1.value); else if (r1.more) for (const u of taps) { const r2 = prog.pick([t, u], pv); if (r2.value !== undefined) tries.push(r2.value); } }
+        for (const v of vals) for (const x of tries) {
+          const val = {...v, [k]: x};
+          if (!enabled(act, atoms, val)) continue;
+          const sc = SIM.schemas.find(y => y.name === act.name), b = {};
+          act.names.forEach((n, j) => b[n] = val[j + 1]);
+          W.propose(sc, b);
+          return 1;
+        }
+      }
+    }
+  }
+  return 0;
+}
 /* Carol is a developer: she publishes the apps of the demo, and offers each to every friend who has not got it */
 const DEV = 'carol';
 function developer() {
@@ -553,8 +606,11 @@ function phone(p) {
   const v = view(p), u = ui[p], d = document.createElement('div');
   d.className = ['phone', LOOK.theme, LOOK.shape, LOOK.density].join(' ');
   if (!P.ui.containers[u.at]) { u.at = P.ui.start; u.env = {}; u.stack = []; }
+  CURAT = u.at;
   const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: '', menu: '', bar: ''}, acts = [];
   let composer = '', title = cap(p), avatar = av(p), info = null;
+  /* a screen about something is titled by it */
+  if (env.it !== undefined) { title = show(lead(env.it)); avatar = av(lead(env.it)); }
   const ident = v.atoms.filter(a => !a.args.length);
   const lists0 = comps.filter(c => c.kind === 'list' && !c.hidden && c.zone === 'middle');
   /* a tab for each list that holds something, and the first list's always, so no screen is a row of empty tabs */
@@ -687,7 +743,7 @@ function phone(p) {
       if (!st || !st.act) continue;
       const a0 = SPEC.acts.find(x => x.name === st.act), {vals, open} = offers(a0, st, v.atoms, p, env, comps);
       if (!vals.length) continue;
-      const where = (LK.of[c.button] || {}).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + a0.name)} data-act="${acts.length}">${esc(lab(c.button))}<small>${esc(c.steps.map(lab).join(', then '))}</small></button>`;
+      const where = lookOn(c.button).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + a0.name)} data-act="${acts.length}">${esc(lab(c.button))}<small>${esc(c.steps.map(lab).join(', then '))}</small></button>`;
       if (where === 'menu') zone.menu += btn; else if (where === 'bar') zone.bar += btn; else if (where === 'primary') zone[c.zone] = btn + zone[c.zone]; else zone[c.zone] += btn;
       acts.push({act: a0, vals, open, c: st, chain: c});
     } else if (c.kind === 'action' && c.act) {
@@ -704,7 +760,7 @@ function phone(p) {
       /* the look puts an action in the menu or the bar, or first and marked */
       /* an action whose value is picked on a picture this screen shows is taken by tapping that picture; its button, with its box to type, goes to the menu */
       const lk2 = open.length === 1 ? lookOf(c, act, open[0]) : {}, onPic = lk2.as === 'picked' && lk2.from && drawnHere.some(x => x.n === lk2.from && x.prog === lk2.on);
-      const where = onPic ? 'menu' : (LK.of[c.button] || {}).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + act.name, 'src:' + (SIM.schemas.find(s => s.name === act.name) || {}).source)} data-act="${acts.length}">${esc(lab(act.button))}${sub}</button>`;
+      const where = onPic ? 'menu' : lookOn(c.button).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + act.name, 'src:' + (SIM.schemas.find(s => s.name === act.name) || {}).source)} data-act="${acts.length}">${esc(lab(act.button))}${sub}</button>`;
       if (where === 'menu') zone.menu += btn; else if (where === 'bar') zone.bar += btn; else if (where === 'primary') zone[c.zone] = btn + zone[c.zone]; else zone[c.zone] += btn;
       acts.push({act, vals, open, c});
     }
@@ -774,7 +830,7 @@ function phone(p) {
   if (fg) fg.onclick = () => {
     const {ks, opts, w} = u.sheet.form, val = {...w.vals[0]};
     for (const k of ks) { const el = d.querySelector(`[data-f="${k}"]`), o = opts(k); val[k] = o ? o[+el.value] : w.act.people.includes(k) ? el.value.trim().toLowerCase() : fieldValue(el); }
-    if (ks.some(k => w.open.includes(k) && w.act.people.includes(k) && !PERSONS.includes(val[k]))) { d.querySelector('[data-ferr]').textContent = 'No one has this key.'; return; }
+    if (ks.some(k => w.open.includes(k) && w.act.people.includes(k) && !isNew(w.act, k) && !PERSONS.includes(val[k]))) { d.querySelector('[data-ferr]').textContent = 'No one has this key.'; return; }
     if (ks.some(k => val[k] === '' || val[k] === undefined)) { d.querySelector('[data-ferr]').textContent = 'Fill in every place.'; return; }
     if (!enabled(w.act, view(p).atoms, val)) { d.querySelector('[data-ferr]').textContent = notAllowed(p, w.act, val); return; }
     propose(p, w.act, val);
@@ -828,20 +884,30 @@ function partial(act, c, env, p) {
   for (const [r, v] of Object.entries(c.bind)) { const k = act.names.indexOf(r) + 1; if (typeof v === 'string') val[k] = env[v]; else if (v.param) val[k] = env[v.param][v.pos - 1]; }
   return val;
 }
+/* a sheet's title: the button tapped, a chain's or the act's, as it is called on this screen */
+const headOf = (w, p) => lab(w.chain ? w.chain.button : w.c && w.c.button || w.act.button, p);
+/* an act whose effects all end facts */
+function ends(act) { const s = SIM.schemas.find(x => x.name === act.name); return !!s && (s.effects || []).length > 0 && s.effects.every(e => e && e.neg); }
 /* one way: done at once; several: a sheet of the people or the things to choose; a typed name: a field */
 function act(p, w) {
   const u = ui[p];
   u.w = w; CURP = p;
-  if (!w.open.length && w.vals.length === 1) return propose(p, w.act, w.vals[0]);
+  if (!w.open.length && w.vals.length === 1) {
+    if (!ends(w.act)) return propose(p, w.act, w.vals[0]);
+    /* an act that only ends facts is not taken by one tap: its sentence is shown, and taken on a second */
+    const head = headOf(w, p);
+    u.sheet = {html: `<div class="sh">${esc(head)}</div><div class="sent">${sentence(w.act, w.vals[0])}</div><button class="pri" data-opt="0">${esc(head)}</button>`, go: [() => propose(p, w.act, w.vals[0])]};
+    return render();
+  }
   const varying = Object.keys(w.vals[0]).map(Number).filter(i => i !== w.act.me && !w.open.includes(i) && w.vals.some(v => !same(v[i], w.vals[0][i])));
   if (w.open.length + varying.length > 1) return form(p, w, varying);
   if (w.open.length) {
     /* an open place: a value is typed; a person is given by her key, as no phone can list everyone */
     const k = w.open[0], person = w.act.people.includes(k);
-    u.sheet = {html: `<div class="sh">${esc(lab(w.act.button))}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"', w.vals[0]))}</div>${person ? `<div class="expl">${lookOf(w.c, w.act, k).as === 'scanned' ? 'Scan their code, or type their key; here, a key is a name.' : 'A key is shared in person or by a link; here, type a name.'}</div>` : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(lab(w.act.button))}</button>`,
+    u.sheet = {html: `<div class="sh">${esc(headOf(w, p))}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"', w.vals[0]))}</div>${person ? `<div class="expl">${lookOf(w.c, w.act, k).as === 'scanned' ? 'Scan their code, or type their key; here, a key is a name.' : 'A key is shared in person or by a link; here, type a name.'}</div>` : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(headOf(w, p))}</button>`,
       name: x => {
         const v = person ? x.toLowerCase() : x;
-        if (person && !PERSONS.includes(v)) return 'No one has this key.';
+        if (person && !isNew(w.act, k) && !PERSONS.includes(v)) return 'No one has this key.';
         const val = {...w.vals[0], [k]: v};
         if (!enabled(w.act, view(p).atoms, val)) return notAllowed(p, w.act, val);
         propose(p, w.act, val);
@@ -895,13 +961,16 @@ function form(p, w, varying) {
     return `<b>${esc(val[k] === undefined ? x : show(val[k]))}</b>`;
   });
   for (const k of ks) if (!done.has(k)) body += ` <span class="fl">${esc(act.names[k - 1])}</span> ${ctl(k)}`;
-  let h = `<div class="sh">${esc(lab(act.button))}</div><div class="sent">${body}</div>`;
-  h += `<div class="err sys" data-ferr></div><button class="pri" data-fgo="1">${esc(lab(act.button))}</button>`;
+  /* a sheet is titled by the button tapped: a chain's, or the act's on this screen */
+  const head = headOf(w, p);
+  let h = `<div class="sh">${esc(head)}</div><div class="sent">${body}</div>`;
+  h += `<div class="err sys" data-ferr></div><button class="pri" data-fgo="1">${esc(headOf(w, p))}</button>`;
   u.sheet = {html: h, form: {ks, opts, w}};
   render();
 }
 function choose(p, act, vals, k) {
-  ui[p].sheet = {html: `<div class="sh">${esc(lab(act.button))}</div>` + (vals.length ? '' : `<div class="empty sys">No one to choose.</div>`) + vals.map((v, i) => `<button class="opt" data-opt="${i}">${av(lead(v[k]))}<div><div>${esc(show(v[k]))}</div>${EXPLAIN ? `<div class="expl">${sentence(act, v)}</div>` : ''}</div></button>`).join(''),
+  const cw = ui[p].w;
+  ui[p].sheet = {html: `<div class="sh">${esc(cw && cw.chain && cw.act.name === act.name ? lab(cw.chain.button, p) : lab(act.button, p))}</div>` + (vals.length ? '' : `<div class="empty sys">No one to choose.</div>`) + vals.map((v, i) => `<button class="opt" data-opt="${i}">${av(lead(v[k]))}<div><div>${esc(show(v[k]))}</div>${EXPLAIN ? `<div class="expl">${sentence(act, v)}</div>` : ''}</div></button>`).join(''),
     go: vals.map(v => () => propose(p, act, v))};
   render();
 }
@@ -976,7 +1045,7 @@ function codePanel() {
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
   h += `<h3 style="margin-top:18px">UI style</h3><p class="lg">How the screens are drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no UI style loses an option the contract allows.</p>`;
   h += `<div class="sum"><div>${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗ ' + LR.errors.length + ' to fix</span>'}</div></div>`;
-  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(STYLE|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|DRAWN BY|PICKED ON|NEWEST FIRST|OLDEST FIRST|ALPHABETICAL|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON|LANDMARKS|AT THE BOTTOM|IN A MENU)\b/g, '<span class="kw">$1</span>');
+  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(STYLE|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|DRAWN BY|PICKED ON|NEWEST FIRST|OLDEST FIRST|ALPHABETICAL|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON|LANDMARKS|AT THE BOTTOM|IN A MENU|ON)\b/g, '<span class="kw">$1</span>');
     return `<div class="ln" ${L.name ? K('line:look' + L.n) : ''}><span class="no">${L.n}</span><span class="g">${e.length ? '<span class="badm">!</span>' : L.kind === 'rule' ? '<span class="ok">✓</span>' : ''}</span><span>${L.kind === 'comment' ? `<span class="cm">${t}</span>` : t}</span></div>` + e.map(x => `<div class="why">${esc(x.msg)}</div>`).join(''); }).join('') || '<div class="ln"><span class="no"></span><span class="g"></span><span class="cm">No UI style: the defaults.</span></div>'}</div>`;
   h += `<div class="ct">How to read it</div><div class="legend">
     <div><code>SCREEN Chat ABOUT Bob:</code><span>a screen, about what was tapped to open it: a person or a value, or a fact of Alice's in the contract's words, <code>ABOUT "Alice is a member of Bob's Hikers"</code>; the start screen is <code>ABOUT Alice</code>, the person whose phone it is</span></div>
