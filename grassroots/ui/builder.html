@@ -78,12 +78,14 @@ textarea { width:100%; height:420px; font-family:var(--mono); font-size:12px; bo
     <textarea id="code" spellcheck="false"></textarea>
     <div class="row"><button class="hb" id="dl">Download</button><span class="hint" style="margin:0">Edits here and on the screens are the same.</span></div>
     <h4 id="lh">UI style</h4>
-    <textarea id="look" spellcheck="false" style="height:130px" placeholder="Text IS LONG.&#10;Sum IS A SLIDER FROM 0 TO 100, OR TYPED.&#10;Contacts ARE A GRID.&#10;Unfriend IS IN THE MENU.&#10;COLOR IS NIGHT."></textarea>
+    <textarea id="look" spellcheck="false" style="height:130px" placeholder="Text IS LONG.&#10;Sum IS A SLIDER FROM 0 TO 100, OR TYPED.&#10;Contacts ARE A GRID.&#10;Contacts ARE ALPHABETICAL.&#10;Unfriend IS IN THE MENU.&#10;COLOR IS NIGHT."></textarea>
     <div class="box" id="lookcheck"></div>
   </section>
 </div>
 <div class="toast" id="toast"></div>
 <script src="ui.js"></script>
+<script src="chess.js"></script>
+<script src="pictures.js"></script>
 <script src="src/emit.js"></script>
 <script>
 const CONTRACTS = {
@@ -212,7 +214,7 @@ function palette() {
 function screens() {
   let h = '';
   for (const [name, C] of Object.entries(P.ui.containers)) {
-    h += `<div class="card" data-scr="${esc(name)}"><div class="ttl">${esc(name)}${name === P.ui.start ? ' <span class="hint">· start</span>' : ''}</div>${C.aboutText || C.aboutName ? `<div class="about">about ${esc(C.aboutText ? '“' + C.aboutText + '”' : C.aboutName)}</div>` : ''}`;
+    h += `<div class="card" data-scr="${esc(name)}"><div class="ttl">${esc(name)}${name === P.ui.start ? ' <span class="hint">· start</span>' : (P.ui.landmarks || []).includes(name) ? ' <span class="hint">· landmark</span>' : ''}</div>${C.aboutText || C.aboutName ? `<div class="about">about ${esc(C.aboutText ? '“' + C.aboutText + '”' : C.aboutName)}</div>` : ''}`;
     const ids = [...new Set(P.lines.filter(L => L.screen === name && L.id).map(L => L.id))];
     for (const id of ids) {
       const c = C.components.find(x => x.id === id), raw = P.lines.filter(L => L.id === id).map(L => L.raw.trim()).join(' ');

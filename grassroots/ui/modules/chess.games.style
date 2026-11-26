@@ -1,4 +1,5 @@
 STYLE Games:
 COLOR IS PAPER.
-Board IS A CHESSBOARD.
-Move IS PICKED ON THE CHESSBOARD.
+Board IS DRAWN BY chessboard.
+Move IS PICKED ON chessboard FROM Board.
+Moves ARE NEWEST FIRST.

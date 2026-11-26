@@ -197,12 +197,27 @@
       if (!done) return;
     }
   };
+  /* why an act is not allowed: the first of its facts that does not hold as required, with its names bound */
+  World.prototype.why = function (s, b) {
+    this.cur = s;
+    const bb = {...b};
+    for (const c of s.pre) if (c.p && !c.neg && this.setVar(c) >= 0 && !Array.isArray(bb[c.args[this.setVar(c)]])) { const ms = this.match(c, bb); if (ms.length) Object.assign(bb, ms[0]); }
+    /* the condition on the values first, as allowed checks it: it computes values the facts are then checked on */
+    if (!this.guard(s.guard, bb)) {
+      /* the first comparison that fails, by the function it calls, if it calls one */
+      const leaf = g => g && g.f === 'and' ? g.a.map(leaf).find(x => x) : this.guard(g, {...bb}) ? null : g;
+      const fn = JSON.stringify(leaf(s.guard) || {}).match(/"fn","a":\[\{"w":"(\w+)"/);
+      return {guard: true, fn: fn ? fn[1] : null};
+    }
+    const c = s.pre.find(c => c.p && this.spec.vocab[c.p] && !this.holds(c, {...bb}));
+    return c ? {p: c.p, args: c.args.map(x => x in bb ? bb[x] : x), neg: !!c.neg} : null;
+  };
   World.prototype.propose = function (s, b) {
     const who = s.by[0];
     for (const c of s.pre) if (c.p === 'today' && !(c.args[1] in b)) b[c.args[1]] = this.today();
-    if (!this.allowed(s, b)) { this.notes[b[who]].push({refused: s.button}); return false; }
+    if (!this.allowed(s, b)) { this.notes[b[who]].push({refused: s.button, why: this.why(s, b)}); return false; }
     const wait = s.by.slice(1).map(r => b[r]);
-    if (!wait.length) { this.apply(s, b); this.settle(); this.prune(); return true; }
+    if (!wait.length) { this.apply(s, b); this.settle(); this.prune(); this.notes[b[who]].push({done: s.button}); return true; }
     this.props.push({id: ++this.nid, s, b, wait: new Set(wait), from: b[who]});
     return true;
   };
@@ -224,7 +239,7 @@
     x.wait.delete(p);
     if (x.wait.size) return;
     this.props = this.props.filter(y => y !== x);
-    if (this.allowed(x.s, x.b)) { this.apply(x.s, x.b); this.settle(); this.prune(); } else this.notes[x.from].push({refused: x.s.button});
+    if (this.allowed(x.s, x.b)) { this.apply(x.s, x.b); this.settle(); this.prune(); this.notes[x.from].push({done: x.s.button}); } else this.notes[x.from].push({refused: x.s.button, why: this.why(x.s, x.b)});
   };
   /* what a person sees: the atoms they hold, without themselves; the questions to them; what they wait for */
   World.prototype.view = function (p) {

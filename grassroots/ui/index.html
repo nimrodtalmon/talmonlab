@@ -132,6 +132,14 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .cb span.d { background:#b58863; }
 .cb span.from { box-shadow:inset 0 0 0 3px #e0a030; }
 .cb.pick span { cursor:pointer; }
+.pic { display:grid; gap:3px; margin:6px 0 8px; }
+.pic span { display:flex; align-items:center; justify-content:center; min-height:26px; font-size:11.5px; border-radius:6px; background:#eee; color:#555; user-select:none; }
+.pic span.on { background:var(--p-acc, #1a7f6b); color:#fff; }
+.pic.pick span { cursor:pointer; }
+.pic span.from { box-shadow:inset 0 0 0 2px #e0a030; }
+.lmk { display:flex; gap:6px; padding:6px 12px 0; flex-wrap:wrap; }
+.lmk button { border:1px solid #ccc; background:none; border-radius:99px; font-size:12px; padding:3px 10px; color:inherit; cursor:pointer; }
+.lmk button.cur { background:var(--p-acc, #1a7f6b); border-color:transparent; color:#fff; }
 .chip.pos { font-family:var(--mono, monospace); }
 .compose input { flex:1; border:1px solid var(--line); border-radius:99px; padding:7px 12px; outline:none; min-width:0; }
 .compose button { width:36px; height:36px; border-radius:50%; border:0; background:var(--acc); color:#fff; font-size:16px; flex:none; }
@@ -241,6 +249,7 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 <script src="ui.js"></script>
 <script src="engine.js"></script>
 <script src="chess.js"></script>
+<script src="pictures.js"></script>
 <script src="qr.js"></script>
 <script>
 const CONTRACTS = {
@@ -277,13 +286,18 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;',
 const cap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 const isP = x => PERSONS.includes(x);
 const isT = x => x && typeof x === 'object' && 't' in x;
-const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x === 'object' && 'coin' in x ? '#' + x.coin : isBoard(x) ? 'a position' : String(x);
-/* a value the look draws as a chessboard: a position, as the library of functions reads it */
-const isBoard = x => typeof x === 'string' && typeof CHESS !== 'undefined' && Object.values(LK.of).some(r => r.as === 'chessboard') && !!CHESS.board(x);
-const PIECE = {K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙', k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟'};
-function boardHtml(fen, pick) {
-  const b = CHESS.board(fen) || [];
-  return `<div class="cb${pick ? ' pick' : ''}">${b.map((x, i) => `<span class="${((i >> 3) + i % 8) % 2 ? 'd' : ''}" ${pick ? `data-sq="${String.fromCharCode(97 + i % 8) + (8 - (i >> 3))}"` : ''}>${x ? PIECE[x] : ''}</span>`).join('')}</div>`;
+const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x === 'object' && 'coin' in x ? '#' + x.coin : drawnBy(x) ? drawnBy(x).label : String(x);
+/* a value the UI style draws by a drawing program (pictures.js): the program, if one draws a value of its kind */
+const drawnBy = x => Object.values(LK.of).filter(r => r.as === 'drawn').map(r => PICTURES[r.by]).find(g => g && g.accepts(x));
+/* a picture: the program's cells, in its columns; with pick, each cell taps */
+function pictureHtml(prog, name, v, pick) {
+  const g = PICTURES[prog], pic = g.draw(v), board = pic.frame === 'board';
+  return `<div class="${board ? 'cb' : 'pic'}${pick ? ' pick' : ''}" ${board ? '' : `style="grid-template-columns:repeat(${pic.cols}, 1fr)"`} data-prog="${esc(prog)}"${pick ? ` data-pv='${esc(JSON.stringify(v === undefined ? null : v))}'` : ''}>${pic.cells.map(c => `<span class="${board ? (c.shade === 'dark' ? 'd' : '') : c.shade}" ${pick ? `data-tap="${esc(c.tap)}"` : ''}>${esc(c.sym)}</span>`).join('')}</div>`;
+}
+/* a list in the order the UI style gives it */
+function ordered(xs, title) {
+  const o = (LK.of[title] || {}).order;
+  return o === 'newest' ? [...xs].reverse() : o === 'alpha' ? [...xs].sort((a, b) => show(lead(a)).localeCompare(show(lead(b)))) : xs;
 }
 const lead = x => Array.isArray(x) ? (x.find(y => !isP(y) && !(y && typeof y === 'object' && 'coin' in y)) ?? x[0]) : x;
 const av = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc(String(p)[0].toUpperCase())}</span>`;
@@ -307,6 +321,14 @@ const valOf = (act, b) => act.names.reduce((o, n, j) => (o[j + 1] = b[n], o), {}
 /* ---------- the person's local view ---------- */
 const view = p => W.view(p);
 function holdsL(atoms, pred, places, val) { return atoms.some(a => a.p === pred && a.args.length === places.length && places.every((k, j) => k === null || same(a.args[j], val[k]))); }
+/* why the contract does not allow an act with these values now: the fact in its way, or its condition on the values */
+function notAllowed(p, act, val) {
+  const s = SIM.schemas.find(x => x.name === act.name), b = {}; act.names.forEach((n, j) => { if (val[j + 1] !== undefined) b[n] = val[j + 1]; });
+  const w = W.why(s, b);
+  if (!w || w.guard) return 'Not allowed: ' + (w && w.fn ? 'the contract\'s function ' + w.fn + ' says no to these values.' : 'the contract\'s condition on these values does not hold.');
+  const [h, ...rest] = w.args;
+  return 'Not allowed: ' + (w.neg ? '' : 'it needs that ') + fact({p: w.p, args: rest}, h, p).replace(/<\/?b>/g, '') + (w.neg ? ' already.' : '.');
+}
 function enabled(act, atoms, val) {
   for (const [p, ks] of act.req) if (!holdsL(atoms, p, ks, val)) return false;
   for (const [p, ks] of act.forb) if (ks.every(k => k === null || val[k] !== undefined) && holdsL(atoms, p, ks, val)) return false;
@@ -377,7 +399,9 @@ function phone(p) {
   const lists = comps.filter(c => c.kind === 'list' && !c.hidden && c.zone === 'middle'), tabbed = LOOK.home === 'tabs' && lists.length > 1;
   /* what the person waits for is a small mark in the header; what just happened, a note that fades */
   const waiting = v.pending.map(x => `${esc(x.s.button)}: ${[...x.wait].map(cap).join(', ')}`);
-  const toasts = v.notes.map(n => `<div class="toast"><span class="sys">${n.refused ? esc(n.refused) + ': not done' : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
+  /* after an act: done, or not done and the fact in the way, in the contract's words */
+  const whyText = w => { if (!w) return ''; if (w.guard) return w.fn ? ', since the contract\'s function ' + w.fn + ' says no' : ''; const [h, ...rest] = w.args; return (w.neg ? ', since ' : ', since it needs: ') + fact({p: w.p, args: rest}, h, p).replace(/<\/?b>/g, ''); };
+  const toasts = v.notes.map(n => `<div class="toast"><span class="sys">${n.done ? esc(n.done) + ': done' : n.refused ? esc(n.refused) + ': not done' + esc(whyText(n.why)) : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
   if (v.notes.length) { clearTimeout(u.fade); u.fade = setTimeout(() => { W.notes[p].length = 0; render(); }, 3500); }
   const asks = [];
   /* a screen about a fact follows it when one of its values changes, as a game's position after a move:
@@ -389,10 +413,10 @@ function phone(p) {
       if (next.length === 1) env.it = next[0].args;
     }
   }
-  /* a value of the screen's subject that the look draws as a chessboard */
-  for (const [n, pos] of Object.entries(C.names || {})) if ((LK.of[n] || {}).as === 'chessboard' && env.it) {
-    const v = pos === null ? env.it : Array.isArray(env.it) ? env.it[pos - 1] : undefined;
-    if (isBoard(v)) zone.middle += boardHtml(v, false);
+  /* a value of the screen's subject that the UI style draws by a program */
+  for (const [n, pos] of Object.entries(C.names || {})) if ((LK.of[n] || {}).as === 'drawn' && env.it) {
+    const v = pos === null ? env.it : Array.isArray(env.it) ? env.it[pos - 1] : undefined, g = PICTURES[LK.of[n].by];
+    if (g && g.accepts(v)) zone.middle += pictureHtml(LK.of[n].by, n, v, false);
   }
   for (const c of comps) {
     if (c.hidden) continue;
@@ -432,7 +456,7 @@ function phone(p) {
       zone[c.zone] += `<div class="thread">${ts.join('') || `<div class="empty sys">No messages yet.</div>`}</div>`;
     } else if (c.kind === 'list') {
       if (tabbed && c.zone === 'middle' && lists[u.tab || 0] !== c) continue;
-      const it = items(c, v.atoms, p, env);
+      const it = ordered(items(c, v.atoms, p, env), c.title);
       const anyItems = lists.some(l => items(l, v.atoms, p, env).length);
       if (!it.length && !tabbed && (anyItems || lists[0] !== c)) continue;
       if (!it.length && !tabbed) { zone[c.zone] += `<div class="empty sys">Nothing here yet.</div>`; continue; }
@@ -471,6 +495,8 @@ function phone(p) {
   let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   const bar = (mode === 'bar' ? zone.bottom : '') + zone.bar, menu = (mode !== 'bar' ? zone.bottom : '') + zone.menu;
   const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
+  const lms = P.ui.landmarks || [];
+  if (lms.length) h += `<div class="lmk">${[P.ui.start, ...lms].map(s => `<button class="${s === u.at ? 'cur' : ''}" data-land="${esc(s)}">${esc(s)}</button>`).join('')}</div>`;
   h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
   if (u.menu && menu) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${menu}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
@@ -480,6 +506,8 @@ function phone(p) {
   const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => { if (Date.now() - TAPPED < 350) return; TAPPED = Date.now(); f(b); });
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
   on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.tab = 0; u.sheet = null; render(); });
+  /* a landmark is reached from every screen, and starts the way back afresh */
+  on('[data-land]', b => { u.at = b.dataset.land; u.env = {}; u.stack = []; u.tab = 0; u.sheet = null; u.menu = false; render(); });
   /* back goes to the screen one came from */
   on('[data-back]', () => { const b = (u.stack || []).pop() || {at: P.ui.start, env: {}, tab: 0}; Object.assign(u, b); u.sheet = null; u.menu = false; render(); });
   on('[data-close]', () => { u.sheet = null; u.menu = false; u.bell = false; render(); });
@@ -501,7 +529,8 @@ function phone(p) {
     const {ks, opts, w} = u.sheet.form, val = {...w.vals[0]};
     for (const k of ks) { const el = d.querySelector(`[data-f="${k}"]`), o = opts(k); val[k] = o ? o[+el.value] : w.act.people.includes(k) ? el.value.trim().toLowerCase() : fieldValue(el); }
     if (ks.some(k => w.open.includes(k) && w.act.people.includes(k) && !PERSONS.includes(val[k]))) { d.querySelector('[data-ferr]').textContent = 'No one has this key.'; return; }
-    if (ks.some(k => val[k] === '' || val[k] === undefined) || !enabled(w.act, view(p).atoms, val)) { d.querySelector('[data-ferr]').textContent = 'Not possible with these choices.'; return; }
+    if (ks.some(k => val[k] === '' || val[k] === undefined)) { d.querySelector('[data-ferr]').textContent = 'Fill in every place.'; return; }
+    if (!enabled(w.act, view(p).atoms, val)) { d.querySelector('[data-ferr]').textContent = notAllowed(p, w.act, val); return; }
     propose(p, w.act, val);
   };
   const nf = d.querySelector('[data-name]');
@@ -514,15 +543,20 @@ function phone(p) {
     b.parentElement.after(box);
     box.querySelectorAll('[data-code]').forEach(c => c.onclick = () => { inp.value = c.dataset.code; box.remove(); });
   });
-  /* tapping a square, then another, writes the move between them in the box below the board */
-  d.querySelectorAll('.cb.pick').forEach(cb => {
-    const inp = cb.parentElement.querySelector('[data-pickboard]');
-    cb.querySelectorAll('[data-sq]').forEach(x => x.onclick = () => {
-      const from = cb.querySelector('.from');
-      if (!from) { x.classList.add('from'); return; }
-      from.classList.remove('from');
-      if (inp) inp.value = from.dataset.sq + x.dataset.sq;
+  /* taps on a picture to pick on: the program says whether they give a value, which goes in the box beside it */
+  d.querySelectorAll('.pick[data-prog]').forEach(pic => {
+    const g = PICTURES[pic.dataset.prog], pv = JSON.parse(pic.dataset.pv), inp = pic.nextElementSibling;
+    let taps = [];
+    pic.querySelectorAll('[data-tap]').forEach(x => x.onclick = () => {
+      taps.push(x.dataset.tap);
+      const r = g.pick(taps, pv === null ? undefined : pv);
+      if (r.more) { x.classList.add('from'); return; }
+      pic.querySelectorAll('.from').forEach(y => y.classList.remove('from')); taps = [];
+      if (r.value !== undefined && inp) { inp.value = r.value; redraw(); }
     });
+    /* a picture of nothing to pick on draws the value given, tapped or typed */
+    const redraw = () => { if (pv !== null || pic.classList.contains('cb')) return; const cs = g.draw(inp.value === '' ? undefined : inp.value).cells; pic.querySelectorAll('[data-tap]').forEach((x, i) => x.className = cs[i].shade); };
+    if (inp) inp.addEventListener('input', redraw);
   });
   /* a slider and the box beside it show one value */
   d.querySelectorAll('.slide').forEach(sl => { const r = sl.querySelector('input[type=range]'), o = sl.querySelector('output'), n = sl.querySelector('input[type=number]'); r.oninput = () => { o.textContent = r.value; if (n) n.value = r.value; }; if (n) n.oninput = () => { r.value = n.value; o.textContent = n.value; }; });
@@ -555,7 +589,7 @@ function act(p, w) {
         const v = person ? x.toLowerCase() : x;
         if (person && !PERSONS.includes(v)) return 'No one has this key.';
         const val = {...w.vals[0], [k]: v};
-        if (!enabled(w.act, view(p).atoms, val)) return 'Not possible now.';
+        if (!enabled(w.act, view(p).atoms, val)) return notAllowed(p, w.act, val);
         propose(p, w.act, val);
       }};
     return render();
@@ -568,10 +602,11 @@ function lookOf(c, act, k) { const r = act.names[k - 1], n = c && c.names ? c.na
 function field(act, c, k, attr, val) {
   const lv = lookOf(c, act, k), r = act.names[k - 1], ph = act.people.includes(k) ? 'their key' : esc(r.toLowerCase());
   if (lv.as === 'scanned') return `<span class="scanf"><input ${attr} placeholder="${ph}"><button class="sec" data-scan="1" type="button">Scan</button></span>`;
-  if (lv.as === 'board-pick') {
-    /* the board the act is on: the value of a place the look draws as a chessboard */
-    const bk = act.names.findIndex(x => lookOf(c, act, act.names.indexOf(x) + 1).as === 'chessboard') + 1, fen = val && bk ? val[bk] : null;
-    return (isBoard(fen) ? boardHtml(fen, true) : '') + `<input ${attr} placeholder="${ph}, as e2e4" data-pickboard="1">`;
+  if (lv.as === 'picked' && PICTURES[lv.on]) {
+    /* the picture to pick on: of the value the UI style names after FROM, a place of the same act, or of nothing */
+    const g = PICTURES[lv.on], fk = lv.from ? act.names.findIndex(x => { const n = c && c.names ? c.names[x] : x; return n === lv.from; }) + 1 : 0, pv = fk && val ? val[fk] : undefined;
+    const num = g.kind === 'number';
+    return (fk && !g.accepts(pv) ? '' : pictureHtml(lv.on, r, pv, true)) + `<input ${attr} ${num ? 'type="number" class="num"' : `placeholder="${ph}"`} data-picked="1">`;
   }
   const num = (act.types || {})[r] === 'num' || /^(Sum|Total|Day|Term|Votes)$/.test(r);
   if (lv.as === 'long') return `<textarea ${attr} rows="3" placeholder="${ph}"></textarea>`;
@@ -671,10 +706,11 @@ function codePanel() {
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
   h += `<h3 style="margin-top:18px">UI style</h3><p class="lg">How the screens are drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no UI style loses an option the contract allows.</p>`;
   h += `<div class="sum"><div>${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗ ' + LR.errors.length + ' to fix</span>'}</div></div>`;
-  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(STYLE|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON)\b/g, '<span class="kw">$1</span>');
+  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(STYLE|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|DRAWN BY|PICKED ON|NEWEST FIRST|OLDEST FIRST|ALPHABETICAL|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON)\b/g, '<span class="kw">$1</span>');
     return `<div class="ln" ${L.name ? K('line:look' + L.n) : ''}><span class="no">${L.n}</span><span class="g">${e.length ? '<span class="badm">!</span>' : L.kind === 'rule' ? '<span class="ok">✓</span>' : ''}</span><span>${L.kind === 'comment' ? `<span class="cm">${t}</span>` : t}</span></div>` + e.map(x => `<div class="why">${esc(x.msg)}</div>`).join(''); }).join('') || '<div class="ln"><span class="no"></span><span class="g"></span><span class="cm">No UI style: the defaults.</span></div>'}</div>`;
   h += `<div class="ct">How to read it</div><div class="legend">
     <div><code>SCREEN Chat ABOUT Bob:</code><span>a screen, about what was tapped to open it: a person or a value, or a fact of Alice's in the contract's words, <code>ABOUT "Alice is a member of Bob's Hikers"</code>; the start screen is <code>ABOUT Alice</code>, the person whose phone it is</span></div>
+    <div><code>SCREEN More ABOUT Alice:</code><span>another screen about Alice herself is a landmark: reached from every screen, by its name at the top</span></div>
     <div><code>QUESTIONS</code><span>the questions put to Alice here</span></div>
     <div><code>SHOW Bob: knows, friend</code><span>these facts about Bob, about Alice, or (<code>SHOW:</code>) about the whole subject</span></div>
     <div><code>THREAD: message</code><span>the same, drawn as a conversation</span></div>
@@ -682,7 +718,8 @@ function codePanel() {
     <div><code>Introduce: Alice may introduce Carol to Bob, Carol FROM knows</code><span>a button, then the contract's sentence for its act, its names renamed at will, Alice the one who acts. A name of the subject takes its value from it; any other is <code>TYPED</code>, <code>FROM PERSONS</code>, <code>FROM</code> a predicate, or <code>IS</code> a name of the subject</span></div>
     <div><code><span class="ok">✓</span> <span class="part">◐</span> <span class="badm">✗</span></code><span>covers its act · a shortcut, another line covers the act · the act is missing</span></div>
     <div><code>Text IS LONG.</code><span>the UI style: a typed value is <code>LONG</code> or <code>SHORT</code>; a typed number <code>A SLIDER FROM 0 TO 100</code>, with <code>, OR TYPED</code> to keep every value, or <code>A DATE</code></span></div>
-    <div><code>Groups ARE A GRID.</code><span>a list is <code>A GRID</code>, <code>ROWS</code> or <code>CHIPS</code>; an action is <code>IN THE MENU</code>, <code>IN THE BAR</code> or <code>PRIMARY</code>; and <code>COLOR IS NIGHT.</code>, <code>CORNERS ARE SQUARE.</code> and the like, for the whole app</span></div>
+    <div><code>Board IS DRAWN BY chessboard.</code><span>a value drawn as a picture by a drawing program; <code>Move IS PICKED ON chessboard FROM Board.</code> gives a value by tapping the picture, and <code>Sum IS PICKED ON tens.</code> on a picture of its own; a box to type it always stays beside</span></div>
+    <div><code>Groups ARE A GRID.</code><span>a list is <code>A GRID</code>, <code>ROWS</code> or <code>CHIPS</code>, and <code>NEWEST FIRST</code>, <code>OLDEST FIRST</code> or <code>ALPHABETICAL</code>; an action is <code>IN THE MENU</code>, <code>IN THE BAR</code> or <code>PRIMARY</code>; and <code>COLOR IS NIGHT.</code>, <code>CORNERS ARE SQUARE.</code> and the like, for the whole app</span></div>
   </div>`;
   $('#code').innerHTML = h;
 }
