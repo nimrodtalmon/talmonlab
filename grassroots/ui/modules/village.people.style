@@ -4,13 +4,52 @@ LANDMARKS ARE AT THE BOTTOM.
 LISTS ARE TABS.
 Bob IS SCANNED.
 Text IS LONG.
-Encounter IS IN THE MENU.
-Close place IS IN THE MENU.
-Person unfriend IS IN THE MENU.
-Unpoint IS IN THE MENU.
 People ARE ALPHABETICAL.
 Calls ARE NEWEST FIRST.
 Feed ARE NEWEST FIRST.
 Grupo IS NEW AS Group1.
+Acquaint IS CALLED "Add someone".
+Acquaint IS PRIMARY.
+Befriend IS CALLED "Make friends".
+Befriend IS PRIMARY.
+Person unfriend IS CALLED "Unfriend".
+Person unfriend IS IN THE MENU.
+Open place IS CALLED "Meet people nearby".
+Close place IS CALLED "Stop meeting nearby".
+Close place IS IN THE MENU.
+Encounter IS IN THE MENU.
+Introduce IS IN THE MENU.
+Message IS CALLED "Write to them".
+Point friend IS CALLED "Follow their feed".
+Unpoint IS CALLED "Unfollow".
+Unpoint IS IN THE MENU.
+Point transitive IS CALLED "Follow someone they follow".
+Point transitive IS IN THE MENU.
+Labeled point friend IS IN THE MENU.
+Labeled point transitive IS IN THE MENU.
+Labeled point transitive friend IS IN THE MENU.
+Labeled unpoint IS IN THE MENU.
+Labeled unpoint self IS IN THE MENU.
+Create IS CALLED "New group".
+Create IS PRIMARY.
+Remove IS IN THE MENU.
+Close IS CALLED "Close a group".
+Close IS IN THE MENU.
+Personal emergency IS CALLED "Ask for help".
+Personal emergency IS PRIMARY.
+Answer IS CALLED "Reply".
+Resolve IS CALLED "Mark as solved".
+Notice IS CALLED "Post a notice".
+Village emergency IS CALLED "Raise a village alarm".
 Notice forward IS IN THE MENU.
 Emergency forward IS IN THE MENU.
+Found IS CALLED "Start an organisation".
+Enter IS CALLED "Add a child".
+Child unfriend IS CALLED "End a child's friendship".
+Organisation unfriend IS CALLED "End an organisation's friendship".
+Found by an organisation IS CALLED "Start an organisation for an organisation".
+Of age IS CALLED "Declare a child of age".
+Propose IS CALLED "Propose a motion".
+Vote IS CALLED "Vote on a motion".
+Act IS CALLED "Carry out a motion".
+Amend IS CALLED "Amend the bylaws".

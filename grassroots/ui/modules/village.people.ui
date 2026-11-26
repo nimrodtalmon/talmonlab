@@ -11,7 +11,6 @@ SCREEN Home ABOUT Alice:
     Open place: Alice may declare her place open
     Close place: Alice may close her place
     Encounter: Bob TYPED
-    Personal emergency: Alice may broadcast Call as a personal emergency, Call TYPED
 
 SCREEN Person ABOUT Bob:
     QUESTIONS
@@ -52,13 +51,8 @@ SCREEN Feed ABOUT Alice:
     Labeled unpoint self: Alice may remove her Dave-pointer to Dave, Dave FROM pointer
 
 SCREEN Village ABOUT Alice:
-    LIST Calls: "Alice holds the broadcast Cast"
-    LIST Mine: "Alice has made the broadcast Call"
-    LIST Emergencies: "Alice has broadcast the personal emergency Call"
-    LIST Resolved: "Alice has resolved Call by Reply"
-    LIST Answers: "Alice has answered Call by Reply"
-    LIST Notices: "Alice has the notice Cast"
-    LIST Village calls: "Alice has the village emergency Cast"
+    Personal emergency: Alice may broadcast Call as a personal emergency, Call TYPED
+    LIST Calls: "Alice holds the broadcast Cast" WITH made_broadcast, personal_emergency, resolved, emergency_answer, notice_of, village_emergency_of
     Answer: Alice may broadcast Reply as an answer to Call, Reply TYPED, Call FROM broadcast
     Resolve: Alice may broadcast Reply as the resolution of Call, Reply TYPED, Call FROM personal_emergency
     Notice: Alice may broadcast Cast as a notice of Orga, Orga FROM officer, Cast TYPED
