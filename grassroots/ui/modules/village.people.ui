@@ -28,7 +28,6 @@ SCREEN Person ABOUT Bob:
 SCREEN Groups ABOUT Alice:
     LIST Groups: "Alice is a member of the group Grupo of Bob" WITH leader OPENS Group
     Create: Alice may create Grupo, Grupo TYPED
-    Join: Alice may add Bob to Grupo, Bob FROM friend, Grupo FROM leader
     Remove: Alice may end Bob's membership in Grupo, Bob FROM listed, Grupo FROM leader
     Close: Alice may close Grupo by leaving it, Grupo FROM leader
 
@@ -38,6 +37,9 @@ SCREEN Group ABOUT "Alice is a member of the group Grupo of Bob":
     THREAD: group_message, posted
     Post: Alice may send Text to the group Grupo of Bob, Text TYPED
     Post own: Alice may send Text to the group Grupo of Alice, Text TYPED
+    Join: Alice may add Carol to Grupo, Carol FROM friend, Grupo FROM leader
+    Remove: Alice may end Carol's membership in Grupo, Carol FROM listed, Grupo FROM leader
+    Close: Alice may close Grupo by leaving it, Grupo FROM leader
     Leave: Alice may end her membership in Bob's Grupo
 
 SCREEN Feed ABOUT Alice:

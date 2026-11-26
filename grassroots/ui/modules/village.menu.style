@@ -6,6 +6,8 @@ Bob IS SCANNED.
 Text IS LONG.
 People ARE ALPHABETICAL.
 Calls ARE NEWEST FIRST.
+Calls ARE TOLD.
+Item IS NEW AS Item1.
 Feed ARE NEWEST FIRST.
 Grupo IS NEW AS Group1.
 Establish IS CALLED "Set up my identity".
@@ -54,3 +56,4 @@ Propose IS CALLED "Propose a motion".
 Vote IS CALLED "Vote on a motion".
 Act IS CALLED "Carry out a motion".
 Amend IS CALLED "Amend the bylaws".
+Post own IS CALLED "Write to the group".
