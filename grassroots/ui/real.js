@@ -14,6 +14,8 @@
     this.notes = {}; persons.forEach(p => this.notes[p] = []);
     this.st = null; this.seqs = new Map(); this.seq = 0; this.out = {}; persons.forEach(p => this.out[p] = []);
     this.told = new Set(); this.busy = Promise.resolve(); this.error = null;
+    /* each value as the agents wrote it, by the simulation's form of it, to propose it back as it was */
+    this.reals = new Map();
     /* where a text sits in a fact: the open value of each act whose field is a text, in the facts it adds, and
        who wrote it, the act's proposer */
     this.texts = {};
@@ -48,10 +50,18 @@
     : j.f ? {f: j.f, args: j.args.map(val)} : null;
   /* and back: a text is the speech act its writer signs, as the app's text field forms it */
   const real = x => x && typeof x === 'object' && 't' in x ? {f: 'speech', args: [{f: 'utterance', args: [{a: String(x.t)}]}, {a: String(x.by)}]}
+    : x && typeof x === 'object' && x.f === 'sgn' ? {f: 'speech', args: [real(x.a[0]), real(x.a[1])]}
     : typeof x === 'number' ? {n: x} : Array.isArray(x) ? {l: x.map(real)} : {a: String(x)};
+  /* A value the contract signs that the simulation holds bare, as a program: where the simulation holds no text,
+     a signed text is its text alone, and a speech act signing another, sgn(Inner, Signer), as the simulation writes
+     a forwarded item (programs/gsc, sgn/2). */
+  const norm = (v, text) => v && typeof v === 'object' && 't' in v ? (text ? v : v.t)
+    : v && typeof v === 'object' && v.f === 'speech' && v.args.length === 2 ? {f: 'sgn', a: [norm(v.args[0], text), v.args[1]]}
+    : v;
   const fa = j => j.f ? [j.f, j.args] : [j.a, []];
   RealWorld.prototype.atom = function (holder, j) {
-    const [p, as] = fa(j), args = as.map(val), t = this.texts[p];
+    const [p, as] = fa(j), t = this.texts[p];
+    const args = as.map((x, i) => { const v = norm(val(x), t && t.i === i); this.reals.set(JSON.stringify(v), x); return v; });
     const k = holder + key({p, args});
     if (!this.seqs.has(k)) this.seqs.set(k, ++this.seq);
     const n = this.seqs.get(k);
@@ -64,7 +74,7 @@
     const [name, as] = fa(j), s = this.spec.schemas.find(x => x.name === name), names = this.map.acts[name] || [];
     if (!s) return null;
     const b = {};
-    names.forEach((n, i) => { b[n] = val(as[i]); });
+    names.forEach((n, i) => { const v = norm(val(as[i]), s.field === 'text' && (s.values || [])[0] === n); this.reals.set(JSON.stringify(v), as[i]); b[n] = v; });
     return {s, b};
   };
   RealWorld.prototype.take = function (st) {
@@ -117,7 +127,10 @@
   RealWorld.prototype.propose = function (s, b) {
     const who = b[s.by[0]], names = this.map.acts[s.name];
     if (!names) { this.notes[who].push({refused: s.button, why: null}); return false; }
-    const req = {f: s.name, args: names.map(n => real(b[n]))};
+    const types = (this.map.types || {})[s.name] || [];
+    /* a value as the agents wrote it; a new one in a place the contract signs, signed by its proposer */
+    const back = (x, ty) => this.reals.get(JSON.stringify(x)) || (ty === 'Speech' && (typeof x === 'string' || typeof x === 'number') ? {f: 'speech', args: [{f: 'utterance', args: [{a: String(x)}]}, {a: String(who)}]} : real(x));
+    const req = {f: s.name, args: names.map((n, i) => back(b[n], types[i]))};
     const o = {s, b, req: {f: s.name, args: req.args}, seen: false};
     this.out[who].push(o);
     /* an act no one else must agree to is done when the agent has taken it */

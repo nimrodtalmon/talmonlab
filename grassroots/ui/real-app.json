@@ -1,0 +1,459 @@
+{
+ "app": "app",
+ "acts": {
+  "establish": [
+   "Alice"
+  ],
+  "acquaint": [
+   "Alice",
+   "Bob"
+  ],
+  "introduce": [
+   "Bob",
+   "Alice",
+   "Carol"
+  ],
+  "open_place": [
+   "Alice"
+  ],
+  "close_place": [
+   "Alice"
+  ],
+  "encounter": [
+   "Alice",
+   "Bob"
+  ],
+  "befriend": [
+   "Alice",
+   "Bob"
+  ],
+  "person_unfriend": [
+   "Alice",
+   "Bob"
+  ],
+  "sign": [
+   "Alice",
+   "Item"
+  ],
+  "forward": [
+   "Bob",
+   "Alice",
+   "Item"
+  ],
+  "publish": [
+   "Carol",
+   "Prog"
+  ],
+  "trust": [
+   "Alice",
+   "Carol"
+  ],
+  "untrust": [
+   "Alice",
+   "Carol"
+  ],
+  "offer": [
+   "Alice",
+   "Carol",
+   "Prog",
+   "Erin"
+  ],
+  "install_own": [
+   "Alice",
+   "Prog"
+  ],
+  "install": [
+   "Alice",
+   "Prog",
+   "Carol"
+  ],
+  "invite": [
+   "Bob",
+   "Alice",
+   "Prog",
+   "Carol"
+  ],
+  "leave": [
+   "Alice",
+   "E1",
+   "Prog"
+  ],
+  "enter": [
+   "Wendy",
+   "Alice"
+  ],
+  "make_guardian": [
+   "Bob",
+   "Wendy",
+   "Decider"
+  ],
+  "resign": [
+   "Bob",
+   "Wendy"
+  ],
+  "end_guardian": [
+   "Bob",
+   "Wendy",
+   "Decider"
+  ],
+  "guardian_unfriend": [
+   "Bob",
+   "Wendy"
+  ],
+  "ward_acquaint": [
+   "Wendy",
+   "Bob"
+  ],
+  "ward_befriend": [
+   "Wendy",
+   "Bob",
+   "Alice"
+  ],
+  "ward_end": [
+   "Wendy",
+   "Bob"
+  ],
+  "unfriend": [
+   "Bob",
+   "Wendy"
+  ],
+  "ward_unfriend": [
+   "Wendy",
+   "Bob",
+   "Alice"
+  ],
+  "wards_acquaint": [
+   "Wendy",
+   "Will"
+  ],
+  "wards_befriend": [
+   "Wendy",
+   "Will",
+   "Alice",
+   "Bob"
+  ],
+  "wards_of_one_guardian_befriend": [
+   "Wendy",
+   "Will",
+   "Alice"
+  ],
+  "retire": [
+   "Wendy",
+   "Decider"
+  ],
+  "open_store": [
+   "Dave",
+   "Carol"
+  ],
+  "list": [
+   "Dave",
+   "Carol",
+   "Prog",
+   "Bob"
+  ],
+  "delist": [
+   "Dave",
+   "Carol"
+  ],
+  "trust_store": [
+   "Alice",
+   "Dave",
+   "Carol"
+  ],
+  "untrust_store": [
+   "Alice",
+   "Dave"
+  ],
+  "install_from_store": [
+   "Alice",
+   "Dave",
+   "Prog",
+   "Bob"
+  ],
+  "open_server": [
+   "Dave",
+   "Carol"
+  ],
+  "sign_link": [
+   "Alice",
+   "Link",
+   "Dave"
+  ],
+  "invite_by_link": [
+   "Dave",
+   "Alice",
+   "Link"
+  ],
+  "use_link": [
+   "Dave",
+   "Alice",
+   "Bob",
+   "Link"
+  ],
+  "present": [
+   "Dave",
+   "Alice",
+   "Bob"
+  ],
+  "open_directory": [
+   "Dora",
+   "Carol"
+  ],
+  "list_me": [
+   "Dora",
+   "Alice",
+   "Mail",
+   "Name"
+  ],
+  "list_me_unshown": [
+   "Dora",
+   "Alice",
+   "Mail",
+   "Name"
+  ],
+  "delist_me": [
+   "Dora",
+   "Alice"
+  ],
+  "delist_me_unshown": [
+   "Dora",
+   "Alice"
+  ],
+  "lookup": [
+   "Bob",
+   "Dora"
+  ],
+  "lookup_by_address": [
+   "Bob",
+   "Dora"
+  ]
+ },
+ "types": {
+  "establish": [
+   "Peer"
+  ],
+  "acquaint": [
+   "Peer",
+   "Peer"
+  ],
+  "introduce": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "open_place": [
+   "Peer"
+  ],
+  "close_place": [
+   "Peer"
+  ],
+  "encounter": [
+   "Peer",
+   "Peer"
+  ],
+  "befriend": [
+   "Peer",
+   "Peer"
+  ],
+  "person_unfriend": [
+   "Peer",
+   "Peer"
+  ],
+  "sign": [
+   "Peer",
+   "Speech"
+  ],
+  "forward": [
+   "Peer",
+   "Peer",
+   "Speech"
+  ],
+  "publish": [
+   "Peer",
+   "Speech"
+  ],
+  "trust": [
+   "Peer",
+   "Peer"
+  ],
+  "untrust": [
+   "Peer",
+   "Peer"
+  ],
+  "offer": [
+   "Peer",
+   "Peer",
+   "Speech",
+   "Peer"
+  ],
+  "install_own": [
+   "Peer",
+   "Speech"
+  ],
+  "install": [
+   "Peer",
+   "Speech",
+   "Peer"
+  ],
+  "invite": [
+   "Peer",
+   "Peer",
+   "Speech",
+   "Peer"
+  ],
+  "leave": [
+   "Peer",
+   "Speech",
+   "Peer"
+  ],
+  "enter": [
+   "Peer",
+   "Peer"
+  ],
+  "make_guardian": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "resign": [
+   "Peer",
+   "Peer"
+  ],
+  "end_guardian": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "guardian_unfriend": [
+   "Peer",
+   "Peer"
+  ],
+  "ward_acquaint": [
+   "Peer",
+   "Peer"
+  ],
+  "ward_befriend": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "ward_end": [
+   "Peer",
+   "Peer"
+  ],
+  "unfriend": [
+   "Peer",
+   "Peer"
+  ],
+  "ward_unfriend": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "wards_acquaint": [
+   "Peer",
+   "Peer"
+  ],
+  "wards_befriend": [
+   "Peer",
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "wards_of_one_guardian_befriend": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "retire": [
+   "Peer",
+   "Peer"
+  ],
+  "open_store": [
+   "Peer",
+   "Peer"
+  ],
+  "list": [
+   "Peer",
+   "Peer",
+   "Speech",
+   "Peer"
+  ],
+  "delist": [
+   "Peer",
+   "Peer"
+  ],
+  "trust_store": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "untrust_store": [
+   "Peer",
+   "Peer"
+  ],
+  "install_from_store": [
+   "Peer",
+   "Peer",
+   "Speech",
+   "Peer"
+  ],
+  "open_server": [
+   "Peer",
+   "Peer"
+  ],
+  "sign_link": [
+   "Peer",
+   "Constant",
+   "Peer"
+  ],
+  "invite_by_link": [
+   "Peer",
+   "Peer",
+   "Constant"
+  ],
+  "use_link": [
+   "Peer",
+   "Peer",
+   "Peer",
+   "Constant"
+  ],
+  "present": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "open_directory": [
+   "Peer",
+   "Peer"
+  ],
+  "list_me": [
+   "Peer",
+   "Peer",
+   "Constant",
+   "Constant"
+  ],
+  "list_me_unshown": [
+   "Peer",
+   "Peer",
+   "Constant",
+   "Constant"
+  ],
+  "delist_me": [
+   "Peer",
+   "Peer"
+  ],
+  "delist_me_unshown": [
+   "Peer",
+   "Peer"
+  ],
+  "lookup": [
+   "Peer",
+   "Peer"
+  ],
+  "lookup_by_address": [
+   "Peer",
+   "Peer"
+  ]
+ }
+}

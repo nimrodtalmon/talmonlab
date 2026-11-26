@@ -60,5 +60,66 @@
    "Text",
    "Grupo"
   ]
+ },
+ "types": {
+  "establish": [
+   "Peer"
+  ],
+  "acquaint": [
+   "Peer",
+   "Peer"
+  ],
+  "introduce": [
+   "Peer",
+   "Peer",
+   "Peer"
+  ],
+  "befriend": [
+   "Peer",
+   "Peer"
+  ],
+  "unfriend": [
+   "Peer",
+   "Peer"
+  ],
+  "message": [
+   "Peer",
+   "Peer",
+   "Speech"
+  ],
+  "create": [
+   "Peer",
+   "Constant"
+  ],
+  "close": [
+   "Peer",
+   "Constant"
+  ],
+  "join": [
+   "Peer",
+   "Peer",
+   "Constant"
+  ],
+  "remove": [
+   "Peer",
+   "Peer",
+   "Constant"
+  ],
+  "leave": [
+   "Peer",
+   "Peer",
+   "Constant"
+  ],
+  "post": [
+   "Peer",
+   "Peer",
+   "Speech",
+   "Constant"
+  ],
+  "post_own": [
+   "Peer",
+   "Speech",
+   "Constant"
+  ]
  }
 }
