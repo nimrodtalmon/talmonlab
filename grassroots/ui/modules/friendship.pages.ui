@@ -3,7 +3,7 @@
 SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
-    LIST Contacts: EVERYONE WITH knows OPENS Person
+    LIST Contacts: PERSONS WITH knows OPENS Person
     Establish: Alice may establish an identity
 
 SCREEN Person ABOUT Bob:

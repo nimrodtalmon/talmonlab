@@ -3,7 +3,7 @@
 SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
-    LIST People: EVERYONE WITH knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision OPENS Person
+    LIST People: PERSONS WITH knows, member, listed, proposed, delivered, vote_for, vote_against, delivered_vote, delivered_decision OPENS Person
     LIST Steward: "Alice is the steward of Delos"
     LIST Proposal: "Alice holds Prop of Delos"
     LIST Decided: "Alice has decided Prop of Delos"

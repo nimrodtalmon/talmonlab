@@ -4,7 +4,7 @@ SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
     LIST DAOs: "Alice is a member of Bob's Delos" OPENS Dao
-    LIST People: EVERYONE WITH knows, listed OPENS Person
+    LIST People: PERSONS WITH knows, listed OPENS Person
     Establish: Alice may establish an identity
     Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
     Found: Alice may found Delos under a new name of hers, Delos TYPED

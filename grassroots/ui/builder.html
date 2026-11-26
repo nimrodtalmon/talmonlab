@@ -146,11 +146,11 @@ function actionLine(a, C) {
 function drop(scr, d) {
   const C = P.ui.containers[scr], start = scr === P.ui.start, comps = C.components;
   if (d.kind === 'act') return insert(scr, actionLine(SPEC.acts.find(a => a.name === d.name), C));
-  const addTo = (c, p) => { const xs = lines(), i = lineOf(c.id) - 1; xs[i] = /\bWITH\b/.test(xs[i]) || c.kind !== 'list' ? xs[i].replace(/(:\s*[\w, ]+?|WITH\s+[\w, ]+?)(\s+OPENS\s+\w+)?\s*$/, (m, a, b) => a + ', ' + p + (b || '')) : xs[i].replace(/(EVERYONE)/, '$1 WITH ' + p); setLines(xs); };
+  const addTo = (c, p) => { const xs = lines(), i = lineOf(c.id) - 1; xs[i] = /\bWITH\b/.test(xs[i]) || c.kind !== 'list' ? xs[i].replace(/(:\s*[\w, ]+?|WITH\s+[\w, ]+?)(\s+OPENS\s+\w+)?\s*$/, (m, a, b) => a + ', ' + p + (b || '')) : xs[i].replace(/(PERSONS)/, '$1 WITH ' + p); setLines(xs); };
   if (d.kind === 'everyone') {
     if (!start) return toast('Everyone is listed on the start screen');
     if (!P.ui.containers.Person) addScreen(['SCREEN Person ABOUT Bob:', '    QUESTIONS']);
-    return insert(scr, 'LIST People: EVERYONE OPENS Person');
+    return insert(scr, 'LIST People: PERSONS OPENS Person');
   }
   const p = d.p, n = arity(p);
   if (n === 0) {

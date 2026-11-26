@@ -4,7 +4,7 @@ SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
     LIST Games: "Alice plays Game against Bob at Board" OPENS Game
-    LIST Friends: EVERYONE WITH knows, friend, won, drawn OPENS Person
+    LIST Friends: PERSONS WITH knows, friend, won, drawn OPENS Person
     LIST Moves: "Alice has made Move in Game at Board"
     Establish: Alice may establish an identity
     Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED

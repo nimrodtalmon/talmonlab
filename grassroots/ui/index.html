@@ -634,7 +634,7 @@ function contractPanel() {
   h += `<p class="lg" style="margin-top:12px">■ enforced by the app · ◆ attested · ○ undertaken by the person.</p>`;
   $('#contract').innerHTML = h;
 }
-const KW = /\b(SCREEN|ABOUT|QUESTIONS|SHOW|THREAD|LIST|EVERYONE|WITH|OPENS|FROM|TYPED|IS)\b/g;
+const KW = /\b(SCREEN|ABOUT|QUESTIONS|SHOW|THREAD|LIST|PERSONS|WITH|OPENS|FROM|TYPED|IS)\b/g;
 function codeLine(L) {
   const comp = L.screen && L.id ? P.ui.containers[L.screen].components.find(c => c.id === L.id) : null;
   let keys = ['line:' + L.n], g = '', why = [];
@@ -678,8 +678,8 @@ function codePanel() {
     <div><code>QUESTIONS</code><span>the questions put to Alice here</span></div>
     <div><code>SHOW Bob: knows, friend</code><span>these facts about Bob, about Alice, or (<code>SHOW:</code>) about the whole subject</span></div>
     <div><code>THREAD: message</code><span>the same, drawn as a conversation</span></div>
-    <div><code>LIST Contacts: EVERYONE OPENS Chat</code><span>everyone Alice knows of; or Alice's facts of one kind, <code>"Alice holds Prop of Delos"</code>; or <code>FROM</code> a predicate, the values in its facts. On a screen about a fact, a name shared with it keeps the list to that fact. A tap opens a screen</span></div>
-    <div><code>Introduce: Alice may introduce Carol to Bob, Carol FROM knows</code><span>a button, then the contract's sentence for its act, its names renamed at will, Alice the one who acts. A name of the subject takes its value from it; any other is <code>TYPED</code>, <code>FROM EVERYONE</code>, <code>FROM</code> a predicate, or <code>IS</code> a name of the subject</span></div>
+    <div><code>LIST Contacts: PERSONS OPENS Chat</code><span>everyone Alice knows of; or Alice's facts of one kind, <code>"Alice holds Prop of Delos"</code>; or <code>FROM</code> a predicate, the values in its facts. On a screen about a fact, a name shared with it keeps the list to that fact. A tap opens a screen</span></div>
+    <div><code>Introduce: Alice may introduce Carol to Bob, Carol FROM knows</code><span>a button, then the contract's sentence for its act, its names renamed at will, Alice the one who acts. A name of the subject takes its value from it; any other is <code>TYPED</code>, <code>FROM PERSONS</code>, <code>FROM</code> a predicate, or <code>IS</code> a name of the subject</span></div>
     <div><code><span class="ok">✓</span> <span class="part">◐</span> <span class="badm">✗</span></code><span>covers its act · a shortcut, another line covers the act · the act is missing</span></div>
     <div><code>Text IS LONG.</code><span>the UI style: a typed value is <code>LONG</code> or <code>SHORT</code>; a typed number <code>A SLIDER FROM 0 TO 100</code>, with <code>, OR TYPED</code> to keep every value, or <code>A DATE</code></span></div>
     <div><code>Groups ARE A GRID.</code><span>a list is <code>A GRID</code>, <code>ROWS</code> or <code>CHIPS</code>; an action is <code>IN THE MENU</code>, <code>IN THE BAR</code> or <code>PRIMARY</code>; and <code>COLOR IS NIGHT.</code>, <code>CORNERS ARE SQUARE.</code> and the like, for the whole app</span></div>

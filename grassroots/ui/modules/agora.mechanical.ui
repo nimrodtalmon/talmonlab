@@ -3,7 +3,7 @@
 SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
-    LIST People: EVERYONE WITH knows, note, escrow_note, member, has_member, post, delivered_post, escrow_item OPENS Person
+    LIST People: PERSONS WITH knows, note, escrow_note, member, has_member, post, delivered_post, escrow_item OPENS Person
     LIST Made: "Alice has made Item"
     LIST Item: "Alice holds the item Item"
     LIST Keeper: "Alice is the keeper of Mart"

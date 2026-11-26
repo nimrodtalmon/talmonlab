@@ -3,7 +3,7 @@
 SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person, open_place, ward, retired, store, rendezvous_server, directory
-    LIST People: EVERYONE WITH knows, friend, program, trusts_developer, installed, participant, has_guardian, creator, guardian, lists_program, listing_signed, trusts_store, link, spent, registered, address, presented, lists_shown, lists_unshown, holds_link OPENS Person
+    LIST People: PERSONS WITH knows, friend, program, trusts_developer, installed, participant, has_guardian, creator, guardian, lists_program, listing_signed, trusts_store, link, spent, registered, address, presented, lists_shown, lists_unshown, holds_link OPENS Person
     LIST Item: "Alice holds the item Item"
     LIST Expired: "Alice holds Link expired"
     Establish: Alice may establish an identity

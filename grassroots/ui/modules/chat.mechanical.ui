@@ -3,7 +3,7 @@
 SCREEN Home ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person
-    LIST People: EVERYONE WITH knows, friend, member, listed, message, sent_message, received_message, posted, group_delivered, group_message OPENS Person
+    LIST People: PERSONS WITH knows, friend, member, listed, message, sent_message, received_message, posted, group_delivered, group_message OPENS Person
     LIST Leader: "Alice is the leader of Grupo"
     Establish: Alice may establish an identity
     Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED

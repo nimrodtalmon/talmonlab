@@ -9,7 +9,7 @@ SCREEN Agora ABOUT Alice:
     LIST Wallet: "Alice holds Sum Carol-notes of type Type" OPENS Note
     LIST In escrow: "Alice holds Sum Dave-notes of type Type in escrow from Bob for Carol on Cond" OPENS Escrow
     LIST Items in escrow: "Alice holds the item Item in escrow from Bob for Carol on Cond" OPENS Held
-    LIST People: EVERYONE WITH knows, has_member, delivered_post OPENS Person
+    LIST People: PERSONS WITH knows, has_member, delivered_post OPENS Person
     Establish: Alice may establish an identity
     Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
     Make: Alice may make the item Item, Item TYPED
