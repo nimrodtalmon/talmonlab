@@ -74,10 +74,10 @@ textarea { width:100%; height:420px; font-family:var(--mono); font-size:12px; bo
   <section class="panel">
     <h4 id="gh">Goals</h4>
     <div class="box" id="goals"></div>
-    <h4>The screens</h4>
+    <h4>UI structure</h4>
     <textarea id="code" spellcheck="false"></textarea>
     <div class="row"><button class="hb" id="dl">Download</button><span class="hint" style="margin:0">Edits here and on the screens are the same.</span></div>
-    <h4 id="lh">The look</h4>
+    <h4 id="lh">UI style</h4>
     <textarea id="look" spellcheck="false" style="height:130px" placeholder="Text IS LONG.&#10;Sum IS A SLIDER FROM 0 TO 100, OR TYPED.&#10;Contacts ARE A GRID.&#10;Unfriend IS IN THE MENU.&#10;COLOR IS NIGHT."></textarea>
     <div class="box" id="lookcheck"></div>
   </section>
@@ -192,8 +192,8 @@ function update() {
 function lookCheck() {
   if (document.activeElement !== $('#look')) $('#look').value = LOOK;
   const r = GUI.checkLook(SPEC, P.ui, GUI.readLook(LOOK));
-  $('#lh').textContent = r.ok ? 'The look' : `The look · ${r.errors.length}`;
-  $('#lookcheck').innerHTML = r.ok ? `<div class="goal qed">${LOOK.trim() ? 'No option lost.' : 'No look: the defaults.'}</div>` : r.errors.map(e => `<div class="goal"><span class="badm">✗</span> line ${e.line}: ${esc(e.msg)}</div>`).join('');
+  $('#lh').textContent = r.ok ? 'UI style' : `UI style · ${r.errors.length}`;
+  $('#lookcheck').innerHTML = r.ok ? `<div class="goal qed">${LOOK.trim() ? 'No option lost.' : 'No UI style: the defaults.'}</div>` : r.errors.map(e => `<div class="goal"><span class="badm">✗</span> line ${e.line}: ${esc(e.msg)}</div>`).join('');
 }
 function palette() {
   $('#acts').innerHTML = SPEC.acts.map(a => {
@@ -276,7 +276,7 @@ async function start(from) {
   if (from === 'empty') TEXT = EMPTY;
   else if (from) TEXT = await (await fetch(`modules/${CN}.${from}.ui`)).text();
   else TEXT = load(CN) || EMPTY;
-  LOOK = from && from !== 'empty' ? await (await fetch(`modules/${CN}.${from}.look`)).text().catch(() => '') : loadLook(CN);
+  LOOK = from && from !== 'empty' ? await (await fetch(`modules/${CN}.${from}.style`)).text().catch(() => '') : loadLook(CN);
   if (/^\s*</.test(LOOK)) LOOK = '';
   $('#try').href = `index.html?c=${CN}&ui=custom`;
   update();

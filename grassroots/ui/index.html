@@ -661,17 +661,17 @@ function codeLine(L) {
   return `<div class="ln" ${K(...keys)}><span class="no">${L.n}</span><span class="g">${g}</span><span>${t}</span></div>` + why.map(w => `<div class="why${g.includes('part') ? ' pw' : ''}">${esc(w)}</div>`).join('');
 }
 function codePanel() {
-  let h = `<h3>The screens <span class="lbl">· ${esc(CONTRACTS[CN].modules[MN])}</span></h3><p class="lg">What each screen holds and which acts it offers: each action is the contract's own sentence for an act, with where each of its names comes from. The checker reads it against the contract.</p>`;
+  let h = `<h3>UI structure <span class="lbl">· ${esc(CONTRACTS[CN].modules[MN])}</span></h3><p class="lg">What each screen holds and which acts it offers: each action is the contract's own sentence for an act, with where each of its names comes from. The checker reads it against the contract.</p>`;
   const n = Object.values(R.acts).filter(a => a.covered).length, m = Object.keys(R.acts).length;
   h += `<div class="sum"><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}: ${n} of ${m} acts covered${Object.values(R.acts).filter(a => !a.covered).map(a => ' · <span class="badm">' + esc(a.button) + '</span>').join('')}</div>`;
   const prs = xs => xs.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ');
   h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact found from the start screen' : R.hidden.length ? '<span class="badm">✗ hidden</span>: ' + prs(R.hidden) : '<span class="part">◐ visible not proved</span>: shown only on inner screens: ' + prs(R.inner)}</div>`;
   if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
-  h += `<h3 style="margin-top:18px">The look</h3><p class="lg">How the screens are drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no look loses an option the contract allows.</p>`;
+  h += `<h3 style="margin-top:18px">UI style</h3><p class="lg">How the screens are drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no UI style loses an option the contract allows.</p>`;
   h += `<div class="sum"><div>${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗ ' + LR.errors.length + ' to fix</span>'}</div></div>`;
-  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(LOOK|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON)\b/g, '<span class="kw">$1</span>');
-    return `<div class="ln" ${L.name ? K('line:look' + L.n) : ''}><span class="no">${L.n}</span><span class="g">${e.length ? '<span class="badm">!</span>' : L.kind === 'rule' ? '<span class="ok">✓</span>' : ''}</span><span>${L.kind === 'comment' ? `<span class="cm">${t}</span>` : t}</span></div>` + e.map(x => `<div class="why">${esc(x.msg)}</div>`).join(''); }).join('') || '<div class="ln"><span class="no"></span><span class="g"></span><span class="cm">No look: the defaults.</span></div>'}</div>`;
+  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(STYLE|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON)\b/g, '<span class="kw">$1</span>');
+    return `<div class="ln" ${L.name ? K('line:look' + L.n) : ''}><span class="no">${L.n}</span><span class="g">${e.length ? '<span class="badm">!</span>' : L.kind === 'rule' ? '<span class="ok">✓</span>' : ''}</span><span>${L.kind === 'comment' ? `<span class="cm">${t}</span>` : t}</span></div>` + e.map(x => `<div class="why">${esc(x.msg)}</div>`).join(''); }).join('') || '<div class="ln"><span class="no"></span><span class="g"></span><span class="cm">No UI style: the defaults.</span></div>'}</div>`;
   h += `<div class="ct">How to read it</div><div class="legend">
     <div><code>SCREEN Chat ABOUT Bob:</code><span>a screen, about what was tapped to open it: a person or a value, or a fact of Alice's in the contract's words, <code>ABOUT "Alice is a member of Bob's Hikers"</code>; the start screen is <code>ABOUT Alice</code>, the person whose phone it is</span></div>
     <div><code>QUESTIONS</code><span>the questions put to Alice here</span></div>
@@ -680,7 +680,7 @@ function codePanel() {
     <div><code>LIST Contacts: EVERYONE OPENS Chat</code><span>everyone Alice knows of; or Alice's facts of one kind, <code>"Alice holds Prop of Delos"</code>; or <code>FROM</code> a predicate, the values in its facts. On a screen about a fact, a name shared with it keeps the list to that fact. A tap opens a screen</span></div>
     <div><code>Introduce: Alice may introduce Carol to Bob, Carol FROM knows</code><span>a button, then the contract's sentence for its act, its names renamed at will, Alice the one who acts. A name of the subject takes its value from it; any other is <code>TYPED</code>, <code>FROM EVERYONE</code>, <code>FROM</code> a predicate, or <code>IS</code> a name of the subject</span></div>
     <div><code><span class="ok">✓</span> <span class="part">◐</span> <span class="badm">✗</span></code><span>covers its act · a shortcut, another line covers the act · the act is missing</span></div>
-    <div><code>Text IS LONG.</code><span>the look: a typed value is <code>LONG</code> or <code>SHORT</code>; a typed number <code>A SLIDER FROM 0 TO 100</code>, with <code>, OR TYPED</code> to keep every value, or <code>A DATE</code></span></div>
+    <div><code>Text IS LONG.</code><span>the UI style: a typed value is <code>LONG</code> or <code>SHORT</code>; a typed number <code>A SLIDER FROM 0 TO 100</code>, with <code>, OR TYPED</code> to keep every value, or <code>A DATE</code></span></div>
     <div><code>Groups ARE A GRID.</code><span>a list is <code>A GRID</code>, <code>ROWS</code> or <code>CHIPS</code>; an action is <code>IN THE MENU</code>, <code>IN THE BAR</code> or <code>PRIMARY</code>; and <code>COLOR IS NIGHT.</code>, <code>CORNERS ARE SQUARE.</code> and the like, for the whole app</span></div>
   </div>`;
   $('#code').innerHTML = h;
@@ -707,10 +707,10 @@ function segs() {
 /* the design tool: the structure, which the checks read, and the look, which they do not */
 function designPanel() {
   const ms = Object.entries(CONTRACTS[CN].modules);
-  let h = `<p class="lg">The look changes how the app is drawn, never what it lets a person do: each button here rewrites a sentence of the look, which the checker reads too.</p>`;
+  let h = `<p class="lg">The UI style changes how the app is drawn, never what it lets a person do: each button here rewrites a sentence of the UI style, which the checker reads too.</p>`;
   if (ms.length > 1) h += `<div class="drow"><div class="dl">Structure</div><div class="seg">${ms.map(([k, v]) => `<button class="${k === MN ? 'on' : ''}" data-m="${k}">${esc(v)}</button>`).join('')}</div></div>`;
-  h += `<div class="drow"><div class="dl">Checks</div><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'} · ${R.visible ? '<span class="ok">✓ visible</span>' : R.hidden.length ? '<span class="badm">✗ not visible</span>' : '<span class="part">◐ visible not proved</span>'} · ${LR.ok ? '<span class="ok">✓ look</span>' : '<span class="badm">✗ look</span>'}</div></div>`;
-  h += `<div class="ct">Look</div>`;
+  h += `<div class="drow"><div class="dl">Checks</div><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'} · ${R.visible ? '<span class="ok">✓ visible</span>' : R.hidden.length ? '<span class="badm">✗ not visible</span>' : '<span class="part">◐ visible not proved</span>'} · ${LR.ok ? '<span class="ok">✓ style</span>' : '<span class="badm">✗ style</span>'}</div></div>`;
+  h += `<div class="ct">Style</div>`;
   for (const [k, v] of Object.entries(LOOKS)) {
     h += `<div class="drow"><div class="dl">${v.label}</div>`;
     if (k === 'theme') h += `<div class="sw">${Object.entries(v.opts).map(([o, t]) => `<button class="phone ${o}${o === LOOK.theme ? ' on' : ''}" data-look="theme" data-v="${o}"><span style="background:var(--p-acc)"></span><span style="background:var(--p-me)"></span><span style="background:var(--p-bg)"></span><em>${t}</em></button>`).join('')}</div>`;
@@ -736,10 +736,10 @@ $('#fold').onclick = e => { e.stopPropagation(); const f = $('#cpanel').classLis
 function screensText() { return MN === 'custom' ? mine(CN) : cache[`modules/${CN}.${MN}.ui`]; }
 function allOf() {
   const contract = SIM.chain.map(c => c.text.join('\n')).join('\n\n'), scr = screensText() || '', look = LOOKTXT || '';
-  const name = CONTRACTS[CN].title, bundle = `# ${name}: the contract, the screens and the look\n\n## The contract\n\n${contract}\n\n## The screens\n\n${scr.trim()}\n\n## The look\n\n${look.trim()}\n`;
+  const name = CONTRACTS[CN].title, bundle = `# ${name}: the contract, the UI structure and the UI style\n\n## The contract\n\n${contract}\n\n## The UI structure\n\n${scr.trim()}\n\n## The UI style\n\n${look.trim()}\n`;
   const d = document.createElement('div'); d.className = 'allof';
-  d.innerHTML = `<div class="box"><div class="row"><b>${esc(name)}</b><span class="lbl">One contract, shared by everyone who uses it; the screens and the look, each person's own.</span><span class="sp"></span><button class="hb" data-dl="1">Download</button><button class="hb" data-sh="1">Copy a link</button><button class="hb" data-x="1">Close</button></div>
-    <div class="cols"><div><h4>The contract</h4><pre>${esc(contract)}</pre></div><div><h4>The screens ${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}</h4><pre>${esc(scr)}</pre></div><div><h4>The look ${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗</span>'}</h4><pre>${esc(look || 'No look: the defaults.')}</pre></div></div></div>`;
+  d.innerHTML = `<div class="box"><div class="row"><b>${esc(name)}</b><span class="lbl">One contract, shared by everyone who uses it; the UI structure and the UI style, each person's own.</span><span class="sp"></span><button class="hb" data-dl="1">Download</button><button class="hb" data-sh="1">Copy a link</button><button class="hb" data-x="1">Close</button></div>
+    <div class="cols"><div><h4>The contract</h4><pre>${esc(contract)}</pre></div><div><h4>UI structure ${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}</h4><pre>${esc(scr)}</pre></div><div><h4>UI style ${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗</span>'}</h4><pre>${esc(look || 'No UI style: the defaults.')}</pre></div></div></div>`;
   document.body.appendChild(d);
   d.querySelector('[data-x]').onclick = () => d.remove();
   d.onclick = e => { if (e.target === d) d.remove(); };
@@ -780,7 +780,7 @@ function setGlobal(k, v) {
 async function module() {
   P = GUI.resolve(SPEC, GUI.read(MN === 'custom' ? mine(CN) : await get(`modules/${CN}.${MN}.ui`)));
   R = GUI.check(SPEC, P.ui);
-  LOOKTXT = MN === 'custom' ? (mineLook(CN) || '') : await getOpt(`modules/${CN}.${MN}.look`);
+  LOOKTXT = MN === 'custom' ? (mineLook(CN) || '') : await getOpt(`modules/${CN}.${MN}.style`);
   applyLook();
   B = CN === 'friendship' ? GUI.brute(SPEC, P.ui, PERSONS) : null;
   PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null});
