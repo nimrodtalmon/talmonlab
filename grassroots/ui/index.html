@@ -22,8 +22,23 @@ header b { font-size:16px; }
 .lbl { color:var(--mute); font-size:12.5px; }
 .hb { border:1px solid var(--line); background:#fff; padding:5px 12px; border-radius:99px; color:var(--ink); }
 .hb.on { background:var(--acc2); border-color:var(--acc); color:var(--acc); }
-.grid { display:grid; grid-template-columns: 320px auto 400px; gap:20px; justify-content:center; align-items:start; padding:18px 20px 30px; }
-@media (max-width:1380px) { .grid { grid-template-columns: auto; } .grid > .col { order:-1; } }
+.grid { display:grid; grid-template-columns: auto auto 340px 440px; gap:16px; justify-content:center; align-items:start; padding:18px 16px 30px; }
+@media (max-width:1640px) { .grid { grid-template-columns: auto auto 1fr; } .grid > #codepanel { grid-column: 2 / 4; } }
+@media (max-width:1100px) { .grid { grid-template-columns: auto; } .grid > .col { order:-1; } .grid > #codepanel { grid-column:auto; } }
+/* the contract, folded to a strip until opened */
+#cpanel { width:320px; }
+#cpanel.folded { width:40px; padding:10px 4px; cursor:pointer; }
+#cpanel.folded > *:not(.fold) { display:none; }
+#cpanel .fold { border:0; background:none; color:var(--mute); font-size:12.5px; padding:0 0 8px; cursor:pointer; }
+#cpanel.folded .fold { writing-mode:vertical-rl; transform:rotate(180deg); padding:6px 0; width:100%; }
+/* everything at once: the contract, the screens and the look */
+.allof { position:fixed; inset:0; background:rgba(20,20,20,.35); z-index:50; display:flex; align-items:center; justify-content:center; }
+.allof .box { background:#fff; border-radius:16px; width:min(1400px, 96vw); height:88vh; display:flex; flex-direction:column; padding:16px 18px; gap:10px; }
+.allof .cols { flex:1; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; min-height:0; }
+.allof .cols > div { display:flex; flex-direction:column; min-height:0; }
+.allof pre { flex:1; overflow:auto; margin:0; background:#f7f6f2; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:12px; line-height:1.45; white-space:pre-wrap; }
+.allof h4 { margin:0 0 6px; font-size:13.5px; }
+.allof .row { display:flex; gap:8px; align-items:center; }
 .pswitch { display:none; }
 .dot { display:inline-block; min-width:16px; height:16px; border-radius:8px; background:var(--acc); color:#fff; font-size:10.5px; line-height:16px; text-align:center; padding:0 4px; margin-left:4px; }
 @media (max-width:760px) {
@@ -158,7 +173,7 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .tabs button.on { color:var(--ink); border-bottom-color:var(--acc); font-weight:600; }
 .drow { display:flex; align-items:center; gap:10px; margin:8px 0; }
 .dl { width:96px; flex:none; color:var(--mute); font-size:12.5px; }
-.sw { display:flex; gap:6px; flex-wrap:wrap; }
+.sw { display:flex; flex-wrap:wrap; gap:6px; flex-wrap:wrap; }
 .sw button { width:auto; height:auto; padding:6px 8px; border-radius:10px; border:1px solid var(--line); background:#fff; display:flex; align-items:center; gap:3px; box-shadow:none; }
 .sw button.on { border-color:var(--ink); }
 .sw span { width:12px; height:12px; border-radius:50%; border:1px solid rgba(0,0,0,.1); }
@@ -211,14 +226,17 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 <header>
   <b>Grassroots UI</b><span class="sub">A contract, two phones, and the UI between them</span>
   <span class="sp"></span>
+  <select class="pick" id="csel" style="width:auto;margin:0"></select>
   <a class="hb" id="build" href="builder.html" style="text-decoration:none">Builder</a>
+  <button class="hb" id="allof">All of it</button>
   <button class="hb" id="explain">Explain</button>
   <button class="hb" id="reset">Start over</button>
 </header>
 <div class="grid">
-  <section class="panel"><select class="pick" id="csel"></select><div id="contract"></div></section>
+  <section class="panel folded" id="cpanel"><button class="fold" id="fold">The contract ▸</button><div id="contract"></div></section>
   <section class="col"><div class="seg pswitch" id="pswitch"><button class="on" data-ph="0">Alice's phone</button><button data-ph="1">Bob's phone</button></div><div class="phones" id="phones"></div><div class="scripts" id="scripts"></div></section>
-  <section class="panel"><div class="tabs"><button class="on" data-tab="design">Design</button><button data-tab="code">UI code</button></div><div id="design"></div><div id="code" style="display:none"></div></section>
+  <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
+  <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
 <script src="ui.js"></script>
 <script src="engine.js"></script>
@@ -643,14 +661,14 @@ function codeLine(L) {
   return `<div class="ln" ${K(...keys)}><span class="no">${L.n}</span><span class="g">${g}</span><span>${t}</span></div>` + why.map(w => `<div class="why${g.includes('part') ? ' pw' : ''}">${esc(w)}</div>`).join('');
 }
 function codePanel() {
-  let h = `<h3>${esc(CONTRACTS[CN].modules[MN])}</h3><p class="lg">Each screen lists what it shows and which acts it offers. Each action is the contract's own sentence for an act, with where each of its names comes from. The checker reads it against the contract; where things go on the screen is the look's.</p>`;
+  let h = `<h3>The screens <span class="lbl">· ${esc(CONTRACTS[CN].modules[MN])}</span></h3><p class="lg">What each screen holds and which acts it offers: each action is the contract's own sentence for an act, with where each of its names comes from. The checker reads it against the contract.</p>`;
   const n = Object.values(R.acts).filter(a => a.covered).length, m = Object.keys(R.acts).length;
   h += `<div class="sum"><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}: ${n} of ${m} acts covered${Object.values(R.acts).filter(a => !a.covered).map(a => ' · <span class="badm">' + esc(a.button) + '</span>').join('')}</div>`;
   const prs = xs => xs.map(p => `<span class="pr" ${K('pred:' + p)}>${esc(p)}</span>`).join(', ');
   h += `<div>${R.visible ? '<span class="ok">✓ visible</span>: every fact found from the start screen' : R.hidden.length ? '<span class="badm">✗ hidden</span>: ' + prs(R.hidden) : '<span class="part">◐ visible not proved</span>: shown only on inner screens: ' + prs(R.inner)}</div>`;
   if (B) h += `<div style="color:var(--mute);font-size:12.5px">Brute force, Alice among four, all ${B.states} states: ${B.answers - B.missed} of ${B.answers} allowed answers offered.</div>`;
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
-  h += `<h3 style="margin-top:18px">The look</h3><p class="lg">How it is drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no look loses an option the contract allows.</p>`;
+  h += `<h3 style="margin-top:18px">The look</h3><p class="lg">How the screens are drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no look loses an option the contract allows.</p>`;
   h += `<div class="sum"><div>${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗ ' + LR.errors.length + ' to fix</span>'}</div></div>`;
   h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(LOOK|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON)\b/g, '<span class="kw">$1</span>');
     return `<div class="ln" ${L.name ? K('line:look' + L.n) : ''}><span class="no">${L.n}</span><span class="g">${e.length ? '<span class="badm">!</span>' : L.kind === 'rule' ? '<span class="ok">✓</span>' : ''}</span><span>${L.kind === 'comment' ? `<span class="cm">${t}</span>` : t}</span></div>` + e.map(x => `<div class="why">${esc(x.msg)}</div>`).join(''); }).join('') || '<div class="ln"><span class="no"></span><span class="g"></span><span class="cm">No look: the defaults.</span></div>'}</div>`;
@@ -691,7 +709,7 @@ function designPanel() {
   const ms = Object.entries(CONTRACTS[CN].modules);
   let h = `<p class="lg">The look changes how the app is drawn, never what it lets a person do: each button here rewrites a sentence of the look, which the checker reads too.</p>`;
   if (ms.length > 1) h += `<div class="drow"><div class="dl">Structure</div><div class="seg">${ms.map(([k, v]) => `<button class="${k === MN ? 'on' : ''}" data-m="${k}">${esc(v)}</button>`).join('')}</div></div>`;
-  h += `<div class="drow"><div class="dl">Checks</div><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'} · ${R.visible ? '<span class="ok">✓ visible</span>' : '<span class="badm">✗ not visible</span>'}</div></div>`;
+  h += `<div class="drow"><div class="dl">Checks</div><div>${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'} · ${R.visible ? '<span class="ok">✓ visible</span>' : R.hidden.length ? '<span class="badm">✗ not visible</span>' : '<span class="part">◐ visible not proved</span>'} · ${LR.ok ? '<span class="ok">✓ look</span>' : '<span class="badm">✗ look</span>'}</div></div>`;
   h += `<div class="ct">Look</div>`;
   for (const [k, v] of Object.entries(LOOKS)) {
     h += `<div class="drow"><div class="dl">${v.label}</div>`;
@@ -711,11 +729,39 @@ function designPanel() {
     history.replaceState(null, '', u.toString());
   };
 }
-document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => {
-  document.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('on', x === b));
-  $('#design').style.display = b.dataset.tab === 'design' ? '' : 'none';
-  $('#code').style.display = b.dataset.tab === 'code' ? '' : 'none';
-});
+/* the contract folds to a strip */
+$('#cpanel').onclick = e => { if ($('#cpanel').classList.contains('folded')) { $('#cpanel').classList.remove('folded'); $('#fold').textContent = 'The contract ◂'; e.stopPropagation(); } };
+$('#fold').onclick = e => { e.stopPropagation(); const f = $('#cpanel').classList.toggle('folded'); $('#fold').textContent = f ? 'The contract ▸' : 'The contract ◂'; };
+/* all of it: the contract, the screens and the look, to read side by side, download or share */
+function screensText() { return MN === 'custom' ? mine(CN) : cache[`modules/${CN}.${MN}.ui`]; }
+function allOf() {
+  const contract = SIM.chain.map(c => c.text.join('\n')).join('\n\n'), scr = screensText() || '', look = LOOKTXT || '';
+  const name = CONTRACTS[CN].title, bundle = `# ${name}: the contract, the screens and the look\n\n## The contract\n\n${contract}\n\n## The screens\n\n${scr.trim()}\n\n## The look\n\n${look.trim()}\n`;
+  const d = document.createElement('div'); d.className = 'allof';
+  d.innerHTML = `<div class="box"><div class="row"><b>${esc(name)}</b><span class="lbl">One contract, shared by everyone who uses it; the screens and the look, each person's own.</span><span class="sp"></span><button class="hb" data-dl="1">Download</button><button class="hb" data-sh="1">Copy a link</button><button class="hb" data-x="1">Close</button></div>
+    <div class="cols"><div><h4>The contract</h4><pre>${esc(contract)}</pre></div><div><h4>The screens ${R.complete ? '<span class="ok">✓ complete</span>' : '<span class="badm">✗ not complete</span>'}</h4><pre>${esc(scr)}</pre></div><div><h4>The look ${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗</span>'}</h4><pre>${esc(look || 'No look: the defaults.')}</pre></div></div></div>`;
+  document.body.appendChild(d);
+  d.querySelector('[data-x]').onclick = () => d.remove();
+  d.onclick = e => { if (e.target === d) d.remove(); };
+  d.querySelector('[data-dl]').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bundle], {type: 'text/plain'})); a.download = `${CN}-${MN}.txt`; a.click(); };
+  d.querySelector('[data-sh]').onclick = e => {
+    const u = new URL(location.href); u.search = ''; u.searchParams.set('c', CN);
+    u.hash = 'share=' + btoa(unescape(encodeURIComponent(JSON.stringify({screens: scr, look}))));
+    const done = t => { e.target.textContent = t; };
+    try { navigator.clipboard.writeText(u.toString()).then(() => done('Copied'), () => done('Link in the address bar')); } catch (x) { done('Link in the address bar'); }
+    history.replaceState(null, '', u.toString());
+  };
+}
+$('#allof').onclick = allOf;
+/* a shared link: its screens and look become this browser's own, and are shown */
+(() => {
+  const m = location.hash.match(/^#share=(.+)$/); if (!m) return;
+  try {
+    const o = JSON.parse(decodeURIComponent(escape(atob(m[1])))), c = new URLSearchParams(location.search).get('c') || CN;
+    localStorage.setItem('grassroots-ui:' + c, o.screens || ''); localStorage.setItem('grassroots-look:' + c, o.look || '');
+    const u = new URL(location.href); u.searchParams.set('ui', 'custom'); u.hash = ''; history.replaceState(null, '', u.toString());
+  } catch (e) {}
+})();
 const cache = {};
 const get = async u => cache[u] || (cache[u] = await (await fetch(u)).text());
 const getOpt = async u => { if (u in cache) return cache[u]; try { const r = await fetch(u); return cache[u] = r.ok ? await r.text() : ''; } catch (e) { return cache[u] = ''; } };
@@ -750,7 +796,7 @@ const mine = c => { try { return localStorage.getItem('grassroots-ui:' + c); } c
 const mineLook = c => { try { return localStorage.getItem('grassroots-look:' + c); } catch (e) { return null; } };
 async function start() {
   SIM = JSON.parse(await get(`sim-${CN}.json`));
-  if (mine(CN)) CONTRACTS[CN].modules.custom = 'Yours (from the builder)';
+  if (mine(CN)) CONTRACTS[CN].modules.custom = 'Yours (from the builder or a link)';
   $('#build').href = 'builder.html?c=' + CN;
   SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env, personal: GUI.personal(SIM)};
   const qm = new URLSearchParams(location.search).get('ui');

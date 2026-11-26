@@ -5,7 +5,7 @@ SCREEN Home ABOUT Alice:
     SHOW Alice: identity, person
     LIST People: EVERYONE WITH knows, friend, at, won, drawn OPENS Person
     LIST Started: "Alice has started Game"
-    LIST Colour: "Alice has the colour Side in Game"
+    LIST Color: "Alice has the color Side in Game"
     LIST Made: "Alice has made Move in Game at Board"
     Establish: Alice may establish an identity
     Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED

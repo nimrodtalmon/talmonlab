@@ -20,7 +20,7 @@ SCREEN Person ABOUT Bob:
 
 SCREEN Game ABOUT "Alice plays Game against Bob at Board":
     QUESTIONS
-    SHOW: at, colour, made
+    SHOW: at, color, made
     Move: Alice may make Move in Game against Bob from Board to Next, Move TYPED
     Win: Alice may claim Game against Bob at Board
     Resign: Alice may resign Game against Bob at Board

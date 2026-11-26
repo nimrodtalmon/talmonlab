@@ -80,8 +80,8 @@
     "b"
    ]
   },
-  "colour": {
-   "phrase": "x has the colour s in g",
+  "color": {
+   "phrase": "x has the color s in g",
    "vars": [
     "x",
     "g",
@@ -629,6 +629,14 @@
      "neg": false
     },
     {
+     "p": "started",
+     "args": [
+      "Bob",
+      "Game"
+     ],
+     "neg": false
+    },
+    {
      "p": "at",
      "args": [
       "Alice",
@@ -649,7 +657,7 @@
      "neg": false
     },
     {
-     "p": "colour",
+     "p": "color",
      "args": [
       "Alice",
       "Game",
@@ -663,7 +671,7 @@
      "neg": false
     },
     {
-     "p": "colour",
+     "p": "color",
      "args": [
       "Bob",
       "Game",
@@ -712,6 +720,14 @@
      "p": "started",
      "args": [
       "Alice",
+      "Game"
+     ],
+     "neg": true
+    },
+    {
+     "p": "started",
+     "args": [
+      "Bob",
       "Game"
      ],
      "neg": true
@@ -944,7 +960,7 @@
      "neg": false
     },
     {
-     "p": "colour",
+     "p": "color",
      "args": [
       "Alice",
       "Game",
@@ -1109,7 +1125,7 @@
      "neg": false
     },
     {
-     "p": "colour",
+     "p": "color",
      "args": [
       "Bob",
       "Game",
