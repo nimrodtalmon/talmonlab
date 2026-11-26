@@ -2,7 +2,7 @@
 # landmarks for the village's conversations, its feed and its calls; More holds the acts of families and
 # organisations, which a person takes seldom.
 
-SCREEN Home ABOUT Alice:
+SCREEN People ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person, open_place, child, retired, of_age, organisation, ward, amended
     LIST People: PERSONS WITH knows, friend OPENS Person

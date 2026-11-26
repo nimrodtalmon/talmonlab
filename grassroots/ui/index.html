@@ -235,6 +235,10 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .phone .line { font-size:13.5px; padding:3px 2px; }
 .phone .qs { max-height:150px; overflow-y:auto; padding:2px 0 6px; }
 .phone .ask { display:flex; align-items:center; gap:8px; padding:8px 10px; margin-bottom:6px; font-size:13px; }
+.phone .help { padding:8px 0; border-bottom:1px solid var(--p-line, #eee); font-size:13px; }
+.phone .help .hb { font-weight:600; }
+.phone .help .hs { color:var(--p-mute, #777); margin:2px 0; }
+.phone .help .ok { color:var(--p-acc, #1a7f6b); }
 .phone .ask .q { flex:1; display:flex; gap:8px; align-items:flex-start; min-width:0; }
 .phone .ask .btns { margin:0; gap:2px; flex:none; }
 .phone .ask .pri { padding:5px 11px; }
@@ -266,12 +270,12 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js?v=1795729707"></script>
-<script src="engine.js?v=1795729707"></script>
-<script src="real.js?v=1795729707"></script>
-<script src="chess.js?v=1795729707"></script>
-<script src="pictures.js?v=1795729707"></script>
-<script src="qr.js?v=1795729707"></script>
+<script src="ui.js?v=1795731731"></script>
+<script src="engine.js?v=1795731731"></script>
+<script src="real.js?v=1795731731"></script>
+<script src="chess.js?v=1795731731"></script>
+<script src="pictures.js?v=1795731731"></script>
+<script src="qr.js?v=1795731731"></script>
 <script>
 const CONTRACTS = {
   app: {title: 'The Grassroots App (home: install and open apps)', modules: {home: 'Home', mechanical: 'Mechanical'}},
@@ -342,7 +346,28 @@ async function ctxOf(name) {
   use(CTX[MAINCN]);
   return CTX[name];
 }
-async function openApp(p, name) { await ctxOf(name); AT[p] = name; render(); }
+/* A routing rule a person chooses (the paper's sources of answers): an act of hers whose only place is herself,
+   such as establishing her identity, taken for her by a script in each app she opens.  The layer asks her once,
+   after she takes such an act on Home; nothing is taken for her unless she said yes. */
+const RULES = {}, RULEASKED = {};
+function ruleOffer(p, act) {
+  if (!HOME || CN !== MAINCN || act.names.length !== 1 || RULEASKED[p + ':' + act.name]) return;
+  RULEASKED[p + ':' + act.name] = true;
+  ui[p].rule = {act: act.name, button: act.button};
+}
+function byRule(p, c) {
+  inCtx(c, () => {
+    for (const n of RULES[p] || []) {
+      const act = SPEC.acts.find(a => a.name === n && a.names.length === 1);
+      if (!act || !enabled(act, view(p).atoms, {[act.me]: p})) continue;
+      const s = SIM.schemas.find(x => x.name === act.name);
+      W.propose(s, {[act.names[0]]: p});
+      W.notes[p] = W.notes[p].filter(x => x.done !== act.button);
+      W.notes[p].push({msg: lab(act.button) + ': done for you, as you asked', at: Date.now()});
+    }
+  })();
+}
+async function openApp(p, name) { const c = await ctxOf(name); AT[p] = name; byRule(p, c); render(); later(); }
 function goHome(p) { AT[p] = MAINCN; render(); }
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -381,6 +406,40 @@ function sentence(act, val) {
   return act.sentence.replace(/\b[A-Z][a-z]+\b/g, w => w in map ? `<b>${esc(map[w])}</b>` : esc(w));
 }
 const valOf = (act, b) => act.names.reduce((o, n, j) => (o[j + 1] = b[n], o), {});
+/* Help, from the contract alone: each act the person can take, in the contract's words, where the UI structure
+   offers it, and, if it cannot be taken now, the first fact of the contract in its way. */
+function helpHtml(p) {
+  const v = view(p), where = {};
+  for (const [name, C] of Object.entries(P.ui.containers)) for (const c of C.components) if (c.kind === 'action' && c.act) (where[c.act] = where[c.act] || new Set()).add(name);
+  const rows = SPEC.acts.filter(a => where[a.name]).map(a => {
+    const s = SIM.schemas.find(x => x.name === a.name), me = a.names[a.me - 1];
+    const open = a.names.filter((n, j) => j !== a.me - 1);
+    let w = W.why(s, {[me]: p});
+    /* a fact of a person not yet chosen depends on whom she picks: not in the way now */
+    if (w && !w.guard && open.includes(w.args[0])) w = null;
+    let now;
+    if (!w) now = '<span class="ok">You can do this now.</span>';
+    else if (w.guard) now = 'Not now: the contract\'s condition on its values says no.';
+    else {
+      const [h, ...rest] = w.args, f = fact({p: w.p, args: rest.map(x => open.includes(x) ? 'someone' : x)}, h === me ? p : h, p).replace(/<\/?b>/g, '');
+      now = 'Not now: ' + (w.neg ? '' : 'it needs that ') + esc(f) + '.';
+    }
+    return `<div class="help"><div class="hb">${esc(lab(a.button))}</div><div class="hs">${sentence(a, {[a.me]: p})}</div><div class="hw">${now} On ${[...where[a.name]].map(esc).join(', ')}.</div></div>`;
+  });
+  return `<div class="sh">What you can do here</div><div class="facts">${rows.join('')}</div>`;
+}
+/* An empty list says how its items come, from the contract: the acts whose effects add a fact of its kind to the
+   person, each by its label, with who takes it. */
+function fillHint(c, p) {
+  const pr = c.items && (c.items.atoms || c.items.pred);
+  if (!pr) return '';
+  const by = SIM.schemas.filter(s => !s.auto && s.effects.some(e => !e.neg && e.p === pr)).map(s => {
+    const a = SPEC.acts.find(x => x.name === s.name), me = a ? a.names[a.me - 1] : null;
+    const holders = s.effects.filter(e => !e.neg && e.p === pr).map(e => e.args[0]);
+    return lab(s.button) + (holders.includes(me) ? '' : ' (by someone else)');
+  });
+  return by.length ? ' They come with ' + [...new Set(by)].map(x => '“' + x + '”').join(', ') + '.' : '';
+}
 
 /* ---------- the person's local view ---------- */
 const view = p => W.view(p);
@@ -461,6 +520,7 @@ function propose(p, act, val) {
   W.notes[p].length = 0;
   W.propose(s, b);
   if (ui[p]) ui[p].sheet = null;
+  ruleOffer(p, act);
   render(); later();
 }
 function answer(p, id, yes) { W.notes[p].length = 0; W.answer(id, p, yes); render(); later(); }
@@ -500,6 +560,8 @@ function phone(p) {
   /* a tab for each list that holds something, and the first list's always, so no screen is a row of empty tabs */
   const lists = lists0.filter((c, i) => i === 0 || items(c, v.atoms, p, env).length), tabbed = LOOK.home === 'tabs' && lists.length > 1;
   if ((u.tab || 0) >= lists.length) u.tab = 0;
+  /* until the person picks a tab, the open one is the first that holds something */
+  if (!u.tabPicked) { const k = lists.findIndex(c => items(c, v.atoms, p, env).length); u.tab = k < 0 ? 0 : k; }
   /* what the person waits for is a small mark in the header; what just happened, a note that fades */
   const waiting = v.pending.map(x => `${esc(lab(x.s.button))}: ${[...x.wait].map(cap).join(', ')}`);
   /* after an act: done, or not done and the fact in the way, in the contract's words */
@@ -518,7 +580,7 @@ function phone(p) {
         const chainC = Object.values(P.ui.containers).flatMap(C => C.components).find(y => y.kind === 'chain' && (y.stepIds || []).includes(x.next));
         if (chainC && chainC.then) (u.after = u.after || []).push({button: a1.button, then: chainC.then});
         propose(p, a1, val);
-      } else if (x.then) { u.at = x.then; u.env = {}; u.stack = []; u.tab = 0; u.sheet = null; render(); }
+      } else if (x.then) { u.at = x.then; u.env = {}; u.stack = []; u.tab = 0; u.tabPicked = false; u.sheet = null; render(); }
     }), 0);
   }
   /* a new message in a thread, from someone else: a note, and a mark on the list item that opens it */
@@ -618,7 +680,7 @@ function phone(p) {
         const last = th ? lastText(v.atoms.filter(a => th.shows.includes(a.p)), x, p) : '';
         const unread = th ? new Set(v.atoms.filter(a => th.shows.includes(a.p) && mentions(a, x) && !u.seen.has(a.seq) && a.args.some(y => isT(y) && y.by !== p)).map(a => JSON.stringify(a.args.find(isT)))).size : 0;
         return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${unread ? `<span class="unread">${unread}</span>` : ''}${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
-      }).join('') + '</div>' + (it.length ? '' : `<div class="empty sys">None yet.</div>`);
+      }).join('') + '</div>' + (it.length ? '' : `<div class="empty sys">None yet.${esc(fillHint(c, p))}</div>`);
     } else if (c.kind === 'chain') {
       /* a chain: its button offers its first step; the next is proposed once the first is done */
       const st = comps.find(x => x.id === (c.stepIds || [])[0]);
@@ -666,7 +728,7 @@ function phone(p) {
   const homeBtn = HOME && CN !== MAINCN && u.at === P.ui.start && !(u.stack || []).length ? `<button class="back" data-home="1" title="The Grassroots App's Home">⌂</button>` : '';
   const opens = HOME && CN === MAINCN && C.aboutPred === 'installed' && env.it ? [].concat(env.it).map(appOf).find(x => x) : null;
   if (opens) zone.top = `<div class="openapp"><button class="pri" data-open="${esc(opens)}">Open ${esc(CONTRACTS[opens].title.replace(/ \(.*\)$/, ''))}</button></div>` + zone.top;
-  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : homeBtn}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : homeBtn}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}<button class="ib" data-help="1" title="Help">?</button>${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   /* an empty screen says where to start: its first marked action, or its first */
   const first = (zone.bottom + zone.bar).match(/<button[^>]*class="[^"]*prim[^"]*"[^>]*>([^<]+)/) || (zone.bottom + zone.bar).match(/<button[^>]*>([^<]+)/);
   zone.middle = zone.middle.replace('@@HINT@@', first ? ` <br>Start with “${first[1]}”.` : '');
@@ -675,7 +737,8 @@ function phone(p) {
   /* the landmarks, as the UI style puts them: a row on top, a bar at the bottom, or a menu behind the name */
   if (lms.length && LOOK.landmarks === 'top') h += `<div class="lmk">${lmrow}</div>`;
   if (lms.length && LOOK.landmarks === 'menu' && u.lmenu) h += `<div class="lmk lmenu">${lmrow}</div>`;
-  h += `<div class="toasts">${toasts}</div><div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${bar ? `<div class="acts${(bar.match(/<button/g) || []).length > 5 ? ' rows' : ''}">${bar}</div>` : ''}${composer}</div>${lms.length && LOOK.landmarks === 'bottom' ? `<div class="lmk lbot">${lmrow}</div>` : ''}`;
+  const rq = HOME && CN === MAINCN && u.rule ? `<div class="ask rule"><div class="q"><div>Do “${esc(lab(u.rule.button))}” for you in each app you open?</div></div><div class="btns"><button class="pri" data-rule="1">Yes</button><button class="ghost" data-rule="0">No</button></div></div>` : '';
+  h += `<div class="toasts">${toasts}</div>${rq ? `<div class="zt">${rq}</div>` : ''}<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${bar ? `<div class="acts${(bar.match(/<button/g) || []).length > 5 ? ' rows' : ''}">${bar}</div>` : ''}${composer}</div>${lms.length && LOOK.landmarks === 'bottom' ? `<div class="lmk lbot">${lmrow}</div>` : ''}`;
   if (u.menu && menu) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${menu}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
   else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
@@ -683,20 +746,22 @@ function phone(p) {
   /* a tap right after the screen changed is not taken: a double tap must not hit what moved under the finger */
   const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => { if (Date.now() - TAPPED < 350) return; TAPPED = Date.now(); f(b); });
   on('[data-open]', b => openApp(p, b.dataset.open));
+  on('[data-rule]', b => { if (b.dataset.rule === '1') (RULES[p] = RULES[p] || new Set()).add(u.rule.act); u.rule = null; render(); });
   on('[data-home]', () => goHome(p));
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
-  on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.tab = 0; u.sheet = null; render(); });
+  on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.tab = 0; u.tabPicked = false; u.sheet = null; render(); });
   /* a landmark is reached from every screen, and starts the way back afresh */
   on('[data-lmenu]', () => { u.lmenu = !u.lmenu; render(); });
-  on('[data-land]', b => { u.lmenu = false; u.at = b.dataset.land; u.env = {}; u.stack = []; u.tab = 0; u.sheet = null; u.menu = false; render(); });
+  on('[data-land]', b => { u.lmenu = false; u.at = b.dataset.land; u.env = {}; u.stack = []; u.tab = 0; u.tabPicked = false; u.sheet = null; u.menu = false; render(); });
   /* back goes to the screen one came from */
   on('[data-back]', () => { const b = (u.stack || []).pop() || {at: P.ui.start, env: {}, tab: 0}; Object.assign(u, b); u.sheet = null; u.menu = false; render(); });
   on('[data-close]', () => { u.sheet = null; u.menu = false; u.bell = false; render(); });
   on('[data-menu]', () => { u.menu = true; render(); });
   on('[data-bell]', () => { u.bell = true; render(); });
-  on('[data-tabi]', b => { u.tab = +b.dataset.tabi; render(); });
+  on('[data-tabi]', b => { u.tab = +b.dataset.tabi; u.tabPicked = true; render(); });
   /* the look has a person SCANNED: the person's own code, for another phone to scan */
   on('[data-mycode]', () => { u.sheet = {html: `<div class="sh">My code</div><div class="qr">${QR.svg(p, 5)}</div><div class="expl">Another phone scans it to give your key.</div><button class="sec" data-close="1">Done</button>`}; render(); });
+  on('[data-help]', () => { u.sheet = {html: helpHtml(p)}; render(); });
   on('[data-info]', () => { u.sheet = {html: `<div class="sh">${esc(info.title)}</div><div class="facts">${info.fs.map(a => `<div class="fact" ${K(info.lk, 'pred:' + a.p)}>${fact(a, p, p)}</div>`).join('')}</div>`}; render(); });
   on('[data-act]', b => { u.menu = false; act(p, acts[+b.dataset.act]); });
   d.querySelectorAll('[data-send]').forEach(b => {

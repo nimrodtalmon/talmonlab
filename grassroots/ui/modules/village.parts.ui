@@ -1,7 +1,7 @@
 # Village Social: a landmark for each part of the village the contract composes, the start screen for
 # people, and a screen for each person.
 
-SCREEN Home ABOUT Alice:
+SCREEN People ABOUT Alice:
     QUESTIONS
     SHOW Alice: identity, person, open_place, child, retired, of_age, organisation, amended, ward
     LIST People: PERSONS WITH knows, friend, pointer, member, listed, message, posted, group_delivered, group_message, points_to, item, delivered, item_from, has_parent, creator, parent, forwarded_broadcast, broadcast_from, has_officer, officer, first_officer, role, has_role, participant, has_participant, founder, vote, village_emergency, village_emergency_with, notice, notice_with OPENS Person
