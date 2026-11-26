@@ -82,5 +82,17 @@
       "DATA": "C:\\sites\\steer-data"
     },
     "start": "& (Get-Content 'C:\\sites\\python.txt' -TotalCount 1) server.py 5501"
+  },
+  {
+    "name": "uiagents",
+    "repo": "https://github.com/nimrodtalmon/GLP-nimrod.git",
+    "branch": "ui-agents",
+    "port": 5601,
+    "build": "build-uiagents.ps1",
+    "workdir": "C:\\sites\\uiagents\\servers\\uiagents",
+    "env": {
+      "GLP_PROGRAMS": "C:\\sites\\uiagents\\programs"
+    },
+    "start": "C:\\tools\\dart-sdk\\bin\\dart.exe bin\\server.dart 5601"
   }
 ]

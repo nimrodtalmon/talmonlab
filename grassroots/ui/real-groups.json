@@ -1,0 +1,64 @@
+{
+ "app": "gsn",
+ "acts": {
+  "establish": [
+   "Alice"
+  ],
+  "acquaint": [
+   "Alice",
+   "Bob"
+  ],
+  "introduce": [
+   "Bob",
+   "Alice",
+   "Carol"
+  ],
+  "befriend": [
+   "Alice",
+   "Bob"
+  ],
+  "unfriend": [
+   "Alice",
+   "Bob"
+  ],
+  "message": [
+   "Bob",
+   "Alice",
+   "Text"
+  ],
+  "create": [
+   "Alice",
+   "Grupo"
+  ],
+  "close": [
+   "Alice",
+   "Grupo"
+  ],
+  "join": [
+   "Bob",
+   "Alice",
+   "Grupo"
+  ],
+  "remove": [
+   "Bob",
+   "Alice",
+   "Grupo"
+  ],
+  "leave": [
+   "Bob",
+   "Alice",
+   "Grupo"
+  ],
+  "post": [
+   "Alice",
+   "Bob",
+   "Text",
+   "Grupo"
+  ],
+  "post_own": [
+   "Alice",
+   "Text",
+   "Grupo"
+  ]
+ }
+}

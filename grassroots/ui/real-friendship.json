@@ -1,0 +1,25 @@
+{
+ "app": "gsg",
+ "acts": {
+  "establish": [
+   "Alice"
+  ],
+  "acquaint": [
+   "Alice",
+   "Bob"
+  ],
+  "introduce": [
+   "Bob",
+   "Alice",
+   "Carol"
+  ],
+  "befriend": [
+   "Alice",
+   "Bob"
+  ],
+  "unfriend": [
+   "Alice",
+   "Bob"
+  ]
+ }
+}

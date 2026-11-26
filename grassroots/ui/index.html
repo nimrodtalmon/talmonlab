@@ -255,6 +255,7 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <a class="hb" id="build" href="builder.html" style="text-decoration:none">Builder</a>
   <button class="hb" id="allof">All of it</button>
   <button class="hb" id="explain">Explain</button>
+  <button class="hb" id="mode" title="Run the screens on the contract's real app, GLP agents on the server, or on a simulation of the contract">Simulated</button>
   <button class="hb" id="reset">Start over</button>
 </header>
 <div class="grid">
@@ -263,11 +264,12 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js?v=1795719972"></script>
-<script src="engine.js?v=1795719972"></script>
-<script src="chess.js?v=1795719972"></script>
-<script src="pictures.js?v=1795719972"></script>
-<script src="qr.js?v=1795719972"></script>
+<script src="ui.js?v=1795728693"></script>
+<script src="engine.js?v=1795728693"></script>
+<script src="real.js?v=1795728693"></script>
+<script src="chess.js?v=1795728693"></script>
+<script src="pictures.js?v=1795728693"></script>
+<script src="qr.js?v=1795728693"></script>
 <script>
 const CONTRACTS = {
   app: {title: 'The Grassroots App itself (home)', modules: {home: 'Home', mechanical: 'Mechanical'}},
@@ -301,6 +303,9 @@ const PERSONS = ['alice', 'bob', 'carol', 'dave'], PHONES = ['alice', 'bob'], SC
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
 const q = new URLSearchParams(location.search);
 let TAPPED = 0;
+/* real agents: ?real=1 runs the screens on the contract's real app, where it has one (real-NAME.json) */
+const REAL = q.get('real') === '1', AGENTS = q.get('agents') || (/^(localhost|127\.)/.test(location.hostname) ? 'http://127.0.0.1:4501' : '/uiagents');
+let REALMAP = null;
 let CN = q.get('c') in CONTRACTS ? q.get('c') : 'chat', MN = null, SIM = null, SPEC = null, P = null, R = null, B = null, W = null, EXPLAIN = false, TN = 0;
 /* the look's text, as read, and its checks */
 let LOOKTXT = '', LK = {of: {}, global: {}, lines: [], errors: []}, LR = {errors: [], ok: true};
@@ -965,9 +970,24 @@ async function module() {
   segs(); codePanel(); designPanel(); render();
 }
 function newWorld() {
+  if (REAL && REALMAP) {
+    W = new Real.RealWorld(SIM, PERSONS, REALMAP, AGENTS, () => { render(); later(); scriptsLine(); });
+    W.start(REALMAP.app, SCRIPTED);
+    return;
+  }
   W = new Engine.World(SIM, PERSONS);
   const est = SIM.schemas.find(s => s.name === 'establish');
   for (const s of SCRIPTED) W.propose(est, {Alice: s});
+}
+/* which world runs: the contract's real app, GLP agents on the server, or a simulation of the contract */
+function scriptsLine() {
+  const real = REAL && REALMAP, m = $('#mode');
+  m.textContent = real ? 'Real GLP agents' : 'Simulated';
+  m.classList.toggle('on', !!real);
+  m.disabled = !REALMAP;
+  m.title = REALMAP ? (real ? 'Each person is the agent of the real app ' + REALMAP.app + ', in GLP, on the server. Tap for the simulation.' : 'Tap to run the real app ' + REALMAP.app + ': each person a GLP agent on the server.') : 'This contract has no real app yet: the screens run on a simulation of it.';
+  $('#scripts').innerHTML = SCRIPTED.map(p => av(p, 'sm')).join('') + '&nbsp;Carol and Dave have no phone here: a script answers yes to each of their questions.' +
+    (real ? ` <b>Real GLP agents</b>: each person is the agent of the app ${esc(REALMAP.app)}, run on the server.` + (W && W.error ? ` <span style="color:#c0392b">${esc(W.error)}</span>` : '') : ' <b>Simulated</b>: the contract\'s acts, run in this page.');
 }
 /* a design made in the builder, kept in this browser */
 const mine = c => { try { return localStorage.getItem('grassroots-ui:' + c); } catch (e) { return null; } };
@@ -979,12 +999,13 @@ async function start() {
   SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env, personal: GUI.personal(SIM)};
   const qm = new URLSearchParams(location.search).get('ui');
   MN = MN || (qm in CONTRACTS[CN].modules ? qm : Object.keys(CONTRACTS[CN].modules)[0]);
-  newWorld(); contractPanel();
-  $('#scripts').innerHTML = SCRIPTED.map(p => av(p, 'sm')).join('') + '&nbsp;Carol and Dave have no phone here: a script answers yes to each of their questions.';
+  REALMAP = JSON.parse((await getOpt(`real-${CN}.json`)) || 'null');
+  newWorld(); contractPanel(); scriptsLine();
   await module();
   /* a shared link's look, once */
   if (!start.done) { start.done = true; let any = false; for (const [k, v] of Object.entries(LOOKS)) { const x = q.get(k); if (x in v.opts && x !== LOOK[k]) { setGlobal(k, x); any = true; } } if (any) { codePanel(); designPanel(); render(); } }
 }
+$('#mode').onclick = () => { const u = new URL(location.href); if (REAL) u.searchParams.delete('real'); else u.searchParams.set('real', '1'); location.href = u.toString(); };
 $('#reset').onclick = () => { newWorld(); PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null}); render(); };
 $('#explain').onclick = () => { EXPLAIN = !EXPLAIN; $('#explain').classList.toggle('on', EXPLAIN); render(); };
 start();
