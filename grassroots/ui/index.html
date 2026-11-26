@@ -266,12 +266,12 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js?v=1795729046"></script>
-<script src="engine.js?v=1795729046"></script>
-<script src="real.js?v=1795729046"></script>
-<script src="chess.js?v=1795729046"></script>
-<script src="pictures.js?v=1795729046"></script>
-<script src="qr.js?v=1795729046"></script>
+<script src="ui.js?v=1795729707"></script>
+<script src="engine.js?v=1795729707"></script>
+<script src="real.js?v=1795729707"></script>
+<script src="chess.js?v=1795729707"></script>
+<script src="pictures.js?v=1795729707"></script>
+<script src="qr.js?v=1795729707"></script>
 <script>
 const CONTRACTS = {
   app: {title: 'The Grassroots App (home: install and open apps)', modules: {home: 'Home', mechanical: 'Mechanical'}},
@@ -930,6 +930,8 @@ function codePanel() {
 }
 let SHOWN = 0;
 function render() {
+  /* nothing to draw before the UI structure is read (the real agents may answer first) */
+  if (!P || PHONES.some(p => !ui[p])) return;
   $('#phones').innerHTML = '';
   keep();
   const asks = {};
