@@ -74,10 +74,10 @@ textarea { width:100%; height:420px; font-family:var(--mono); font-size:12px; bo
   <section class="panel">
     <h4 id="gh">Goals</h4>
     <div class="box" id="goals"></div>
-    <h4>UI code</h4>
+    <h4>The screens</h4>
     <textarea id="code" spellcheck="false"></textarea>
     <div class="row"><button class="hb" id="dl">Download</button><span class="hint" style="margin:0">Edits here and on the screens are the same.</span></div>
-    <h4 id="lh">Look</h4>
+    <h4 id="lh">The look</h4>
     <textarea id="look" spellcheck="false" style="height:130px" placeholder="Text IS LONG.&#10;Sum IS A SLIDER FROM 0 TO 100, OR TYPED.&#10;Contacts ARE A GRID.&#10;Unfriend IS IN THE MENU.&#10;COLOR IS NIGHT."></textarea>
     <div class="box" id="lookcheck"></div>
   </section>
@@ -192,7 +192,7 @@ function update() {
 function lookCheck() {
   if (document.activeElement !== $('#look')) $('#look').value = LOOK;
   const r = GUI.checkLook(SPEC, P.ui, GUI.readLook(LOOK));
-  $('#lh').textContent = r.ok ? 'Look' : `Look · ${r.errors.length}`;
+  $('#lh').textContent = r.ok ? 'The look' : `The look · ${r.errors.length}`;
   $('#lookcheck').innerHTML = r.ok ? `<div class="goal qed">${LOOK.trim() ? 'No option lost.' : 'No look: the defaults.'}</div>` : r.errors.map(e => `<div class="goal"><span class="badm">✗</span> line ${e.line}: ${esc(e.msg)}</div>`).join('');
 }
 function palette() {
