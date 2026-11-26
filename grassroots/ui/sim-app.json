@@ -1,0 +1,5550 @@
+{
+ "contract": "App",
+ "chain": [
+  {
+   "contract": "Knowledge",
+   "text": [
+    "Knowledge",
+    "An *identity* is a unique cryptographic key pair.",
+    "A *party* to a contract is whoever has an identity, and a *person* is a party who established their own identity.",
+    "Alice, Bob and Carol are persons.",
+    "1. ○ Establish: Alice may establish an identity once. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it.",
+    "2. ■ Acquaint: Alice and Bob may jointly come to know each other.",
+    "3. ■ Introduce: Alice may introduce Carol to Bob with the consent of Bob, provided Alice and Bob know each other and Alice knows Carol."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Encounters",
+   "text": [
+    "Encounters",
+    "Encounters inherits from Knowledge (GSC, From Grassroots Contract to Grassroots App, https://arxiv.org/abs/2609.06231).",
+    "A person is *nearby* Alice when her phone reaches theirs by Bluetooth or the local network, without the Internet; a *place* is where Alice is.",
+    "Alice and Bob are persons.",
+    "1. ■ Open place: Alice may declare the place she is in open. Close place: Alice may close it.",
+    "2. ■ Encounter: Alice and Bob, nearby each other, who have both declared the place open, come to know each other."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Friendship",
+   "text": [
+    "Friendship",
+    "Friendship inherits from Knowledge.",
+    "Alice *trusts* Bob when she knows Bob personally and believes him to keep the undertakings he signs under grassroots contracts.",
+    "Alice and Bob are persons.",
+    "1. ○ Befriend: Alice and Bob, who trust each other and are not friends, may jointly become friends.",
+    "2. ■ Unfriend: Alice may end her friendship with Bob.",
+    "3. ○ Loss of Trust. Alice will end her friendship with Bob if she ceases to trust him."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Guardians",
+   "text": [
+    "Guardians",
+    "Guardians inherits from Friendship.",
+    "A *relation* is a friendship or the membership of a group. Bob *trusts* Wendy, a ward of Alice, when he trusts Alice. The *decision rule*, which the creator of a ward decides, says who decides for a ward and how. A ward takes an act of a party by those who decide for the ward.",
+    "Alice and Bob are persons, Wendy and Will wards.",
+    "1. ■ Enter: Alice may create a ward, Wendy, and establish Wendy's identity by choosing Wendy's key pair. Alice is then the creator, a guardian and a friend of Wendy.",
+    "2. ■ Guardian decisions. Make guardian: Those who decide for Wendy may make Bob, a friend of a guardian of Wendy, a guardian and a friend of Wendy, with the consent of Bob. Resign: Bob may end his guardianship of Wendy. End guardian: Those who decide for Wendy, other than Bob, may end Bob's guardianship. Guardian unfriend: Bob may end his friendship with Wendy, which ends his guardianship. Wendy may not end a friendship with her guardian.",
+    "3. ■ Ward and person. Ward acquaint: Wendy, a ward of Alice, and Bob may jointly come to know each other. Ward befriend: Wendy may enter a relation with Bob with the consent of Bob and Alice, provided Wendy and Bob know each other and Alice and Bob are friends. Ward end, Unfriend, Ward unfriend: Wendy, Bob or Alice may end the relation of Bob and Wendy.",
+    "4. ■ Wards. Wards acquaint: Wendy, a ward of Alice, and Will, a ward of Bob, may jointly come to know each other. Wards befriend: Wendy may enter a relation with Will with the consent of Will, Alice and Bob, provided Wendy and Will know each other, Alice knows Will and is a friend of Bob, Alice and Bob possibly one person.",
+    "5. ■ Retire: Those who decide for Wendy may retire Wendy; every guardianship and relation of Wendy then ends and Wendy can take no act."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Services",
+   "text": [
+    "Services",
+    "Services inherits from Guardians (GSC, From Grassroots Contract to Grassroots App, https://arxiv.org/abs/2609.06231).",
+    "A *service* is a ward operated by a machine at an address every person can reach."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Rendezvous",
+   "text": [
+    "Rendezvous",
+    "Rendezvous inherits from Services.",
+    "An *invitation link* of Alice's is a term she signs, naming her, a rendezvous server, a serial and an expiry.",
+    "Alice, Bob and Carol are persons, Dave a service.",
+    "1. ■ Open server: Carol may make her service Dave a rendezvous server.",
+    "2. ■ Invite by link: Alice may register with Dave an invitation link of hers that names Dave, with a new serial.",
+    "3. ■ Use link: Bob may present to Dave an invitation link of Alice's registered with Dave that has not expired; Dave then gives Alice Bob's address and Bob Alice's, and the link is spent.",
+    "4. ■ Reconnection. Present: Alice and Bob, who are friends, may each present to Dave the other's signature over their friendship. Match: Dave then gives each the address of the other."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Directory",
+   "text": [
+    "Directory",
+    "Directory inherits from Rendezvous.",
+    "A *directory* is a service with a page every person can read.",
+    "Alice, Bob and Carol are persons, Dora a service.",
+    "1. ■ Open directory: Carol may make her service Dora a directory.",
+    "2. ■ Listing. List me: Alice may list herself with Dora by an email address of hers that Dora verified, with a name if she chooses, shown on Dora's page or not; her app then keeps Dora supplied with invitation links of hers. Delist me: Alice may delist herself.",
+    "3. ■ Lookup: Bob may look Alice up, on Dora's page if she is shown there, and by her email address and name if not; Dora then gives Bob an invitation link of Alice's."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Forwarding",
+   "text": [
+    "Forwarding",
+    "Forwarding inherits from Friendship.",
+    "The *author* of an item is its first signer.",
+    "Alice and Bob are persons.",
+    "1. ■ Sign: Alice may create an item by signing it.",
+    "2. ■ Forward: Alice may forward an item she holds to her friend Bob, adding her signature to the signatures the item carries."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "Programs",
+   "text": [
+    "Programs",
+    "Programs inherits from Forwarding (GSC, From Grassroots Contract to Grassroots App, https://arxiv.org/abs/2609.06231).",
+    "A *program* is an item: compiled code, signed by its compiler, that gives the grassroots contract it is compiled from, its clauses and its speech-act schemas; its *developer* is its author. Alice *trusts* Carol *as a developer* when she has declared it and has not withdrawn the declaration.",
+    "Alice, Bob and Carol are persons.",
+    "1. ◆ Publish: Carol may publish a program by signing it, attesting that its schemas say what its clauses say, that it is the result of compiling the schemas, and that it is expected to behave correctly according to the contract.",
+    "2. ■ Developer Trust. Trust: Alice may declare trust in Carol, whom she knows, as a developer. Untrust: Alice may withdraw the declaration.",
+    "3. ■ Offer: Carol may offer a program she holds to her friend Alice by forwarding it to her.",
+    "4. ■ Install: Alice may install a program she published, as well as a program offered to her whose developer she trusts.",
+    "5. ■ Invite: Alice may invite her friend Bob to join her in a program she installed, with the consent of Bob, who trusts its developer; Bob then has the program installed, with Alice's signature added, and each is a participant of the program with the other.",
+    "6. ■ Leave: Alice may leave a program she installed; it is then no longer installed, and her participation in it with every participant ends."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "AppStore",
+   "text": [
+    "AppStore",
+    "AppStore inherits from Programs and Services (GNA, GLP Networking API and Services, in preparation).",
+    "A *store* is a service holding a list of programs. Alice *trusts* a store when she has declared it and has not withdrawn the declaration.",
+    "Alice, Bob and Carol are persons, Dave a service.",
+    "1. ■ Open store: Carol may make her service Dave a store.",
+    "2. ○ Listing. List: Carol may list in Dave a program developed by Bob, after adding her signature to its signatures, provided she trusts Bob as a developer. Delist: Carol may delist it. Carol will delist it if she ceases to trust Bob as a developer.",
+    "3. ■ Store trust. Trust store: Alice may declare trust in Dave, Carol being known to her. Untrust store: Alice may withdraw the declaration.",
+    "4. ■ Install from store: Alice may install a program listed in a store she trusts."
+   ],
+   "changed": []
+  },
+  {
+   "contract": "App",
+   "text": [
+    "App",
+    "App inherits from Encounters, AppStore and Directory."
+   ],
+   "changed": []
+  }
+ ],
+ "vocab": {
+  "identity": {
+   "phrase": "x has an identity",
+   "vars": [
+    "x"
+   ]
+  },
+  "person": {
+   "phrase": "x is a person",
+   "vars": [
+    "x"
+   ]
+  },
+  "knows": {
+   "phrase": "x knows y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "nearby": {
+   "phrase": "x is nearby y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "open_place": {
+   "phrase": "x has declared the place open",
+   "vars": [
+    "x"
+   ]
+  },
+  "friend": {
+   "phrase": "x counts y as a friend",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "ward": {
+   "phrase": "z is a ward",
+   "vars": [
+    "z"
+   ]
+  },
+  "has_guardian": {
+   "phrase": "x has y as a guardian",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "guardian": {
+   "phrase": "y is a guardian of x",
+   "vars": [
+    "y",
+    "x"
+   ]
+  },
+  "creator": {
+   "phrase": "y is the creator of x",
+   "vars": [
+    "y",
+    "x"
+   ]
+  },
+  "retired": {
+   "phrase": "x is retired",
+   "vars": [
+    "x"
+   ]
+  },
+  "rendezvous_server": {
+   "phrase": "d is a rendezvous server",
+   "vars": [
+    "d"
+   ]
+  },
+  "link": {
+   "phrase": "x has signed n as an invitation link that names d",
+   "vars": [
+    "x",
+    "n",
+    "d"
+   ]
+  },
+  "registered": {
+   "phrase": "d has n registered for x",
+   "vars": [
+    "d",
+    "n",
+    "x"
+   ]
+  },
+  "expired": {
+   "phrase": "d holds n expired",
+   "vars": [
+    "d",
+    "n"
+   ]
+  },
+  "spent": {
+   "phrase": "d holds n spent for x",
+   "vars": [
+    "d",
+    "n",
+    "x"
+   ]
+  },
+  "address": {
+   "phrase": "x has the address of y",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "presented": {
+   "phrase": "d has the signature of y over the friendship of x and y presented",
+   "vars": [
+    "d",
+    "x",
+    "y"
+   ]
+  },
+  "directory": {
+   "phrase": "d is a directory",
+   "vars": [
+    "d"
+   ]
+  },
+  "lists_shown": {
+   "phrase": "d lists x by e under m on its page",
+   "vars": [
+    "d",
+    "x",
+    "e",
+    "m"
+   ]
+  },
+  "lists_unshown": {
+   "phrase": "d lists x by e under m off its page",
+   "vars": [
+    "d",
+    "x",
+    "e",
+    "m"
+   ]
+  },
+  "holds_link": {
+   "phrase": "y holds an invitation link of x from d",
+   "vars": [
+    "y",
+    "x",
+    "d"
+   ]
+  },
+  "item": {
+   "phrase": "x holds the item t",
+   "vars": [
+    "x",
+    "t"
+   ]
+  },
+  "program": {
+   "phrase": "x holds p of y",
+   "vars": [
+    "x",
+    "p",
+    "y"
+   ]
+  },
+  "trusts_developer": {
+   "phrase": "x trusts y as a developer",
+   "vars": [
+    "x",
+    "y"
+   ]
+  },
+  "installed": {
+   "phrase": "x has p of y installed",
+   "vars": [
+    "x",
+    "p",
+    "y"
+   ]
+  },
+  "participant": {
+   "phrase": "x is a participant of p of z with y",
+   "vars": [
+    "x",
+    "p",
+    "z",
+    "y"
+   ]
+  },
+  "store": {
+   "phrase": "d is a store",
+   "vars": [
+    "d"
+   ]
+  },
+  "lists_program": {
+   "phrase": "d lists p of y",
+   "vars": [
+    "d",
+    "p",
+    "y"
+   ]
+  },
+  "listing_signed": {
+   "phrase": "d has p of y signed by x",
+   "vars": [
+    "d",
+    "p",
+    "y",
+    "x"
+   ]
+  },
+  "trusts_store": {
+   "phrase": "x trusts the store d",
+   "vars": [
+    "x",
+    "d"
+   ]
+  }
+ },
+ "reflexive": [
+  "knows"
+ ],
+ "schemas": [
+  {
+   "name": "establish",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Establish",
+   "sentence": "Alice may establish an identity. Alice will make herself known by her public key, sign her acts with her private key, and be accountable for every act signed with it",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "acquaint",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Acquaint",
+   "sentence": "Alice and Bob may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "introduce",
+   "persons": [
+    "Bob",
+    "Alice",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Introduce",
+   "sentence": "Alice may introduce Carol to Bob",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to introduce Carol to you."
+   },
+   "field": null
+  },
+  {
+   "name": "open_place",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "open_place",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "open_place",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Open place",
+   "sentence": "Alice may declare her place open",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "close_place",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "open_place",
+     "args": [
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "open_place",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Close place",
+   "sentence": "Alice may close her place",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "encounter",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "nearby",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "nearby",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "open_place",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "open_place",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Encounter",
+   "sentence": "Alice and Bob come to know each other, and Alice and Bob must consent",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "befriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Befriend",
+   "sentence": "Alice and Bob may jointly become friends",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice asks to be your friend."
+   },
+   "field": null
+  },
+  {
+   "name": "person_unfriend",
+   "persons": [
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Person unfriend",
+   "sentence": "Friendship:2",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "sign",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Item"
+   ],
+   "effects": [
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Sign",
+   "sentence": "Alice may create Item by signing it",
+   "auto": false,
+   "questions": {},
+   "field": "text"
+  },
+  {
+   "name": "forward",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Item"
+   ],
+   "effects": [
+    {
+     "p": "item",
+     "args": [
+      "Bob",
+      {
+       "f": "sgn",
+       "a": [
+        "Item",
+        "Alice"
+       ]
+      }
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "item",
+     "args": [
+      "Alice",
+      "Item"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Forward",
+   "sentence": "Alice may forward Item to Bob, adding her signature to the signatures Item carries",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "publish",
+   "persons": [
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog"
+   ],
+   "effects": [
+    {
+     "p": "program",
+     "args": [
+      "Carol",
+      "Prog",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "program",
+     "args": [
+      "Carol",
+      "Prog",
+      "Carol"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Publish",
+   "sentence": "Carol may publish Prog by signing it. Carol attests that its schemas say what its clauses say, that it is the result of compiling the schemas, and that it is expected to behave correctly according to the contract",
+   "auto": false,
+   "questions": {},
+   "field": "prog"
+  },
+  {
+   "name": "trust",
+   "persons": [
+    "Alice"
+   ],
+   "one": {
+    "Carol": [
+     "Alice"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "trusts_developer",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_developer",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Trust",
+   "sentence": "Alice may declare trust in Carol as a developer",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "untrust",
+   "persons": [
+    "Alice"
+   ],
+   "one": {
+    "Carol": [
+     "Alice"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "trusts_developer",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_developer",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Untrust",
+   "sentence": "Alice may withdraw her declaration of trust in Carol as a developer",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "offer",
+   "persons": [
+    "Alice"
+   ],
+   "one": {
+    "Carol": [
+     "Alice"
+    ],
+    "Erin": [
+     "Alice",
+     "Carol"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog"
+   ],
+   "effects": [
+    {
+     "p": "program",
+     "args": [
+      "Alice",
+      {
+       "f": "sgn",
+       "a": [
+        "Prog",
+        "Carol"
+       ]
+      },
+      "Erin"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "program",
+     "args": [
+      "Carol",
+      "Prog",
+      "Erin"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Carol",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Offer",
+   "sentence": "Carol may offer Prog of Erin to Alice",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "install_own",
+   "persons": [
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog"
+   ],
+   "effects": [
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "program",
+     "args": [
+      "Alice",
+      "Prog",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Install own",
+   "sentence": "Alice may install her own Prog",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "install",
+   "persons": [
+    "Alice"
+   ],
+   "one": {
+    "Carol": [
+     "Alice"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog"
+   ],
+   "effects": [
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "program",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_developer",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Install",
+   "sentence": "Alice may install Prog of Carol",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "invite",
+   "persons": [
+    "Bob",
+    "Alice"
+   ],
+   "one": {
+    "Carol": [
+     "Bob",
+     "Alice"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog"
+   ],
+   "effects": [
+    {
+     "p": "program",
+     "args": [
+      "Bob",
+      {
+       "f": "sgn",
+       "a": [
+        "Prog",
+        "Alice"
+       ]
+      },
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "installed",
+     "args": [
+      "Bob",
+      {
+       "f": "sgn",
+       "a": [
+        "Prog",
+        "Alice"
+       ]
+      },
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "participant",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "participant",
+     "args": [
+      "Bob",
+      "Prog",
+      "Carol",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_developer",
+     "args": [
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice",
+    "Bob"
+   ],
+   "button": "Invite",
+   "sentence": "Alice may invite Bob to join in Prog of Carol",
+   "auto": false,
+   "questions": {
+    "Bob": "Alice invites you to join her in a program."
+   },
+   "field": null
+  },
+  {
+   "name": "leave",
+   "persons": [
+    "Alice"
+   ],
+   "one": {
+    "Carol": [
+     "Alice"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog"
+   ],
+   "effects": [
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol"
+     ],
+     "neg": true
+    },
+    {
+     "p": "participant",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol",
+      "_"
+     ],
+     "neg": true
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "participant",
+      "args": [
+       "Alice",
+       "Prog",
+       "Carol",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "participant",
+       "args": [
+        "E1",
+        "Prog",
+        "Carol",
+        "Alice"
+       ],
+       "neg": true
+      }
+     ]
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "participant",
+      "args": [
+       "Alice",
+       "Prog",
+       "Carol",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "E1"
+       ],
+       "neg": false
+      },
+      {
+       "p": "participant",
+       "args": [
+        "E1",
+        "Prog",
+        "Carol",
+        "Alice"
+       ],
+       "neg": false
+      }
+     ]
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Leave",
+   "sentence": "Alice may leave Prog of Carol",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "enter",
+   "persons": [
+    "Wendy",
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "creator",
+     "args": [
+      "Alice",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Alice",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": true
+    }
+   ],
+   "by": [
+    "Alice",
+    "Wendy"
+   ],
+   "button": "Enter",
+   "sentence": "Alice may create Wendy, and Wendy must consent",
+   "auto": false,
+   "questions": {
+    "Wendy": "Alice asks to be your guardian."
+   },
+   "field": "name"
+  },
+  {
+   "name": "make_guardian",
+   "persons": [
+    "Bob",
+    "Wendy",
+    "Decider",
+    "Codecider"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "retired",
+     "args": [
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Decider",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "Codecider"
+     ],
+     "over": {
+      "p": "has_guardian",
+      "args": [
+       "Wendy",
+       "Codecider"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "Codecider"
+       ],
+       "neg": false
+      },
+      {
+       "p": "person",
+       "args": [
+        "Codecider"
+       ],
+       "neg": false
+      },
+      {
+       "p": "guardian",
+       "args": [
+        "Codecider",
+        "Wendy"
+       ],
+       "neg": false
+      }
+     ]
+    }
+   ],
+   "by": [
+    "Bob",
+    "Decider",
+    "Codecider"
+   ],
+   "button": "Make guardian",
+   "sentence": "Those who decide for Wendy may make Bob a guardian of Wendy",
+   "auto": false,
+   "questions": {
+    "Bob": "Decider asks you to be a guardian of the service Wendy.",
+    "Codecider": "Decider asks that Bob be a guardian of your service Wendy."
+   },
+   "field": "person"
+  },
+  {
+   "name": "resign",
+   "persons": [
+    "Bob",
+    "Wendy"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Resign",
+   "sentence": "Bob may end his guardianship of Wendy",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "end_guardian",
+   "persons": [
+    "Bob",
+    "Wendy",
+    "Decider",
+    "Codecider"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Decider",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "Codecider"
+     ],
+     "over": {
+      "p": "has_guardian",
+      "args": [
+       "Wendy",
+       "Codecider"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "Codecider"
+       ],
+       "neg": false
+      },
+      {
+       "p": "person",
+       "args": [
+        "Codecider"
+       ],
+       "neg": false
+      },
+      {
+       "p": "guardian",
+       "args": [
+        "Codecider",
+        "Wendy"
+       ],
+       "neg": false
+      }
+     ]
+    }
+   ],
+   "by": [
+    "Decider",
+    "Codecider"
+   ],
+   "button": "End guardian",
+   "sentence": "Those who decide for Wendy, other than Bob, may end Bob's guardianship of Wendy",
+   "auto": false,
+   "questions": {
+    "Codecider": "Decider asks to end Bob's guardianship of your service Wendy."
+   },
+   "field": "person"
+  },
+  {
+   "name": "guardian_unfriend",
+   "persons": [
+    "Bob",
+    "Wendy"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Guardian unfriend",
+   "sentence": "Bob may end his friendship with his ward Wendy. Wendy may not end a friendship with her guardian",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "ward_acquaint",
+   "persons": [
+    "Wendy",
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Alice"
+   ],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Wendy",
+    "Bob"
+   ],
+   "button": "Ward acquaint",
+   "sentence": "Wendy and Bob may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Wendy": "Bob wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "ward_befriend",
+   "persons": [
+    "Wendy",
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "retired",
+     "args": [
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Wendy",
+    "Bob",
+    "Alice"
+   ],
+   "button": "Ward befriend",
+   "sentence": "Wendy and Bob may jointly become friends",
+   "auto": false,
+   "questions": {
+    "Wendy": "Alice asks that you and Bob befriend.",
+    "Bob": "Alice asks that you and her ward Wendy befriend."
+   },
+   "field": "ward"
+  },
+  {
+   "name": "ward_end",
+   "persons": [
+    "Wendy",
+    "Bob",
+    "G1"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "G1"
+   ],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "G1"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Wendy"
+   ],
+   "button": "Ward end",
+   "sentence": "Wendy may end her friendship with Bob",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "unfriend",
+   "persons": [
+    "Bob",
+    "Wendy"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Unfriend",
+   "sentence": "Bob may end his friendship with Wendy",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "ward_unfriend",
+   "persons": [
+    "Wendy",
+    "Bob",
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Ward unfriend",
+   "sentence": "Alice may end the friendship of Wendy and Bob",
+   "auto": false,
+   "questions": {},
+   "field": "ward"
+  },
+  {
+   "name": "wards_acquaint",
+   "persons": [
+    "Wendy",
+    "Will",
+    "Alice"
+   ],
+   "one": {
+    "Bob": [
+     "Alice"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Alice"
+   ],
+   "effects": [
+    {
+     "p": "knows",
+     "args": [
+      "Wendy",
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Will",
+      "Wendy"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Will",
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Wendy",
+    "Will"
+   ],
+   "button": "Wards acquaint",
+   "sentence": "Wendy and Will may jointly come to know each other",
+   "auto": false,
+   "questions": {
+    "Will": "Wendy wishes that you know each other."
+   },
+   "field": "person"
+  },
+  {
+   "name": "wards_befriend",
+   "persons": [
+    "Wendy",
+    "Will",
+    "Alice"
+   ],
+   "one": {
+    "Bob": [
+     "Alice"
+    ]
+   },
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Will",
+      "Wendy"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "retired",
+     "args": [
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "retired",
+     "args": [
+      "Will"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Will",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Wendy",
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Will",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Will"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Will",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Wendy",
+    "Will",
+    "Alice",
+    "Bob"
+   ],
+   "button": "Wards befriend",
+   "sentence": "Wendy and Will may jointly become friends",
+   "auto": false,
+   "questions": {
+    "Wendy": "Alice asks that you and Will befriend.",
+    "Will": "Alice asks that you and Wendy befriend.",
+    "Bob": "Alice asks that Wendy and your ward Will befriend."
+   },
+   "field": "ward"
+  },
+  {
+   "name": "wards_of_one_guardian_befriend",
+   "persons": [
+    "Wendy",
+    "Will",
+    "Alice"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Will",
+      "Wendy"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "retired",
+     "args": [
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "ward",
+     "args": [
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "retired",
+     "args": [
+      "Will"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Will",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Wendy",
+      "Will"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Will",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "Will"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Will",
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Wendy",
+    "Will",
+    "Alice"
+   ],
+   "button": "Wards of one guardian befriend",
+   "sentence": "Wendy and Will may jointly become friends",
+   "auto": false,
+   "questions": {
+    "Wendy": "Alice asks that you and Will befriend.",
+    "Will": "Alice asks that you and Wendy befriend."
+   },
+   "field": "ward"
+  },
+  {
+   "name": "retire",
+   "persons": [
+    "Wendy",
+    "Decider",
+    "Codecider"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "retired",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "has_guardian",
+      "args": [
+       "Wendy",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "guardian",
+       "args": [
+        "E1",
+        "Wendy"
+       ],
+       "neg": true
+      }
+     ]
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "_"
+     ],
+     "neg": true
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Wendy",
+      "_"
+     ],
+     "neg": true
+    },
+    {
+     "forall": [
+      "E2"
+     ],
+     "over": {
+      "p": "friend",
+      "args": [
+       "Wendy",
+       "E2"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "friend",
+       "args": [
+        "E2",
+        "Wendy"
+       ],
+       "neg": true
+      }
+     ]
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "retired",
+     "args": [
+      "Wendy"
+     ],
+     "neg": true
+    },
+    {
+     "p": "has_guardian",
+     "args": [
+      "Wendy",
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Decider"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Decider",
+      "Wendy"
+     ],
+     "neg": false
+    },
+    {
+     "forall": [
+      "Codecider"
+     ],
+     "over": {
+      "p": "has_guardian",
+      "args": [
+       "Wendy",
+       "Codecider"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "Codecider"
+       ],
+       "neg": false
+      },
+      {
+       "p": "person",
+       "args": [
+        "Codecider"
+       ],
+       "neg": false
+      },
+      {
+       "p": "guardian",
+       "args": [
+        "Codecider",
+        "Wendy"
+       ],
+       "neg": false
+      }
+     ]
+    },
+    {
+     "forall": [
+      "E1"
+     ],
+     "over": {
+      "p": "has_guardian",
+      "args": [
+       "Wendy",
+       "E1"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "E1"
+       ],
+       "neg": false
+      },
+      {
+       "p": "guardian",
+       "args": [
+        "E1",
+        "Wendy"
+       ],
+       "neg": false
+      }
+     ]
+    },
+    {
+     "forall": [
+      "E2"
+     ],
+     "over": {
+      "p": "friend",
+      "args": [
+       "Wendy",
+       "E2"
+      ],
+      "neg": false
+     },
+     "then": [
+      {
+       "p": "identity",
+       "args": [
+        "E2"
+       ],
+       "neg": false
+      },
+      {
+       "p": "friend",
+       "args": [
+        "E2",
+        "Wendy"
+       ],
+       "neg": false
+      }
+     ]
+    }
+   ],
+   "by": [
+    "Decider",
+    "Codecider"
+   ],
+   "button": "Retire",
+   "sentence": "Those who decide for Wendy may retire Wendy. Wendy can then take no act",
+   "auto": false,
+   "questions": {
+    "Codecider": "Decider asks to retire your service Wendy."
+   },
+   "field": null
+  },
+  {
+   "name": "open_store",
+   "persons": [
+    "Dave",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "store",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Carol",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "store",
+     "args": [
+      "Dave"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Open store",
+   "sentence": "Carol may make Dave a store",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "list",
+   "persons": [
+    "Dave",
+    "Carol",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog",
+    "Bob"
+   ],
+   "effects": [
+    {
+     "p": "lists_program",
+     "args": [
+      "Dave",
+      "Prog",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "listing_signed",
+     "args": [
+      "Dave",
+      "Prog",
+      "Bob",
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Carol",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "store",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_developer",
+     "args": [
+      "Carol",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "program",
+     "args": [
+      "Carol",
+      "Prog",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_program",
+     "args": [
+      "Dave",
+      "Prog",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "List",
+   "sentence": "Carol may list in Dave Prog of Bob",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "delist",
+   "persons": [
+    "Dave",
+    "Carol",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog",
+    "Bob"
+   ],
+   "effects": [
+    {
+     "p": "lists_program",
+     "args": [
+      "Dave",
+      "Prog",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "listing_signed",
+     "args": [
+      "Dave",
+      "Prog",
+      "Bob",
+      "_"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Carol",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_program",
+     "args": [
+      "Dave",
+      "Prog",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Delist",
+   "sentence": "Carol may delist from Dave Prog of Bob",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "trust_store",
+   "persons": [
+    "Alice",
+    "Dave",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "trusts_store",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "store",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Carol",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_store",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Trust store",
+   "sentence": "Alice may declare trust in Dave",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "untrust_store",
+   "persons": [
+    "Alice",
+    "Dave"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Dave"
+   ],
+   "effects": [
+    {
+     "p": "trusts_store",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_store",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Untrust store",
+   "sentence": "Alice may withdraw her declaration of trust in Dave",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "install_from_store",
+   "persons": [
+    "Alice",
+    "Dave",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Prog",
+    "Bob"
+   ],
+   "effects": [
+    {
+     "p": "program",
+     "args": [
+      "Alice",
+      "Prog",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_program",
+     "args": [
+      "Dave",
+      "Prog",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "trusts_store",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "installed",
+     "args": [
+      "Alice",
+      "Prog",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Install from store",
+   "sentence": "Alice may install from a store Prog of Bob",
+   "auto": false,
+   "questions": {},
+   "field": "prog"
+  },
+  {
+   "name": "open_server",
+   "persons": [
+    "Dave",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "rendezvous_server",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Carol",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "rendezvous_server",
+     "args": [
+      "Dave"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Open server",
+   "sentence": "Carol may make Dave a rendezvous server",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "sign_link",
+   "persons": [
+    "Alice",
+    "Dave"
+   ],
+   "one": {},
+   "types": {
+    "Link": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Link",
+    "Dave"
+   ],
+   "effects": [
+    {
+     "p": "link",
+     "args": [
+      "Alice",
+      "Link",
+      "Dave"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "link",
+     "args": [
+      "Alice",
+      "Link",
+      "Dave"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Sign link",
+   "sentence": "Alice may sign Link as an invitation link that names Dave",
+   "auto": false,
+   "questions": {},
+   "field": "link"
+  },
+  {
+   "name": "invite_by_link",
+   "persons": [
+    "Dave",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Link": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Link"
+   ],
+   "effects": [
+    {
+     "p": "registered",
+     "args": [
+      "Dave",
+      "Link",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "link",
+     "args": [
+      "Alice",
+      "Link",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "rendezvous_server",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "spent",
+     "args": [
+      "Dave",
+      "Link",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "registered",
+     "args": [
+      "Dave",
+      "Link",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Invite by link",
+   "sentence": "Alice may register Link with Dave",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "use_link",
+   "persons": [
+    "Dave",
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {
+    "Link": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Link"
+   ],
+   "effects": [
+    {
+     "p": "registered",
+     "args": [
+      "Dave",
+      "Link",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "spent",
+     "args": [
+      "Dave",
+      "Link",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "address",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "address",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "expired",
+     "args": [
+      "Dave",
+      "Link"
+     ],
+     "neg": true
+    },
+    {
+     "p": "registered",
+     "args": [
+      "Dave",
+      "Link",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Use link",
+   "sentence": "Bob may present Link of Alice to Dave",
+   "auto": false,
+   "questions": {},
+   "field": "alice"
+  },
+  {
+   "name": "present",
+   "persons": [
+    "Dave",
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "presented",
+     "args": [
+      "Dave",
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "friend",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "rendezvous_server",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "presented",
+     "args": [
+      "Dave",
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Present",
+   "sentence": "Alice may present to Dave the signature of Bob over the friendship of Alice and Bob",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "match",
+   "persons": [
+    "Dave",
+    "Alice",
+    "Bob"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "presented",
+     "args": [
+      "Dave",
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "presented",
+     "args": [
+      "Dave",
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "address",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "address",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dave"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "address",
+     "args": [
+      "Alice",
+      "Bob"
+     ],
+     "neg": true
+    },
+    {
+     "p": "address",
+     "args": [
+      "Bob",
+      "Alice"
+     ],
+     "neg": true
+    },
+    {
+     "p": "presented",
+     "args": [
+      "Dave",
+      "Alice",
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "presented",
+     "args": [
+      "Dave",
+      "Bob",
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [],
+   "button": "Match",
+   "sentence": "Dave matches Alice and Bob",
+   "auto": true,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "open_directory",
+   "persons": [
+    "Dora",
+    "Carol"
+   ],
+   "one": {},
+   "types": {},
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [],
+   "effects": [
+    {
+     "p": "directory",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    },
+    {
+     "p": "guardian",
+     "args": [
+      "Carol",
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "directory",
+     "args": [
+      "Dora"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Carol"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Carol"
+   ],
+   "button": "Open directory",
+   "sentence": "Carol may make Dora a directory",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "list_me",
+   "persons": [
+    "Dora",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mail": "const",
+    "Name": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Mail",
+    "Name"
+   ],
+   "effects": [
+    {
+     "p": "lists_shown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "directory",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_shown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "or": [
+      [
+       {
+        "p": "person",
+        "args": [
+         "Dora"
+        ],
+        "neg": false
+       }
+      ],
+      [
+       {
+        "p": "ward",
+        "args": [
+         "Dora"
+        ],
+        "neg": false
+       },
+       {
+        "exists": [
+         "G1"
+        ],
+        "body": [
+         {
+          "p": "has_guardian",
+          "args": [
+           "Dora",
+           "G1"
+          ],
+          "neg": false
+         }
+        ]
+       }
+      ]
+     ]
+    }
+   ],
+   "by": [
+    "Alice",
+    "Dora"
+   ],
+   "button": "List me",
+   "sentence": "Alice may list with Dora by Mail under Name on its page",
+   "auto": false,
+   "questions": {
+    "Dora": "Alice asks to be listed."
+   },
+   "field": "mail"
+  },
+  {
+   "name": "list_me_unshown",
+   "persons": [
+    "Dora",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mail": "const",
+    "Name": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Mail",
+    "Name"
+   ],
+   "effects": [
+    {
+     "p": "lists_unshown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "directory",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Alice",
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_unshown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": true
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "or": [
+      [
+       {
+        "p": "person",
+        "args": [
+         "Dora"
+        ],
+        "neg": false
+       }
+      ],
+      [
+       {
+        "p": "ward",
+        "args": [
+         "Dora"
+        ],
+        "neg": false
+       },
+       {
+        "exists": [
+         "G1"
+        ],
+        "body": [
+         {
+          "p": "has_guardian",
+          "args": [
+           "Dora",
+           "G1"
+          ],
+          "neg": false
+         }
+        ]
+       }
+      ]
+     ]
+    }
+   ],
+   "by": [
+    "Alice",
+    "Dora"
+   ],
+   "button": "List me unshown",
+   "sentence": "Alice may list with Dora by Mail under Name off its page",
+   "auto": false,
+   "questions": {
+    "Dora": "Alice asks to be listed."
+   },
+   "field": "mail"
+  },
+  {
+   "name": "delist_me",
+   "persons": [
+    "Dora",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mail": "const",
+    "Name": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Mail",
+    "Name"
+   ],
+   "effects": [
+    {
+     "p": "lists_shown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_shown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Delist me",
+   "sentence": "Alice may delist from Dora by Mail under Name on its page",
+   "auto": false,
+   "questions": {},
+   "field": "dora"
+  },
+  {
+   "name": "delist_me_unshown",
+   "persons": [
+    "Dora",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mail": "const",
+    "Name": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Mail",
+    "Name"
+   ],
+   "effects": [
+    {
+     "p": "lists_unshown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": true
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_unshown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Alice"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Alice"
+   ],
+   "button": "Delist me unshown",
+   "sentence": "Alice may delist from Dora by Mail under Name off its page",
+   "auto": false,
+   "questions": {},
+   "field": "dora"
+  },
+  {
+   "name": "lookup",
+   "persons": [
+    "Bob",
+    "Dora",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mail": "const",
+    "Name": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Alice",
+    "Mail",
+    "Name"
+   ],
+   "effects": [
+    {
+     "p": "holds_link",
+     "args": [
+      "Bob",
+      "Alice",
+      "Dora"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_shown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Lookup",
+   "sentence": "Bob may look Alice up on Dora's page",
+   "auto": false,
+   "questions": {},
+   "field": null
+  },
+  {
+   "name": "lookup_by_address",
+   "persons": [
+    "Bob",
+    "Dora",
+    "Alice"
+   ],
+   "one": {},
+   "types": {
+    "Mail": "const",
+    "Name": "const"
+   },
+   "sizes": {},
+   "guard": {
+    "w": "true"
+   },
+   "derived": [],
+   "values": [
+    "Alice",
+    "Mail",
+    "Name"
+   ],
+   "effects": [
+    {
+     "p": "holds_link",
+     "args": [
+      "Bob",
+      "Alice",
+      "Dora"
+     ],
+     "neg": false
+    }
+   ],
+   "pre": [
+    {
+     "p": "identity",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    },
+    {
+     "p": "identity",
+     "args": [
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "knows",
+     "args": [
+      "Bob",
+      "Dora"
+     ],
+     "neg": false
+    },
+    {
+     "p": "lists_unshown",
+     "args": [
+      "Dora",
+      "Alice",
+      "Mail",
+      "Name"
+     ],
+     "neg": false
+    },
+    {
+     "p": "person",
+     "args": [
+      "Bob"
+     ],
+     "neg": false
+    }
+   ],
+   "by": [
+    "Bob"
+   ],
+   "button": "Lookup by address",
+   "sentence": "Bob may look Alice up with Dora by address",
+   "auto": false,
+   "questions": {},
+   "field": null
+  }
+ ],
+ "tabs": {
+  "Contacts": "those Alice knows",
+  "Look": "🌱, os",
+  "Nearby": "an environment predicate, nearby(Alice, Bob), the persons the networking layer reports nearby, which Alice's app keeps current",
+  "Open place": "while the place is open Alice's app sets the trust of Bluetooth and of the local network open, and closed otherwise (GNA)",
+  "Found by the phone": "x is nearby y",
+  "Friends": "the friends of Alice",
+  "Guardianships": "those Alice is a guardian of",
+  "Use link, Reconnection": "the address of a person is the one at which the server's networking layer observes them, read by peer_address/2; a person given an address punches towards it by punch_udp/1, and the smaller key initiates",
+  "Invite by link": "Alice's app makes the link with its serial and its expiry, and signs and registers it at one tap of Alice's",
+  "Use link": "an environment predicate, expired(Dave, Link), the links whose expiry has passed, which Dave keeps current",
+  "Listing": "the directory verifies an email address by sending it a message with a link, which Alice opens",
+  "Listing, Lookup": "Alice's app makes invitation links every so often, registers each with her rendezvous server (GRV:2) and gives them to Dora; Dora keeps a buffer of unexpired ones, at least one, and asks Alice's app for more by how often Alice is looked up, two when one is taken, and so on; a link given to Dora expires a day after it is made, so Alice's app renews them daily while it runs, and a lookup finds none when it has been off longer",
+  "Lookup": "the link is given as its web address, which opens the Grassroots App, which redeems it (GRV:3)",
+  "Items": "the items Alice holds, each with its signatures",
+  "Programs": "those Alice installed",
+  "Developers": "Alice trusts developers of her choice",
+  "Offers": "the programs Alice holds",
+  "Install": "before installing a program, Alice's app checks that its developer is one she trusts, that its schemas pass the checker, and that its compiler's certificate matches its code; the code is type-checked when activated",
+  "Stores": "Alice trusts stores of her choice",
+  "Listings": "Carol's store lists programs",
+  "Open store": "the store's page shows its key, its owner and its listings, each program with its contract, the checker's verdict and the artefacts of its cascade; Dave answers anyone who asks for a listed program"
+ },
+ "env": [
+  "nearby"
+ ],
+ "parametric": []
+}

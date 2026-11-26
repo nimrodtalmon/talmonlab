@@ -1,0 +1,62 @@
+# Mechanical: what a machine writes for any contract. Complete and visible, and not pleasant.
+
+SCREEN Home ABOUT Alice:
+    QUESTIONS
+    SHOW Alice: identity, person, open_place, ward, retired, store, rendezvous_server, directory
+    LIST People: EVERYONE WITH knows, friend, program, trusts_developer, installed, participant, has_guardian, creator, guardian, lists_program, listing_signed, trusts_store, link, spent, registered, address, presented, lists_shown, lists_unshown, holds_link OPENS Person
+    LIST Item: "Alice holds the item Item"
+    LIST Expired: "Alice holds Link expired"
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+    Introduce: Alice may introduce Carol to Bob, Bob FROM knows, Carol FROM knows
+    Open place: Alice may declare her place open
+    Close place: Alice may close her place
+    Encounter: Bob TYPED
+    Befriend: Alice and Bob may jointly become friends, Bob FROM knows
+    Person unfriend: Bob FROM friend
+    Sign: Alice may create Item by signing it, Item TYPED
+    Forward: Alice may forward Item to Bob, adding his signature to the signatures Item carries, Bob FROM friend, Item FROM item
+    Publish: Alice may publish Prog by signing it, Prog TYPED
+    Trust: Alice may declare trust in Carol as a developer, Carol FROM knows
+    Untrust: Alice may withdraw her declaration of trust in Carol as a developer, Carol FROM trusts_developer
+    Offer: Alice may offer Prog of Erin to Bob, Bob FROM friend, Erin FROM program, Prog FROM program
+    Install own: Alice may install her own Prog, Prog FROM program
+    Install: Alice may install Prog of Carol, Carol FROM program, Prog FROM program
+    Invite: Alice may invite Bob to join in Prog of Carol, Bob FROM friend, Carol FROM installed, Prog FROM installed
+    Leave: Alice may leave Prog of Carol, Carol FROM installed, Prog FROM installed
+    Enter: Alice may create Wendy, and Wendy must consent, Wendy TYPED
+    Make guardian: Those who decide for Wendy may make Alice a guardian of Wendy, Wendy TYPED, Decider FROM friend, Codecider TYPED
+    Resign: Alice may end her guardianship of Wendy, Wendy FROM guardian
+    End guardian: Those who decide for Wendy, other than Bob, may end Bob's guardianship of Wendy, Bob TYPED, Wendy FROM guardian, Codecider TYPED
+    Guardian unfriend: Alice may end her friendship with her ward Wendy, Wendy FROM friend
+    Ward acquaint: Alice and Bob may jointly come to know each other, Bob TYPED, Alice FROM has_guardian
+    Ward befriend: Alice and Bob may jointly become friends, Bob FROM knows, Alice FROM has_guardian
+    Ward end: Alice may end her friendship with Bob, Bob FROM friend, G1 FROM has_guardian
+    Unfriend: Alice may end her friendship with Wendy, Wendy FROM friend
+    Ward unfriend: Alice may end the friendship of Wendy and Bob, Wendy TYPED, Bob TYPED
+    Wards acquaint: Alice and Will may jointly come to know each other, Will TYPED, Alice FROM has_guardian, Bob TYPED
+    Wards befriend: Alice and Will may jointly become friends, Will FROM knows, Alice FROM has_guardian, Bob TYPED
+    Wards of one guardian befriend: Alice and Will may jointly become friends, Will FROM knows, Alice FROM has_guardian
+    Retire: Those who decide for Wendy may retire Wendy, Wendy FROM guardian, Codecider TYPED
+    Open store: Alice may make Dave a store, Dave FROM guardian
+    List: Alice may list in Dave Prog of Bob, Dave FROM guardian, Bob FROM trusts_developer, Prog FROM program
+    Delist: Alice may delist from Dave Prog of Bob, Dave FROM guardian, Bob TYPED, Prog TYPED
+    Trust store: Alice may declare trust in Dave, Dave FROM knows, Carol FROM knows
+    Untrust store: Alice may withdraw her declaration of trust in Dave, Dave FROM trusts_store
+    Install from store: Alice may install from a store Prog of Bob, Dave FROM trusts_store, Bob TYPED, Prog TYPED
+    Open server: Alice may make Dave a rendezvous server, Dave FROM guardian
+    Sign link: Alice may sign Link as an invitation link that names Dave, Dave FROM knows, Link TYPED
+    Invite by link: Alice may register Link with Dave, Dave FROM link, Link FROM link
+    Use link: Alice may present Link of Bob to Dave, Dave FROM knows, Bob TYPED, Link TYPED
+    Present: Alice may present to Dave the signature of Bob over the friendship of Alice and Bob, Dave FROM knows, Bob FROM friend
+    Open directory: Alice may make Dora a directory, Dora FROM guardian
+    List me: Alice may list with Dora by Mail under Name on its page, Dora FROM knows, Mail TYPED, Name TYPED
+    List me unshown: Alice may list with Dora by Mail under Name off its page, Dora FROM knows, Mail TYPED, Name TYPED
+    Delist me: Alice may delist from Dora by Mail under Name on its page, Dora TYPED, Mail TYPED, Name TYPED
+    Delist me unshown: Alice may delist from Dora by Mail under Name off its page, Dora TYPED, Mail TYPED, Name TYPED
+    Lookup: Alice may look Bob up on Dora's page, Dora FROM knows, Bob TYPED, Mail TYPED, Name TYPED
+    Lookup by address: Alice may look Bob up with Dora by address, Dora FROM knows, Bob TYPED, Mail TYPED, Name TYPED
+
+SCREEN Person ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, friend, program, trusts_developer, installed, participant, has_guardian, creator, guardian, lists_program, listing_signed, trusts_store, link, spent, registered, address, presented, lists_shown, lists_unshown, holds_link
