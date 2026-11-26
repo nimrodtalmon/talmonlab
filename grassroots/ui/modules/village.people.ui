@@ -27,7 +27,7 @@ SCREEN Person ABOUT Bob:
 
 SCREEN Groups ABOUT Alice:
     LIST Groups: "Alice is a member of the group Grupo of Bob" WITH leader OPENS Group
-    Create: Alice may create Grupo, Grupo TYPED
+    Create: Alice may create Grupo, Grupo TYPED, THEN IT
     Remove: Alice may end Bob's membership in Grupo, Bob FROM listed, Grupo FROM leader
     Close: Alice may close Grupo by leaving it, Grupo FROM leader
 
@@ -65,7 +65,7 @@ SCREEN Village ABOUT Alice:
 SCREEN Orgs ABOUT Alice:
     LIST Member of: FROM participant OPENS Org
     LIST Officer of: FROM officer OPENS Org
-    Found: Orga TYPED, Role TYPED
+    Found: Orga TYPED, Role TYPED, THEN IT
     Join: Alice may become a participant of Orga, Orga TYPED, Decider TYPED, Codecider TYPED
     Found by an organisation: Alice may found Orga with Gov in the role Role, Orga TYPED, Gov TYPED, G2 TYPED, Role TYPED
 

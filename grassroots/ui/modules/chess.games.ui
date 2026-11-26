@@ -7,7 +7,7 @@ SCREEN Home ABOUT Alice:
     LIST Friends: PERSONS WITH knows, friend, won, drawn OPENS Person
     Establish: Alice may establish an identity
     Make friends: Acquaint AND Befriend, Bob TYPED
-    Start: Alice and Bob may jointly start Game at Board, Bob FROM friend, Game TYPED
+    Start: Alice and Bob may jointly start Game at Board, Bob FROM friend, Game TYPED, THEN IT
     Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
 
 SCREEN Person ABOUT Bob:
@@ -17,7 +17,7 @@ SCREEN Person ABOUT Bob:
     Introduce: Alice may introduce Bob to Carol, Carol FROM knows
     Befriend: Alice and Bob may jointly become friends
     Unfriend: Alice may end her friendship with Bob
-    Start: Alice and Bob may jointly start Game at Board, Game TYPED, THEN Home
+    Start: Alice and Bob may jointly start Game at Board, Game TYPED, THEN IT
 
 SCREEN Game ABOUT "Alice plays Game against Bob at Board":
     QUESTIONS

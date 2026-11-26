@@ -103,6 +103,10 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .facts { display:flex; flex-direction:column; gap:4px; }
 .fact { font-size:13px; color:var(--mute); }
 .fact b { color:var(--ink); font-weight:600; }
+.hint { border:1px dashed var(--p-line, #ccc); border-radius:10px; padding:8px 10px; font-size:13px; color:var(--p-mute, #555); margin:6px 0; }
+.hint b { color:var(--p-ink, #222); }
+.hway { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.hway small { color:var(--p-mute, #777); }
 .empty { color:var(--mute); text-align:center; padding:18px 8px; font-size:13px; }
 .bub { max-width:78%; padding:6px 10px; border-radius:14px; margin:3px 0; font-size:13.5px; background:#fff; border:1px solid var(--line); align-self:flex-start; }
 .bub.me { background:var(--me); border-color:#c6e8dd; align-self:flex-end; }
@@ -270,12 +274,12 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js?v=1795735036"></script>
-<script src="engine.js?v=1795735036"></script>
-<script src="real.js?v=1795735036"></script>
-<script src="chess.js?v=1795735036"></script>
-<script src="pictures.js?v=1795735036"></script>
-<script src="qr.js?v=1795735036"></script>
+<script src="ui.js?v=1795737291"></script>
+<script src="engine.js?v=1795737291"></script>
+<script src="real.js?v=1795737291"></script>
+<script src="chess.js?v=1795737291"></script>
+<script src="pictures.js?v=1795737291"></script>
+<script src="qr.js?v=1795737291"></script>
 <script>
 const CONTRACTS = {
   app: {title: 'The Grassroots App (home: install and open apps)', modules: {home: 'Home', mechanical: 'Mechanical'}},
@@ -458,6 +462,102 @@ function fillHint(c, p) {
   return by.length ? ' They come with ' + [...new Set(by)].map(x => '“' + x + '”').join(', ') + '.' : '';
 }
 
+/* ---------- the way to an important act ---------- */
+/* The names of an act a screen fixes: the person, the screen's subject and its values, and a place picked from a
+   list kept to the subject.  The rest are open. */
+function fixedOf(act, c, env, p) {
+  const b = {[act.names[act.me - 1]]: p};
+  for (const [r, v] of Object.entries(c.bind || {})) {
+    if (typeof v === 'string') b[r] = env[v];
+    else if (v.param) b[r] = env[v.param] === undefined ? undefined : env[v.param][v.pos - 1];
+    else if (v.select && v.same !== undefined && env.it !== undefined) b[r] = v.same === 0 ? env.it : env.it[v.same - 1];
+  }
+  for (const k of Object.keys(b)) if (b[k] === undefined) delete b[k];
+  return b;
+}
+/* the names a schema's facts use */
+function varsOf(s) { const o = new Set(); const walk = c => { if (!c) return; if (c.forall) { walk(c.over); (c.then || []).forEach(walk); return; } (c.args || []).forEach(x => typeof x === 'string' && o.add(x)); }; (s.pre || []).forEach(walk); (s.effects || []).forEach(walk); return o; }
+/* the places on which an act of the person can be taken now, from where she is: this screen, the start screen and
+   the landmarks, each with its own subject */
+function placings(p, a) {
+  const u = ui[p], out = [], seen = new Set();
+  for (const at of [u.at, P.ui.start, ...(P.ui.landmarks || [])]) {
+    if (seen.has(at)) continue; seen.add(at);
+    const C = P.ui.containers[at]; if (!C) continue;
+    const env = at === u.at ? u.env : {};
+    for (const c of C.components) {
+      if (c.kind !== 'action' || c.act !== a.name) continue;
+      if (!c.step) { out.push({at, c, act: a, chain: null, env, comps: C.components}); continue; }
+      /* a step of a chain: the chain's button takes it, by its first step, the names it shares bound alike */
+      const chain = C.components.find(x => x.kind === 'chain' && (x.stepIds || []).includes(c.id)), c0 = chain && C.components.find(x => x.id === chain.stepIds[0]);
+      const a0 = c0 && SPEC.acts.find(x => x.name === c0.act);
+      if (a0) out.push({at, c: c0, act: a0, chain, env, comps: C.components});
+    }
+  }
+  return out;
+}
+/* The way to an act that is not offered: the first fact of the contract in its way, with the screen's names bound,
+   and the person's own acts whose effects bring that fact (or end it, if it is in the way by holding), searched
+   backward, each act's own missing fact in turn, three deep.  The first act on the way that she can take now is
+   offered; the others are named.  A fact that no act of hers brings comes when another person takes an act that
+   brings it. */
+function wayTo(p, s, b, depth) {
+  const vs = varsOf(s), isVar = x => typeof x === 'string' && vs.has(x) && !(x in b);
+  /* a fact of a place not yet chosen depends on what she picks: not in the way now */
+  const w = W.why({...s, pre: (s.pre || []).filter(c => !(c.p && Array.isArray(c.args) && isVar(c.args[0])))}, {...b});
+  if (!w) return null;
+  if (w.guard) return {w};
+  /* a fact in the way by holding that the act itself brings: the act is done already */
+  if (w.neg && (s.effects || []).some(e => e.p === w.p && !e.neg)) return null;
+  const res = {w, isVar};
+  if (depth > 3) return res;
+  const atoms = view(p).atoms;
+  for (const mine of [true, false]) for (const a of SPEC.acts) {
+    const s2 = SIM.schemas.find(x => x.name === a.name);
+    if (!s2 || s2.auto || s2 === s) continue;
+    const vs2 = varsOf(s2), me2 = a.names[a.me - 1];
+    for (const e of s2.effects || []) {
+      if (!e.p || e.p !== w.p || !!e.neg !== !!w.neg || !Array.isArray(e.args) || e.args.length !== w.args.length) continue;
+      const b2 = mine ? {[me2]: p} : {};
+      let ok = true;
+      e.args.forEach((ev, i) => { const wv = w.args[i]; if (isVar(wv) || typeof ev !== 'string' || !vs2.has(ev)) return; if (ev in b2 && !same(b2[ev], wv)) ok = false; else b2[ev] = wv; });
+      if (!ok) continue;
+      if (!mine) { if (!(me2 in b2) || b2[me2] !== p) return {...res, other: a}; continue; }
+      /* one of hers: taken now from one of the screens she reaches, or on the way, by the fact in its way */
+      for (const pl of placings(p, a)) {
+        const {vals, open} = offers(pl.act, pl.c, atoms, p, pl.env, pl.comps);
+        const fit = vals.filter(v => Object.entries(b2).every(([n, x]) => { const k = pl.act.names.indexOf(n) + 1; return !k || v[k] === undefined || same(v[k], x); }));
+        if (fit.length) return {...res, first: {act: pl.act, vals: fit, open, c: pl.c, chain: pl.chain, at: pl.at}, rest: []};
+      }
+      if (placings(p, a).length) {
+        const r = wayTo(p, s2, b2, depth + 1);
+        if (r && r.first) return {...res, first: r.first, rest: [...r.rest, lab(a.button)]};
+      }
+    }
+  }
+  return res;
+}
+/* the hint in an important act's place: what is in its way, in the contract's words, and the first step to it */
+function hintOf(p, act, c, env, label, acts, used) {
+  const s = SIM.schemas.find(x => x.name === act.name); if (!s) return '';
+  const r = wayTo(p, s, fixedOf(act, c, env, p), 1);
+  if (!r) return '';
+  let why;
+  if (r.w.guard) why = 'the contract\'s condition on its values says no now';
+  else {
+    const [h, ...rest] = r.w.args;
+    why = (r.w.neg ? '' : 'it needs that ') + fact({p: r.w.p, args: rest.map(x => r.isVar(x) ? 'someone' : x)}, h, p).replace(/<\/?b>/g, '') + (r.w.neg ? ' now' : '');
+  }
+  let way = '';
+  if (r.first) {
+    const f = r.first, key = (f.chain || f.c).id, fl = lab(f.chain ? f.chain.button : f.c.button || f.act.button), then = [...r.rest, label].map(esc).join(', then ');
+    /* two hints with one first step: its button is in the first of them */
+    if (used.has(key)) way = `<div class="hway"><small>First “${esc(fl)}”, then ${then}.</small></div>`;
+    else { used.add(key); way = `<div class="hway"><button class="sec" data-act="${acts.length}">${esc(fl)}</button><small>then ${then}</small></div>`; acts.push({act: f.act, vals: f.vals, open: f.open, c: f.c, chain: f.chain || undefined}); }
+  } else if (r.other) way = `<div class="hway"><small>It comes when another person takes “${esc(lab(r.other.button))}”.</small></div>`;
+  return {html: `<div class="hint" ${K('line:' + c.line, 'act:' + act.name)}><div>To <b>${esc(label)}</b>: ${esc(why)}.</div>${way}</div>`, first: r.first};
+}
+
 /* ---------- the person's local view ---------- */
 const view = p => W.view(p);
 function holdsL(atoms, pred, places, val) { return atoms.some(a => a.p === pred && a.args.length === places.length && places.every((k, j) => k === null || same(a.args[j], val[k]))); }
@@ -528,8 +628,8 @@ function offers(act, c, atoms, me, env, comps) {
 function propose(p, act, val) {
   const u0 = ui[p], w = u0 && u0.w;
   if (w && w.act.name === act.name) {
-    const next = w.chain ? w.chain.stepIds[1] : null, then = w.chain ? w.chain.then : w.c && w.c.then;
-    if (next || then) (u0.after = u0.after || []).push({button: act.button, next, val, act, then});
+    const next = w.chain ? w.chain.stepIds[1] : null, then = w.chain ? w.chain.then : w.c && w.c.then, thenIt = w.chain ? w.chain.thenIt : w.c && w.c.thenIt;
+    if (next || then) (u0.after = u0.after || []).push({button: act.button, next, val, act, then, thenIt});
     u0.w = null;
   }
   const s = SIM.schemas.find(x => x.name === act.name), b = {};
@@ -634,8 +734,13 @@ function phone(p) {
         a1.names.forEach((r, j) => { const k0 = x.act.names.indexOf(r); if (k0 >= 0) val[j + 1] = x.val[k0 + 1]; });
         val[a1.me] = p;
         const chainC = Object.values(P.ui.containers).flatMap(C => C.components).find(y => y.kind === 'chain' && (y.stepIds || []).includes(x.next));
-        if (chainC && chainC.then) (u.after = u.after || []).push({button: a1.button, then: chainC.then});
+        if (chainC && chainC.then) (u.after = u.after || []).push({button: a1.button, then: chainC.then, thenIt: chainC.thenIt});
         propose(p, a1, val);
+      } else if (x.thenIt) {
+        /* THEN IT: the screen about the fact the act just added, as its list on the start screen or a landmark opens it */
+        const t = x.thenIt, a = view(p).atoms.filter(y => y.p === t.pred).sort((m, n) => n.seq - m.seq)[0], S = P.ui.containers[t.screen];
+        if (a && S) { u.stack = [{at: t.from, env: {}, tab: 0}]; u.env = {[S.params[0]]: t.of === 'value' ? a.args.find(y => !isT(y)) : a.args}; u.at = t.screen; } else { u.at = t.from; u.env = {}; u.stack = []; }
+        u.tab = 0; u.tabPicked = false; u.sheet = null; render();
       } else if (x.then) { u.at = x.then; u.env = {}; u.stack = []; u.tab = 0; u.tabPicked = false; u.sheet = null; render(); }
     }), 0);
   }
@@ -678,6 +783,21 @@ function phone(p) {
       if (next.length === 1) env.it = next[0].args;
     }
   }
+  /* an important act not offered now: in its place, what is in its way and the first step to it; that step's own
+     button, if it is on this screen, is the hint's */
+  const hints = {}, byHint = new Set(), usedFirst = new Set();
+  let hintBar = '';
+  for (const c of comps) {
+    if (c.hidden || !((c.kind === 'action' && c.act) || c.kind === 'chain') || !lookOn(c.button).important) continue;
+    const st = c.kind === 'chain' ? comps.find(x => x.id === (c.stepIds || [])[0]) : c;
+    if (!st || !st.act) continue;
+    const a = SPEC.acts.find(x => x.name === st.act);
+    if (!a || offers(a, st, v.atoms, p, env, comps).vals.length) continue;
+    const h = hintOf(p, a, st, env, lab(c.button), acts, usedFirst);
+    if (!h) continue;
+    hints[c.id] = h.html;
+    if (h.first && h.first.at === u.at) byHint.add((h.first.chain || h.first.c).id);
+  }
   const drawnHere = [];
   /* a value of the screen's subject that the UI style draws by a program */
   for (const [n, pos] of Object.entries(C.names || {})) if ((LK.of[n] || {}).as === 'drawn' && env.it) {
@@ -685,8 +805,9 @@ function phone(p) {
     if (g && g.accepts(v)) { zone.middle += `@@PIC${drawnHere.length}@@`; drawnHere.push({n, prog: LK.of[n].by, v}); }
   }
   for (const c of comps) {
-    if (c.hidden) continue;
+    if (c.hidden || byHint.has(c.id)) continue;
     const lk = 'line:' + c.line;
+    if (hints[c.id]) { if (c.zone === 'bottom') hintBar += hints[c.id]; else zone[c.zone] += hints[c.id]; continue; }
     if (c.kind === 'inbox') {
       for (const a of v.asks) {
         const role = Object.keys(a.b).find(r => a.b[r] === p), act = SPEC.acts.find(x => x.name === a.s.name);
@@ -786,7 +907,7 @@ function phone(p) {
   if (opens) zone.top = `<div class="openapp"><button class="pri" data-open="${esc(opens)}">Open ${esc(CONTRACTS[opens].title.replace(/ \(.*\)$/, ''))}</button></div>` + zone.top;
   let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : homeBtn}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}<button class="ib" data-help="1" title="Help">?</button>${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   /* an empty screen says where to start: its first marked action, or its first */
-  const first = (zone.bottom + zone.bar).match(/<button[^>]*class="[^"]*prim[^"]*"[^>]*>([^<]+)/) || (zone.bottom + zone.bar).match(/<button[^>]*>([^<]+)/);
+  const first = (zone.bottom + zone.bar).match(/<button[^>]*class="[^"]*prim[^"]*"[^>]*>([^<]+)/) || (zone.bottom + zone.bar + hintBar).match(/<button[^>]*>([^<]+)/);
   zone.middle = zone.middle.replace('@@HINT@@', first ? ` <br>Start with “${first[1]}”.` : '');
   const bar = (mode === 'bar' ? zone.bottom : '') + zone.bar, menu = (mode !== 'bar' ? zone.bottom : '') + zone.menu;
   const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
@@ -794,7 +915,7 @@ function phone(p) {
   if (lms.length && LOOK.landmarks === 'top') h += `<div class="lmk">${lmrow}</div>`;
   if (lms.length && LOOK.landmarks === 'menu' && u.lmenu) h += `<div class="lmk lmenu">${lmrow}</div>`;
   const rq = HOME && CN === MAINCN && u.rule ? `<div class="ask rule"><div class="q"><div>Do “${esc(lab(u.rule.button))}” for you in each app you open?</div></div><div class="btns"><button class="pri" data-rule="1">Yes</button><button class="ghost" data-rule="0">No</button></div></div>` : '';
-  h += `<div class="toasts">${toasts}</div>${rq ? `<div class="zt">${rq}</div>` : ''}<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${bar ? `<div class="acts${(bar.match(/<button/g) || []).length > 5 ? ' rows' : ''}">${bar}</div>` : ''}${composer}</div>${lms.length && LOOK.landmarks === 'bottom' ? `<div class="lmk lbot">${lmrow}</div>` : ''}`;
+  h += `<div class="toasts">${toasts}</div>${rq ? `<div class="zt">${rq}</div>` : ''}<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${hintBar ? `<div class="hints">${hintBar}</div>` : ''}${bar ? `<div class="acts${(bar.match(/<button/g) || []).length > 5 ? ' rows' : ''}">${bar}</div>` : ''}${composer}</div>${lms.length && LOOK.landmarks === 'bottom' ? `<div class="lmk lbot">${lmrow}</div>` : ''}`;
   if (u.menu && menu) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${menu}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
   else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
@@ -904,7 +1025,7 @@ function act(p, w) {
   if (w.open.length) {
     /* an open place: a value is typed; a person is given by her key, as no phone can list everyone */
     const k = w.open[0], person = w.act.people.includes(k);
-    u.sheet = {html: `<div class="sh">${esc(headOf(w, p))}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"', w.vals[0]))}</div>${person ? `<div class="expl">${lookOf(w.c, w.act, k).as === 'scanned' ? 'Scan their code, or type their key; here, a key is a name.' : 'A key is shared in person or by a link; here, type a name.'}</div>` : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(headOf(w, p))}</button>`,
+    u.sheet = {html: `<div class="sh">${esc(headOf(w, p))}</div>${lookOf(w.c, w.act, k).label ? `<div class="fl">${esc(lookOf(w.c, w.act, k).label)}</div>` : ''}<div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"', w.vals[0]))}</div>${person ? `<div class="expl">${lookOf(w.c, w.act, k).as === 'scanned' ? 'Scan their code, or type their key; here, a key is a name.' : 'A key is shared in person or by a link; here, type a name.'}</div>` : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(headOf(w, p))}</button>`,
       name: x => {
         const v = person ? x.toLowerCase() : x;
         if (person && !isNew(w.act, k) && !PERSONS.includes(v)) return 'No one has this key.';
@@ -920,7 +1041,8 @@ function act(p, w) {
 /* the look of a typed place: by the name the description gives it */
 function lookOf(c, act, k) { const r = act.names[k - 1], n = c && c.names ? c.names[r] : r; return LK.of[n] || {}; }
 function field(act, c, k, attr, val) {
-  const lv = lookOf(c, act, k), r = act.names[k - 1], ph = act.people.includes(k) ? 'their key' : esc(r.toLowerCase());
+  /* a typed name the UI style calls by a label is labeled so */
+  const lv = lookOf(c, act, k), r = act.names[k - 1], ph = lv.label ? esc(lv.label) : act.people.includes(k) ? 'their key' : esc(r.toLowerCase());
   if (lv.as === 'scanned') return `<span class="scanf"><input ${attr} placeholder="${ph}"><button class="sec" data-scan="1" type="button">Scan</button></span>`;
   if (lv.as === 'picked' && PICTURES[lv.on]) {
     /* the picture to pick on: of the value the UI style names after FROM, a place of the same act, or of nothing */
@@ -960,7 +1082,7 @@ function form(p, w, varying) {
     if (ks.includes(k) && !done.has(k)) { done.add(k); return ctl(k); }
     return `<b>${esc(val[k] === undefined ? x : show(val[k]))}</b>`;
   });
-  for (const k of ks) if (!done.has(k)) body += ` <span class="fl">${esc(act.names[k - 1])}</span> ${ctl(k)}`;
+  for (const k of ks) if (!done.has(k)) body += ` <span class="fl">${esc(lookOf(w.c, act, k).label || act.names[k - 1])}</span> ${ctl(k)}`;
   /* a sheet is titled by the button tapped: a chain's, or the act's on this screen */
   const head = headOf(w, p);
   let h = `<div class="sh">${esc(head)}</div><div class="sent">${body}</div>`;

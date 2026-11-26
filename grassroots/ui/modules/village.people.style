@@ -116,3 +116,6 @@ Retire ON More IS CALLED "Retire a child's account".
 Resign ON Org IS CALLED "Give up my office".
 Retire ON Org IS CALLED "Close the organization".
 Organisation unfriend IS IN THE MENU.
+Found IS IMPORTANT.
+Role IS CALLED "Your role in it".
+Post ON Group IS IMPORTANT.
