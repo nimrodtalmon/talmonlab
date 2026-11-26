@@ -191,7 +191,8 @@
       for (const s of this.spec.schemas.filter(x => x.auto)) {
         this.cur = s;
         let bs = [{}];
-        for (const c of s.pre) if (c.p && !c.neg) bs = bs.flatMap(b => this.match(c, b));
+        /* an environment's fact, as that a broadcast is live, holds of every value and binds none */
+        for (const c of s.pre) if (c.p && !c.neg && !(this.spec.env || []).includes(c.p)) bs = bs.flatMap(b => this.match(c, b));
         for (const b of bs) if (this.allowed(s, b)) { this.apply(s, b); done = true; }
       }
       if (!done) return;

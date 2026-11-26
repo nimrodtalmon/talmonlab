@@ -1,0 +1,126 @@
+# People first, its screens behind a menu (the same structure as People first): the start screen is the people one knows and meeting more; Groups, Feed and Village are
+# landmarks for the village's conversations, its feed and its calls; More holds the acts of families and
+# organisations, which a person takes seldom.
+
+SCREEN Home ABOUT Alice:
+    QUESTIONS
+    SHOW Alice: identity, person, open_place, child, retired, of_age, organisation, ward, amended
+    LIST People: PERSONS WITH knows, friend OPENS Person
+    Establish: Alice may establish an identity
+    Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
+    Open place: Alice may declare her place open
+    Close place: Alice may close her place
+    Encounter: Bob TYPED
+    Personal emergency: Alice may broadcast Call as a personal emergency, Call TYPED
+
+SCREEN Person ABOUT Bob:
+    QUESTIONS
+    SHOW Bob: knows, friend, pointer, points_to, member, listed, posted, group_delivered, group_message, item, delivered, item_from, has_parent, creator, parent, forwarded_broadcast, broadcast_from, has_officer, officer, first_officer, role, has_role, participant, has_participant, founder, vote, village_emergency, village_emergency_with, notice, notice_with
+    THREAD: message
+    Message: Alice may send Text to Bob, Text TYPED
+    Befriend: Alice and Bob may jointly become friends
+    Person unfriend: Alice may end her friendship with Bob
+    Introduce: Alice may introduce Carol to Bob, Carol FROM knows
+    Introduce: Alice may introduce Bob to Carol, Carol FROM knows
+    Join: Alice may add Bob to Grupo, Grupo FROM leader
+    Point friend: Alice may point to Bob
+    Unpoint: Alice may cease pointing to Bob
+
+SCREEN Groups ABOUT Alice:
+    LIST Groups: "Alice is a member of the group Grupo of Bob" WITH leader OPENS Group
+    Create: Alice may create Grupo, Grupo TYPED
+    Join: Alice may add Bob to Grupo, Bob FROM friend, Grupo FROM leader
+    Remove: Alice may end Bob's membership in Grupo, Bob FROM listed, Grupo FROM leader
+    Close: Alice may close Grupo by leaving it, Grupo FROM leader
+
+SCREEN Group ABOUT "Alice is a member of the group Grupo of Bob":
+    QUESTIONS
+    SHOW: member, leader
+    THREAD: group_message, posted
+    Post: Alice may send Text to the group Grupo of Bob, Text TYPED
+    Post own: Alice may send Text to the group Grupo of Alice, Text TYPED
+    Leave: Alice may end her membership in Bob's Grupo
+
+SCREEN Feed ABOUT Alice:
+    LIST Feed: "Alice holds the item Item of Carol's feed"
+    Post: Alice may post Item to her feed, Item TYPED
+    Point transitive: Alice may point to Carol, Bob FROM points_to, Carol FROM knows
+    Labeled point friend: Alice may add a Dave-pointer to Bob, Bob FROM friend, Dave TYPED, Erin TYPED
+    Labeled point transitive: Alice may add a Dave-pointer to Carol, Bob FROM pointer, Carol FROM knows, Dave FROM pointer
+    Labeled point transitive friend: Alice may add a Dave-pointer to Carol, Bob FROM friend, Carol FROM knows, Dave TYPED
+    Labeled unpoint: Alice may remove her Dave-pointer to Carol, Carol FROM pointer, Dave FROM pointer
+    Labeled unpoint self: Alice may remove her Dave-pointer to Dave, Dave FROM pointer
+
+SCREEN Village ABOUT Alice:
+    LIST Calls: "Alice holds the broadcast Cast"
+    LIST Mine: "Alice has made the broadcast Call"
+    LIST Emergencies: "Alice has broadcast the personal emergency Call"
+    LIST Resolved: "Alice has resolved Call by Reply"
+    LIST Answers: "Alice has answered Call by Reply"
+    LIST Notices: "Alice has the notice Cast"
+    LIST Village calls: "Alice has the village emergency Cast"
+    Answer: Alice may broadcast Reply as an answer to Call, Reply TYPED, Call FROM broadcast
+    Resolve: Alice may broadcast Reply as the resolution of Call, Reply TYPED, Call FROM personal_emergency
+    Notice: Alice may broadcast Cast as a notice of Orga, Orga FROM officer, Cast TYPED
+    Village emergency: Alice may broadcast Cast as a village emergency of Orga, Orga FROM officer, Cast TYPED
+    Notice forward: Alice may forward the notice Cast to Bob in Orga, Bob TYPED, Orga TYPED, Cast FROM broadcast
+    Emergency forward: Alice may forward the village emergency Cast to Bob in Orga, Bob TYPED, Orga TYPED, Cast FROM broadcast
+
+SCREEN More ABOUT Alice:
+    LIST Has guardian: "Alice has Y2 as a guardian"
+    LIST Guardian: "Alice is a guardian of X2"
+    LIST Proposed: "Alice has Motion proposed"
+    LIST Taken: "Alice has Motion taken"
+    Person unfriend: Bob FROM friend
+    Enter: Alice may create Wendy, and Wendy must consent, Wendy TYPED
+    Make parent: Wendy TYPED, Decider FROM friend, Codecider TYPED
+    Resign: Alice may end her guardianship of Wendy, Wendy FROM parent
+    End parent: Bob TYPED, Wendy FROM parent, Codecider TYPED
+    Parent unfriend: Wendy FROM friend
+    Child acquaint: Bob TYPED, Alice FROM has_parent
+    Child befriend: Bob FROM knows, Alice FROM has_parent
+    Child end: Bob FROM friend, G1 FROM has_parent
+    Unfriend: Alice may end her friendship with Wendy, Wendy FROM friend
+    Child unfriend: Wendy TYPED, Bob TYPED
+    Children acquaint: Will TYPED, Alice FROM has_parent, Bob TYPED
+    Children befriend: Will FROM knows, Alice FROM has_parent, Bob TYPED
+    Children of one parent befriend: Will FROM knows, Alice FROM has_parent
+    Retire: Those who decide for Wendy may retire Wendy, Wendy FROM parent, Codecider TYPED
+    Child message: Bob FROM friend, G1 FROM has_parent, Text TYPED
+    Child post: Alice FROM member, G1 FROM has_parent, Text TYPED, Grupo FROM member
+    Child post own: G1 FROM has_parent, Text TYPED, Grupo FROM member
+    Child create: Alice FROM has_parent, Grupo TYPED
+    Child close: G1 FROM has_parent, Grupo FROM leader
+    Parent close: Wendy FROM parent, Grupo TYPED
+    Child join: Wendy FROM friend, Alice FROM friend, G1 TYPED, Grupo FROM leader
+    Children join: Will FROM friend, Alice FROM has_parent, Bob TYPED, Grupo FROM leader
+    Children of one parent join: Will FROM friend, Alice FROM has_parent, Grupo FROM leader
+    Child withdraw: Wendy FROM parent, Bob TYPED, Grupo TYPED
+    Child add: Will FROM friend, Alice FROM has_parent, Bob TYPED, Grupo FROM leader
+    Child leave: Alice FROM member, G1 FROM has_parent, Grupo FROM member
+    Child remove: Bob FROM listed, G1 FROM has_parent, Grupo FROM leader
+    Of age: Alice may declare Wendy of age, Wendy FROM creator, Bob TYPED
+    Resign: Alice may end her guardianship of Orga, Orga FROM officer
+    Unfriend: Alice may end her friendship with Orga, Orga FROM friend
+    Retire: Those who decide for Orga may retire Orga, Orga FROM officer, Codecider TYPED
+    Found: Orga TYPED, Role TYPED
+    Appoint: Orga FROM participant, Decider FROM friend, Codecider TYPED, Role TYPED
+    End officer: Bob TYPED, Orga FROM officer, Codecider TYPED
+    Officer unfriend: Orga FROM friend
+    Organisation acquaint: Bob TYPED, Alice FROM has_officer
+    Organisation befriend: Bob FROM knows, Alice FROM has_officer
+    Organisation end: Bob FROM friend, G2 FROM has_officer
+    Organisation unfriend: Orga TYPED, Bob TYPED
+    Organisations acquaint: Will TYPED, Alice FROM has_officer, Bob TYPED
+    Organisations befriend: Will FROM knows, Alice FROM has_officer, Bob TYPED
+    Organisations of one officer befriend: Will FROM knows, Alice FROM has_officer
+    Found by an organisation: Alice may found Orga with Gov in the role Role, Orga TYPED, Gov TYPED, G2 TYPED, Role TYPED
+    Propose: Alice may propose Motion in Orga, Orga FROM officer, Motion TYPED
+    Vote: Alice may vote on Motion in Orga, Orga FROM participant, Motion TYPED
+    Act: Alice may take Motion for Orga, Orga FROM officer, Motion TYPED
+    Join: Alice may become a participant of Orga, Orga TYPED, Decider TYPED, Codecider TYPED
+    Leave: Alice may end her participation in Orga, Orga FROM participant
+    Officer leave: Alice may end her participation and her office in Orga, Orga FROM participant
+    Expel: Those who expel participants of Orga may end Bob's participation in Orga, Bob TYPED, Orga FROM officer, Codecider TYPED
+    Officer expel: Those who expel participants of Orga may end Bob's participation and Bob's office in Orga, Bob TYPED, Orga FROM officer, Codecider TYPED
+    Amend: Alice may amend the bylaws of Orga as Motion says, Orga FROM officer, Motion TYPED

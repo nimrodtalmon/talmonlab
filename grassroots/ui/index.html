@@ -144,6 +144,10 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .cnode { border:1px solid #d8d4cc; border-radius:8px; padding:4px 8px; font-size:12px; background:#fff; display:flex; flex-direction:column; align-items:center; min-width:70px; }
 .cnode span { font-size:11px; color:#1a7f6b; }
 .cnode em { font-size:10.5px; color:#888; font-style:normal; }
+.lmk.lbot { flex-wrap:nowrap; justify-content:space-around; padding:6px 4px 8px; border-top:1px solid #e5e2dc; background:var(--p-bg); }
+.lmk.lbot button { border:0; border-radius:8px; padding:4px 7px; font-size:11.5px; white-space:nowrap; }
+.lmk.lmenu { flex-direction:column; align-items:stretch; padding:6px 12px; }
+.lmk.lmenu button { text-align:left; border-radius:8px; }
 .lmk { display:flex; gap:6px; padding:6px 12px 0; flex-wrap:wrap; }
 .lmk button { border:1px solid #ccc; background:none; border-radius:99px; font-size:12px; padding:3px 10px; color:inherit; cursor:pointer; }
 .lmk button.cur { background:var(--p-acc, #1a7f6b); border-color:transparent; color:#fff; }
@@ -253,11 +257,11 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js?v=1795714530"></script>
-<script src="engine.js?v=1795714530"></script>
-<script src="chess.js?v=1795714530"></script>
-<script src="pictures.js?v=1795714530"></script>
-<script src="qr.js?v=1795714530"></script>
+<script src="ui.js?v=1795716998"></script>
+<script src="engine.js?v=1795716998"></script>
+<script src="chess.js?v=1795716998"></script>
+<script src="pictures.js?v=1795716998"></script>
+<script src="qr.js?v=1795716998"></script>
 <script>
 const CONTRACTS = {
   app: {title: 'The Grassroots App itself (home)', modules: {home: 'Home', mechanical: 'Mechanical'}},
@@ -267,7 +271,7 @@ const CONTRACTS = {
   dao: {title: 'DAO', modules: {assembly: 'Assembly', mechanical: 'Mechanical'}},
   friendship: {title: 'Friendship', modules: {people: 'People', home: 'Home first', mechanical: 'Mechanical', pages: 'Pages only (not complete)'}},
   chess: {title: 'Chess (proposed)', modules: {games: 'Games', mechanical: 'Mechanical'}},
-  village: {title: 'Village Social (made of seven contracts)', modules: {parts: 'A screen per part', mechanical: 'Mechanical'}},
+  village: {title: 'Village Social (made of seven contracts)', modules: {people: 'People first', menu: 'People first, quiet', parts: 'A screen per part', mechanical: 'Mechanical'}},
 };
 /* the look: modules that change how the app is drawn and nothing of what it lets a person do */
 const LOOKS = {
@@ -276,6 +280,7 @@ const LOOKS = {
   convo: {label: 'Conversations', opts: {bubbles: 'Bubbles', plain: 'Plain'}},
   actions: {label: 'Actions', opts: {bar: 'Bar', menu: 'Menu', button: 'Button'}},
   questions: {label: 'Questions', opts: {top: 'On top', bell: 'Bell'}},
+  landmarks: {label: 'Landmarks', opts: {top: 'On top', bottom: 'At the bottom', menu: 'In a menu'}},
   shape: {label: 'Shape', opts: {round: 'Round', square: 'Square'}},
   density: {label: 'Density', opts: {cozy: 'Cozy', compact: 'Compact'}},
 };
@@ -311,7 +316,8 @@ function ordered(xs, title) {
   return o === 'newest' ? [...xs].reverse() : o === 'alpha' ? [...xs].sort((a, b) => show(lead(a)).localeCompare(show(lead(b)))) : xs;
 }
 const lead = x => Array.isArray(x) ? (x.find(y => !isP(y) && !(y && typeof y === 'object' && 'coin' in y)) ?? x[0]) : x;
-const av = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc(String(p)[0].toUpperCase())}</span>`;
+const av = (p0, cls) => { const p = isT(p0) && p0.by ? p0.by : p0; return avOf(p, cls); };
+const avOf = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc(String(p)[0].toUpperCase())}</span>`;
 const K = (...ks) => `data-k="${ks.filter(Boolean).join(' ')}"`;
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -413,7 +419,10 @@ function phone(p) {
   const C = P.ui.containers[u.at], comps = C.components, env = u.env, zone = {top: '', middle: '', bottom: '', menu: '', bar: ''}, acts = [];
   let composer = '', title = cap(p), avatar = av(p), info = null;
   const ident = v.atoms.filter(a => !a.args.length);
-  const lists = comps.filter(c => c.kind === 'list' && !c.hidden && c.zone === 'middle'), tabbed = LOOK.home === 'tabs' && lists.length > 1;
+  const lists0 = comps.filter(c => c.kind === 'list' && !c.hidden && c.zone === 'middle');
+  /* a tab for each list that holds something, and the first list's always, so no screen is a row of empty tabs */
+  const lists = lists0.filter((c, i) => i === 0 || items(c, v.atoms, p, env).length), tabbed = LOOK.home === 'tabs' && lists.length > 1;
+  if ((u.tab || 0) >= lists.length) u.tab = 0;
   /* what the person waits for is a small mark in the header; what just happened, a note that fades */
   const waiting = v.pending.map(x => `${esc(x.s.button)}: ${[...x.wait].map(cap).join(', ')}`);
   /* after an act: done, or not done and the fact in the way, in the contract's words */
@@ -443,10 +452,14 @@ function phone(p) {
   for (const a of unseen) {
     if (thHere && thHere.shows.includes(a.p) && mentions(a, parHere)) { u.seen.add(a.seq); continue; }
     u.told = u.told || new Set();
-    if (!u.told.has(a.seq)) { u.told.add(a.seq); const tx = a.args.find(isT); W.notes[p].push({msg: cap(tx.by) + ': ' + tx.t}); }
+    /* one note a message, though the state hold it twice (posted, and delivered) */
+    const tx = a.args.find(isT), tk = 'msg:' + JSON.stringify(tx);
+    if (!u.told.has(a.seq) && !u.told.has(tk)) { u.told.add(a.seq); u.told.add(tk); W.notes[p].push({msg: cap(tx.by) + ': ' + tx.t}); }
   }
-  const toasts = v.notes.map(n => `<div class="toast"><span class="sys">${n.msg ? esc(n.msg) : n.done ? esc(n.done) + ': done' : n.refused ? esc(n.refused) + ': not done' + esc(whyText(n.why)) : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
-  if (v.notes.length) { clearTimeout(u.fade); u.fade = setTimeout(() => { W.notes[p].length = 0; render(); }, 3500); }
+  /* each note shows for a few seconds from when it came, however often the screen is drawn again */
+  const now = Date.now(); v.notes.forEach(n => { n.at = n.at || now; });
+  const toasts = v.notes.filter(n => now - n.at < 3500).map(n => `<div class="toast"><span class="sys">${n.msg ? esc(n.msg) : n.done ? esc(n.done) + ': done' : n.refused ? esc(n.refused) + ': not done' + esc(whyText(n.why)) : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
+  if (v.notes.some(n => now - n.at < 3500)) { clearTimeout(u.fade); u.fade = setTimeout(() => render(), 3600); }
 
   const asks = [];
   /* a screen about a fact follows it when one of its values changes, as a game's position after a move:
@@ -502,6 +515,7 @@ function phone(p) {
       zone[c.zone] += `<div class="thread">${ts.join('') || `<div class="empty sys">No messages yet.</div>`}</div>`;
     } else if (c.kind === 'list') {
       if (tabbed && c.zone === 'middle' && lists[u.tab || 0] !== c) continue;
+      if (LOOK.home === 'tabs' && !tabbed && c.zone === 'middle' && lists[0] !== c && !items(c, v.atoms, p, env).length) continue;
       const it = ordered(items(c, v.atoms, p, env), c.title);
       const anyItems = lists.some(l => items(l, v.atoms, p, env).length);
       if (!it.length && !tabbed && (anyItems || lists[0] !== c)) continue;
@@ -513,7 +527,7 @@ function phone(p) {
         const s = Array.isArray(x) ? x.filter(y => !isCoin(y) && !same(y, lead(x)) && !same(y, wv)).map(y => y === p ? 'yours' : show(y)).join(' · ') + (COUNT[plain(x)] > 1 ? ' · ×' + COUNT[plain(x)] : '') : '';
         const th = c.event ? P.ui.containers[c.event.navigate].components.find(y => y.kind === 'thread') : null;
         const last = th ? lastText(v.atoms.filter(a => th.shows.includes(a.p)), x, p) : '';
-        const unread = th ? v.atoms.filter(a => th.shows.includes(a.p) && mentions(a, x) && !u.seen.has(a.seq) && a.args.some(y => isT(y) && y.by !== p)).length : 0;
+        const unread = th ? new Set(v.atoms.filter(a => th.shows.includes(a.p) && mentions(a, x) && !u.seen.has(a.seq) && a.args.some(y => isT(y) && y.by !== p)).map(a => JSON.stringify(a.args.find(isT)))).size : 0;
         return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${unread ? `<span class="unread">${unread}</span>` : ''}${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
       }).join('') + '</div>' + (it.length ? '' : `<div class="empty sys">None yet.</div>`);
     } else if (c.kind === 'chain') {
@@ -555,12 +569,14 @@ function phone(p) {
   if (asks.length && LOOK.questions === 'top') zone.top = `<div class="qs">${asks.join('')}</div>`;
   const bell = LOOK.questions === 'bell' && asks.length ? `<button class="ib bell" data-bell="1">${asks.length}</button>` : '';
   const wchip = waiting.length ? `<span class="wait" title="${waiting.join(' · ')}"><span class="spin"></span>${waiting.length}</span>` : '';
-  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  const lms = P.ui.landmarks || [], lmrow = lms.length ? [P.ui.start, ...lms].map(s => `<button class="${s === u.at ? 'cur' : ''}" data-land="${esc(s)}">${esc(s)}</button>`).join('') : '';
+  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   const bar = (mode === 'bar' ? zone.bottom : '') + zone.bar, menu = (mode !== 'bar' ? zone.bottom : '') + zone.menu;
   const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
-  const lms = P.ui.landmarks || [];
-  if (lms.length) h += `<div class="lmk">${[P.ui.start, ...lms].map(s => `<button class="${s === u.at ? 'cur' : ''}" data-land="${esc(s)}">${esc(s)}</button>`).join('')}</div>`;
-  h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
+  /* the landmarks, as the UI style puts them: a row on top, a bar at the bottom, or a menu behind the name */
+  if (lms.length && LOOK.landmarks === 'top') h += `<div class="lmk">${lmrow}</div>`;
+  if (lms.length && LOOK.landmarks === 'menu' && u.lmenu) h += `<div class="lmk lmenu">${lmrow}</div>`;
+  h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>${lms.length && LOOK.landmarks === 'bottom' ? `<div class="lmk lbot">${lmrow}</div>` : ''}`;
   if (u.menu && menu) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${menu}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
   else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
@@ -570,7 +586,8 @@ function phone(p) {
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
   on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.tab = 0; u.sheet = null; render(); });
   /* a landmark is reached from every screen, and starts the way back afresh */
-  on('[data-land]', b => { u.at = b.dataset.land; u.env = {}; u.stack = []; u.tab = 0; u.sheet = null; u.menu = false; render(); });
+  on('[data-lmenu]', () => { u.lmenu = !u.lmenu; render(); });
+  on('[data-land]', b => { u.lmenu = false; u.at = b.dataset.land; u.env = {}; u.stack = []; u.tab = 0; u.sheet = null; u.menu = false; render(); });
   /* back goes to the screen one came from */
   on('[data-back]', () => { const b = (u.stack || []).pop() || {at: P.ui.start, env: {}, tab: 0}; Object.assign(u, b); u.sheet = null; u.menu = false; render(); });
   on('[data-close]', () => { u.sheet = null; u.menu = false; u.bell = false; render(); });
@@ -793,7 +810,7 @@ function codePanel() {
   h += `</div><div class="code">${P.lines.map(codeLine).join('')}</div>`;
   h += `<h3 style="margin-top:18px">UI style</h3><p class="lg">How the screens are drawn, one sentence a line, by the names above. No sentence can hide anything, and the checker makes sure no UI style loses an option the contract allows.</p>`;
   h += `<div class="sum"><div>${LR.ok ? '<span class="ok">✓ no option lost</span>' : '<span class="badm">✗ ' + LR.errors.length + ' to fix</span>'}</div></div>`;
-  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(STYLE|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|DRAWN BY|PICKED ON|NEWEST FIRST|OLDEST FIRST|ALPHABETICAL|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON)\b/g, '<span class="kw">$1</span>');
+  h += `<div class="code">${LK.lines.map(L => { const e = LR.errors.filter(x => x.line === L.n), t = esc(L.raw).replace(/\b(STYLE|IS|ARE|LONG|SHORT|A SLIDER FROM|TO|OR TYPED|A DATE|DRAWN BY|PICKED ON|NEWEST FIRST|OLDEST FIRST|ALPHABETICAL|A GRID|ROWS|CHIPS|IN THE MENU|IN THE BAR|PRIMARY|COLOR|CORNERS|SPACING|LISTS|CONVERSATIONS|QUESTIONS|ACTIONS|FRESH|NIGHT|PAPER|CANDY|ROUND|SQUARE|COZY|COMPACT|SECTIONS|TABS|BUBBLES|PLAIN|ON TOP|IN A BELL|ON A BUTTON|LANDMARKS|AT THE BOTTOM|IN A MENU)\b/g, '<span class="kw">$1</span>');
     return `<div class="ln" ${L.name ? K('line:look' + L.n) : ''}><span class="no">${L.n}</span><span class="g">${e.length ? '<span class="badm">!</span>' : L.kind === 'rule' ? '<span class="ok">✓</span>' : ''}</span><span>${L.kind === 'comment' ? `<span class="cm">${t}</span>` : t}</span></div>` + e.map(x => `<div class="why">${esc(x.msg)}</div>`).join(''); }).join('') || '<div class="ln"><span class="no"></span><span class="g"></span><span class="cm">No UI style: the defaults.</span></div>'}</div>`;
   h += `<div class="ct">How to read it</div><div class="legend">
     <div><code>SCREEN Chat ABOUT Bob:</code><span>a screen, about what was tapped to open it: a person or a value, or a fact of Alice's in the contract's words, <code>ABOUT "Alice is a member of Bob's Hikers"</code>; the start screen is <code>ABOUT Alice</code>, the person whose phone it is</span></div>
