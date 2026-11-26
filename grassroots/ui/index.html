@@ -107,6 +107,11 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .slide .num { width:5em; }
 .slide output { min-width:2.5em; font-weight:700; }
 .look-ok { color:var(--ok, #1a7f37); }
+.scanf { display:inline-flex; gap:6px; align-items:center; }
+.scanner { margin:8px 0; }
+.scanner .codes { display:flex; gap:8px; flex-wrap:wrap; }
+.scanner .codes button { display:flex; flex-direction:column; align-items:center; gap:2px; border:1px solid var(--line); border-radius:10px; background:#fff; padding:6px; cursor:pointer; font-size:12px; }
+.qr { display:flex; justify-content:center; margin:8px 0; }
 .cb { display:grid; grid-template-columns:repeat(8, 1fr); width:100%; max-width:248px; aspect-ratio:1; margin:6px auto 10px; border:2px solid #6b4f36; border-radius:4px; overflow:hidden; }
 .cb span { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:22px; line-height:1; background:#f0d9b5; color:#222; user-select:none; }
 .cb span.d { background:#b58863; }
@@ -218,6 +223,7 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 <script src="ui.js"></script>
 <script src="engine.js"></script>
 <script src="chess.js"></script>
+<script src="qr.js"></script>
 <script>
 const CONTRACTS = {
   chat: {title: 'Chat (proposed)', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
@@ -443,7 +449,7 @@ function phone(p) {
   if (asks.length && LOOK.questions === 'top') zone.top = `<div class="qs">${asks.join('')}</div>`;
   const bell = LOOK.questions === 'bell' && asks.length ? `<button class="ib bell" data-bell="1">${asks.length}</button>` : '';
   const wchip = waiting.length ? `<span class="wait" title="${waiting.join(' · ')}"><span class="spin"></span>${waiting.length}</span>` : '';
-  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${info ? '<button class="ib" data-info="1">i</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   const bar = (mode === 'bar' ? zone.bottom : '') + zone.bar, menu = (mode !== 'bar' ? zone.bottom : '') + zone.menu;
   const tabbar = tabbed ? `<div class="tbar">${lists.map((c, i) => `<button class="${i === (u.tab || 0) ? 'on' : ''}" data-tabi="${i}" ${K('line:' + c.line)}>${esc(c.title)}</button>`).join('')}</div>` : '';
   h += `<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="toasts">${toasts}</div><div class="zb">${bar ? `<div class="acts">${bar}</div>` : ''}${composer}</div>`;
@@ -461,6 +467,8 @@ function phone(p) {
   on('[data-menu]', () => { u.menu = true; render(); });
   on('[data-bell]', () => { u.bell = true; render(); });
   on('[data-tabi]', b => { u.tab = +b.dataset.tabi; render(); });
+  /* the look has a person SCANNED: the person's own code, for another phone to scan */
+  on('[data-mycode]', () => { u.sheet = {html: `<div class="sh">My code</div><div class="qr">${QR.svg(p, 5)}</div><div class="expl">Another phone scans it to give your key.</div><button class="sec" data-close="1">Done</button>`}; render(); });
   on('[data-info]', () => { u.sheet = {html: `<div class="sh">${esc(info.title)}</div><div class="facts">${info.fs.map(a => `<div class="fact" ${K(info.lk, 'pred:' + a.p)}>${fact(a, p, p)}</div>`).join('')}</div>`}; render(); });
   on('[data-act]', b => { u.menu = false; act(p, acts[+b.dataset.act]); });
   d.querySelectorAll('[data-send]').forEach(b => {
@@ -479,6 +487,14 @@ function phone(p) {
   };
   const nf = d.querySelector('[data-name]');
   if (nf) { nf.focus(); const go = () => { const x = fieldValue(nf); if (!x) return; const e = u.sheet.name(x); if (e) d.querySelector('[data-ferr]').textContent = e; }; nf.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); go(); } }; d.querySelector('[data-namego]').onclick = go; }
+  /* scanning: here the camera sees the codes of the phones beside this one; tapping one gives its key */
+  d.querySelectorAll('[data-scan]').forEach(b => b.onclick = () => {
+    const inp = b.parentElement.querySelector('input'), box = document.createElement('div');
+    box.className = 'scanner';
+    box.innerHTML = `<div class="expl">Point at a code. Here, the codes of the phones beside this one:</div><div class="codes">${PERSONS.filter(x => x !== p).map(x => `<button type="button" data-code="${x}">${QR.svg(x, 2)}<span>${esc(cap(x))}</span></button>`).join('')}</div>`;
+    b.parentElement.after(box);
+    box.querySelectorAll('[data-code]').forEach(c => c.onclick = () => { inp.value = c.dataset.code; box.remove(); });
+  });
   /* tapping a square, then another, writes the move between them in the box below the board */
   d.querySelectorAll('.cb.pick').forEach(cb => {
     const inp = cb.parentElement.querySelector('[data-pickboard]');
@@ -515,7 +531,7 @@ function act(p, w) {
   if (w.open.length) {
     /* an open place: a value is typed; a person is given by her key, as no phone can list everyone */
     const k = w.open[0], person = w.act.people.includes(k);
-    u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"', w.vals[0]))}</div>${person ? '<div class="expl">A key is shared in person or by a link; here, type a name.</div>' : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
+    u.sheet = {html: `<div class="sh">${esc(w.act.button)}</div><div class="sent">${sentence(w.act, w.vals[0]).replace('<b>…</b>', field(w.act, w.c, k, 'data-name="1"', w.vals[0]))}</div>${person ? `<div class="expl">${lookOf(w.c, w.act, k).as === 'scanned' ? 'Scan their code, or type their key; here, a key is a name.' : 'A key is shared in person or by a link; here, type a name.'}</div>` : ''}<div class="err" data-ferr></div><button class="pri" data-namego="1">${esc(w.act.button)}</button>`,
       name: x => {
         const v = person ? x.toLowerCase() : x;
         if (person && !PERSONS.includes(v)) return 'No one has this key.';
@@ -532,6 +548,7 @@ function act(p, w) {
 function lookOf(c, act, k) { const r = act.names[k - 1], n = c && c.names ? c.names[r] : r; return LK.of[n] || {}; }
 function field(act, c, k, attr, val) {
   const lv = lookOf(c, act, k), r = act.names[k - 1], ph = act.people.includes(k) ? 'their key' : esc(r.toLowerCase());
+  if (lv.as === 'scanned') return `<span class="scanf"><input ${attr} placeholder="${ph}"><button class="sec" data-scan="1" type="button">Scan</button></span>`;
   if (lv.as === 'board-pick') {
     /* the board the act is on: the value of a place the look draws as a chessboard */
     const bk = act.names.findIndex(x => lookOf(c, act, act.names.indexOf(x) + 1).as === 'chessboard') + 1, fen = val && bk ? val[bk] : null;
