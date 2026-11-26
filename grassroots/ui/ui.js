@@ -174,11 +174,19 @@
         const cands = spec.acts.filter(a => a.button === c.button);
         if (!cands.length) { err(c.line, 'the contract has no act of the button ' + c.button); continue; }
         let a = null, map = null;
+        /* two acts may say the same sentence (an act a contract inherits and one it makes anew under the same
+           title); the line's sources then tell them apart: the act that requires the facts they are drawn from */
+        const fits = (x, mm) => Object.entries(c.sources).every(([N, s]) => !s.from || s.from === 'everyone' || x.req.some(([p, ks]) => p === s.from && ks.some(k => (mm[x.names[k - 1]] || x.names[k - 1]) === N)));
+        const found = [];
         for (const x of cands) {
           const slots = [...new Set(x.all.concat(x.names))];
           const mm = c.said ? matchWith(pattern(template(x), slots), c.said) : Object.fromEntries(x.names.map(r => [r, r]));
-          if (mm) { a = x; map = mm; break; }
+          if (mm) found.push([x, mm]);
         }
+        /* and, past that, the act whose own names the line keeps (Orga, not Wendy) */
+        const own = (x, mm) => Object.entries(mm).every(([r, N]) => r === N || r === x.names[x.me - 1] || !x.names.includes(r));
+        const pick = found.find(([x, mm]) => fits(x, mm) && own(x, mm)) || found.find(([x, mm]) => fits(x, mm)) || found[0];
+        if (pick) [a, map] = pick;
         if (!a) { err(c.line, 'not the contract\'s sentence for ' + c.button + ', "' + template(cands[0]) + '", with its names renamed'); continue; }
         c.act = a.name;
         c.names = Object.fromEntries(a.names.map(r => [r, map[r] || r]));
