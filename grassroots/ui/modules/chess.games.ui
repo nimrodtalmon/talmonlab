@@ -5,7 +5,6 @@ SCREEN Home ABOUT Alice:
     SHOW Alice: identity, person
     LIST Games: "Alice plays Game against Bob at Board" OPENS Game
     LIST Friends: PERSONS WITH knows, friend, won, drawn OPENS Person
-    LIST Moves: "Alice has made Move in Game at Board"
     Establish: Alice may establish an identity
     Acquaint: Alice and Bob may jointly come to know each other, Bob TYPED
 
@@ -16,7 +15,7 @@ SCREEN Person ABOUT Bob:
     Introduce: Alice may introduce Bob to Carol, Carol FROM knows
     Befriend: Alice and Bob may jointly become friends
     Unfriend: Alice may end her friendship with Bob
-    Start: Alice and Bob may jointly start Game at Board, Game TYPED
+    Start: Alice and Bob may jointly start Game at Board, Game TYPED, THEN Home
 
 SCREEN Game ABOUT "Alice plays Game against Bob at Board":
     QUESTIONS

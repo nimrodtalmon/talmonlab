@@ -137,6 +137,8 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .pic span.on { background:var(--p-acc, #1a7f6b); color:#fff; }
 .pic.pick span { cursor:pointer; }
 .pic span.from { box-shadow:inset 0 0 0 2px #e0a030; }
+.row { position:relative; }
+.unread { position:absolute; right:10px; top:10px; min-width:18px; height:18px; border-radius:9px; background:var(--p-acc, #1a7f6b); color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center; padding:0 5px; }
 .lmk { display:flex; gap:6px; padding:6px 12px 0; flex-wrap:wrap; }
 .lmk button { border:1px solid #ccc; background:none; border-radius:99px; font-size:12px; padding:3px 10px; color:inherit; cursor:pointer; }
 .lmk button.cur { background:var(--p-acc, #1a7f6b); border-color:transparent; color:#fff; }
@@ -246,11 +248,11 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js"></script>
-<script src="engine.js"></script>
-<script src="chess.js"></script>
-<script src="pictures.js"></script>
-<script src="qr.js"></script>
+<script src="ui.js?v=1795714530"></script>
+<script src="engine.js?v=1795714530"></script>
+<script src="chess.js?v=1795714530"></script>
+<script src="pictures.js?v=1795714530"></script>
+<script src="qr.js?v=1795714530"></script>
 <script>
 const CONTRACTS = {
   app: {title: 'The Grassroots App itself (home)', modules: {home: 'Home', mechanical: 'Mechanical'}},
@@ -258,7 +260,7 @@ const CONTRACTS = {
   groups: {title: 'Groups', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
   agora: {title: 'Agora (barter market)', modules: {market: 'Market', mechanical: 'Mechanical'}},
   dao: {title: 'DAO', modules: {assembly: 'Assembly', mechanical: 'Mechanical'}},
-  friendship: {title: 'Friendship', modules: {people: 'People', mechanical: 'Mechanical', pages: 'Pages only (not complete)'}},
+  friendship: {title: 'Friendship', modules: {people: 'People', home: 'Home first', mechanical: 'Mechanical', pages: 'Pages only (not complete)'}},
   chess: {title: 'Chess (proposed)', modules: {games: 'Games', mechanical: 'Mechanical'}},
 };
 /* the look: modules that change how the app is drawn and nothing of what it lets a person do */
@@ -272,7 +274,10 @@ const LOOKS = {
   density: {label: 'Density', opts: {cozy: 'Cozy', compact: 'Compact'}},
 };
 const LOOK = {};
-for (const [k, v] of Object.entries(LOOKS)) { const x = new URLSearchParams(location.search).get(k); LOOK[k] = x in v.opts ? x : Object.keys(v.opts)[0]; }
+for (const [k, v] of Object.entries(LOOKS)) { const x = new URLSearchParams(location.search).get(k); LOOK[k] = x in v.opts ? x : k === 'home' ? 'tabs' : Object.keys(v.opts)[0]; }
+/* what the person picked in the design panel stays picked when she changes the contract or the text */
+const MYLOOK = (() => { try { return JSON.parse(localStorage.getItem('grassroots-mylook') || '{}'); } catch (e) { return {}; } })();
+let CURP = null;
 const PERSONS = ['alice', 'bob', 'carol', 'dave'], PHONES = ['alice', 'bob'], SCRIPTED = ['carol', 'dave'];
 const COL = {alice: 'var(--alice)', bob: 'var(--bob)', carol: 'var(--carol)', dave: 'var(--dave)'};
 const q = new URLSearchParams(location.search);
@@ -290,9 +295,9 @@ const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x
 /* a value the UI style draws by a drawing program (pictures.js): the program, if one draws a value of its kind */
 const drawnBy = x => Object.values(LK.of).filter(r => r.as === 'drawn').map(r => PICTURES[r.by]).find(g => g && g.accepts(x));
 /* a picture: the program's cells, in its columns; with pick, each cell taps */
-function pictureHtml(prog, name, v, pick) {
+function pictureHtml(prog, name, v, pick, extra) {
   const g = PICTURES[prog], pic = g.draw(v), board = pic.frame === 'board';
-  return `<div class="${board ? 'cb' : 'pic'}${pick ? ' pick' : ''}" ${board ? '' : `style="grid-template-columns:repeat(${pic.cols}, 1fr)"`} data-prog="${esc(prog)}"${pick ? ` data-pv='${esc(JSON.stringify(v === undefined ? null : v))}'` : ''}>${pic.cells.map(c => `<span class="${board ? (c.shade === 'dark' ? 'd' : '') : c.shade}" ${pick ? `data-tap="${esc(c.tap)}"` : ''}>${esc(c.sym)}</span>`).join('')}</div>`;
+  return `<div class="${board ? 'cb' : 'pic'}${pick ? ' pick' : ''}" ${board ? '' : `style="grid-template-columns:repeat(${pic.cols}, 1fr)"`} data-prog="${esc(prog)}"${pick ? ` data-pv='${esc(JSON.stringify(v === undefined ? null : v))}'` : ''}${extra || ''}>${pic.cells.map(c => `<span class="${board ? (c.shade === 'dark' ? 'd' : '') : c.shade}" ${pick ? `data-tap="${esc(c.tap)}"` : ''}>${esc(c.sym)}</span>`).join('')}</div>`;
 }
 /* a list in the order the UI style gives it */
 function ordered(xs, title) {
@@ -377,6 +382,12 @@ function offers(act, c, atoms, me, env, comps) {
 
 /* ---------- acting ---------- */
 function propose(p, act, val) {
+  const u0 = ui[p], w = u0 && u0.w;
+  if (w && w.act.name === act.name) {
+    const next = w.chain ? w.chain.stepIds[1] : null, then = w.chain ? w.chain.then : w.c && w.c.then;
+    if (next || then) (u0.after = u0.after || []).push({button: act.button, next, val, act, then});
+    u0.w = null;
+  }
   const s = SIM.schemas.find(x => x.name === act.name), b = {};
   act.names.forEach((n, j) => b[n] = val[j + 1]);
   W.notes[p].length = 0;
@@ -401,8 +412,36 @@ function phone(p) {
   const waiting = v.pending.map(x => `${esc(x.s.button)}: ${[...x.wait].map(cap).join(', ')}`);
   /* after an act: done, or not done and the fact in the way, in the contract's words */
   const whyText = w => { if (!w) return ''; if (w.guard) return w.fn ? ', since the contract\'s function ' + w.fn + ' says no' : ''; const [h, ...rest] = w.args; return (w.neg ? ', since ' : ', since it needs: ') + fact({p: w.p, args: rest}, h, p).replace(/<\/?b>/g, ''); };
-  const toasts = v.notes.map(n => `<div class="toast"><span class="sys">${n.done ? esc(n.done) + ': done' : n.refused ? esc(n.refused) + ': not done' + esc(whyText(n.why)) : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
+  for (const n of v.notes) if (n.done && !n.seen) {
+    n.seen = true;
+    const i = (u.after || []).findIndex(x => x.button === n.done);
+    if (i < 0) continue;
+    const [x] = u.after.splice(i, 1);
+    setTimeout(() => {
+      if (x.next) {
+        /* a chain's next step: the act of its button, the names it shares with the step before bound alike */
+        const step = Object.values(P.ui.containers).flatMap(C => C.components).find(y => y.id === x.next), a1 = SPEC.acts.find(y => y.name === step.act), val = {};
+        a1.names.forEach((r, j) => { const k0 = x.act.names.indexOf(r); if (k0 >= 0) val[j + 1] = x.val[k0 + 1]; });
+        val[a1.me] = p;
+        const chainC = Object.values(P.ui.containers).flatMap(C => C.components).find(y => y.kind === 'chain' && (y.stepIds || []).includes(x.next));
+        if (chainC && chainC.then) (u.after = u.after || []).push({button: a1.button, then: chainC.then});
+        propose(p, a1, val);
+      } else if (x.then) { u.at = x.then; u.env = {}; u.stack = []; u.tab = 0; u.sheet = null; render(); }
+    }, 0);
+  }
+  /* a new message in a thread, from someone else: a note, and a mark on the list item that opens it */
+  u.seen = u.seen || new Set();
+  const threadPreds = new Set(Object.values(P.ui.containers).flatMap(C2 => C2.components.filter(x => x.kind === 'thread').flatMap(x => x.shows)));
+  const unseen = v.atoms.filter(a => threadPreds.has(a.p) && !u.seen.has(a.seq) && a.args.some(x => isT(x) && x.by !== p));
+  const thHere = comps.find(x => x.kind === 'thread'), parHere = thHere ? env[C.params[0]] : undefined;
+  for (const a of unseen) {
+    if (thHere && thHere.shows.includes(a.p) && mentions(a, parHere)) { u.seen.add(a.seq); continue; }
+    u.told = u.told || new Set();
+    if (!u.told.has(a.seq)) { u.told.add(a.seq); const tx = a.args.find(isT); W.notes[p].push({msg: cap(tx.by) + ': ' + tx.t}); }
+  }
+  const toasts = v.notes.map(n => `<div class="toast"><span class="sys">${n.msg ? esc(n.msg) : n.done ? esc(n.done) + ': done' : n.refused ? esc(n.refused) + ': not done' + esc(whyText(n.why)) : n.withdrawn ? esc(n.withdrawn) + ': no longer needed' : esc(n.declined) + ': ' + cap(n.by) + ' said no'}</span></div>`).join('');
   if (v.notes.length) { clearTimeout(u.fade); u.fade = setTimeout(() => { W.notes[p].length = 0; render(); }, 3500); }
+
   const asks = [];
   /* a screen about a fact follows it when one of its values changes, as a game's position after a move:
      the one fact of the same kind that differs from it in one place */
@@ -413,10 +452,11 @@ function phone(p) {
       if (next.length === 1) env.it = next[0].args;
     }
   }
+  const drawnHere = [];
   /* a value of the screen's subject that the UI style draws by a program */
   for (const [n, pos] of Object.entries(C.names || {})) if ((LK.of[n] || {}).as === 'drawn' && env.it) {
     const v = pos === null ? env.it : Array.isArray(env.it) ? env.it[pos - 1] : undefined, g = PICTURES[LK.of[n].by];
-    if (g && g.accepts(v)) zone.middle += pictureHtml(LK.of[n].by, n, v, false);
+    if (g && g.accepts(v)) { zone.middle += `@@PIC${drawnHere.length}@@`; drawnHere.push({n, prog: LK.of[n].by, v}); }
   }
   for (const c of comps) {
     if (c.hidden) continue;
@@ -467,8 +507,18 @@ function phone(p) {
         const s = Array.isArray(x) ? x.filter(y => !isCoin(y) && !same(y, lead(x)) && !same(y, wv)).map(y => y === p ? 'yours' : show(y)).join(' · ') + (COUNT[plain(x)] > 1 ? ' · ×' + COUNT[plain(x)] : '') : '';
         const th = c.event ? P.ui.containers[c.event.navigate].components.find(y => y.kind === 'thread') : null;
         const last = th ? lastText(v.atoms.filter(a => th.shows.includes(a.p)), x, p) : '';
-        return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
+        const unread = th ? v.atoms.filter(a => th.shows.includes(a.p) && mentions(a, x) && !u.seen.has(a.seq) && a.args.some(y => isT(y) && y.by !== p)).length : 0;
+        return `<button class="row" ${K(lk)} ${c.event ? `data-nav="${c.id}" data-item='${esc(JSON.stringify(x))}'` : ''}>${unread ? `<span class="unread">${unread}</span>` : ''}${av(lead(x))}<div style="min-width:0"><div class="t">${esc(show(lead(x)))}${s ? `<span class="s" style="font-weight:400"> · ${esc(s)}</span>` : ''}</div>${last ? `<div class="s">${esc(last)}</div>` : ''}<div class="chips">${chips}</div></div></button>`;
       }).join('') + '</div>' + (it.length ? '' : `<div class="empty sys">None yet.</div>`);
+    } else if (c.kind === 'chain') {
+      /* a chain: its button offers its first step; the next is proposed once the first is done */
+      const st = comps.find(x => x.id === (c.stepIds || [])[0]);
+      if (!st || !st.act) continue;
+      const a0 = SPEC.acts.find(x => x.name === st.act), {vals, open} = offers(a0, st, v.atoms, p, env, comps);
+      if (!vals.length) continue;
+      const where = (LK.of[c.button] || {}).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + a0.name)} data-act="${acts.length}">${esc(c.button)}<small>${esc(c.steps.join(', then '))}</small></button>`;
+      if (where === 'menu') zone.menu += btn; else if (where === 'bar') zone.bar += btn; else if (where === 'primary') zone[c.zone] = btn + zone[c.zone]; else zone[c.zone] += btn;
+      acts.push({act: a0, vals, open, c: st, chain: c});
     } else if (c.kind === 'action' && c.act) {
       const act = SPEC.acts.find(x => x.name === c.act), {vals, open} = offers(act, c, v.atoms, p, env, comps);
       if (!vals.length) continue;
@@ -478,14 +528,21 @@ function phone(p) {
         composer += `<div class="compose" ${K(lk, 'act:' + act.name)}>${long ? `<textarea rows="2" placeholder="${esc(act.button)}" data-compose="${acts.length}"></textarea>` : `<input placeholder="${esc(act.button)}" data-compose="${acts.length}">`}<button data-send="${acts.length}">➤</button></div>` + (EXPLAIN ? `<div class="expl">${sentence(act, vals[0])}</div>` : '');
         acts.push({act, vals, open, c}); continue;
       }
-      const twin = comps.filter(x => x.kind === 'action' && x.button === c.button).length > 1;
+      const twin = comps.filter(x => x.kind === 'action' && !x.step && x.button === c.button).length > 1;
       const sub = EXPLAIN || twin ? `<small>${sentence(act, vals.length === 1 && !open.length ? vals[0] : partial(act, c, env, p)).replace(/<\/?b>/g, '')}</small>` : '';
       /* the look puts an action in the menu or the bar, or first and marked */
-      const where = (LK.of[c.button] || {}).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + act.name)} data-act="${acts.length}">${esc(act.button)}${sub}</button>`;
+      /* an action whose value is picked on a picture this screen shows is taken by tapping that picture; its button, with its box to type, goes to the menu */
+      const lk2 = open.length === 1 ? lookOf(c, act, open[0]) : {}, onPic = lk2.as === 'picked' && lk2.from && drawnHere.some(x => x.n === lk2.from && x.prog === lk2.on);
+      const where = onPic ? 'menu' : (LK.of[c.button] || {}).as, btn = `<button class="${c.zone === 'bottom' ? 'pri' : 'sec'}${where === 'primary' ? ' prim' : ''}" ${K(lk, 'act:' + act.name)} data-act="${acts.length}">${esc(act.button)}${sub}</button>`;
       if (where === 'menu') zone.menu += btn; else if (where === 'bar') zone.bar += btn; else if (where === 'primary') zone[c.zone] = btn + zone[c.zone]; else zone[c.zone] += btn;
       acts.push({act, vals, open, c});
     }
   }
+  /* the pictures of the subject: one an action picks on is drawn to be tapped */
+  drawnHere.forEach((x, i) => {
+    const j = acts.findIndex(w => w.open.length === 1 && w.vals.length === 1 && (() => { const l = lookOf(w.c, w.act, w.open[0]); return l.as === 'picked' && l.from === x.n && l.on === x.prog; })());
+    zone.middle = zone.middle.replace(`@@PIC${i}@@`, pictureHtml(x.prog, x.n, x.v, j >= 0, j >= 0 ? ` data-pickact="${j}"` : ''));
+  });
   /* in a conversation one can write, the other actions go in a menu beside the name */
   const mode = composer && comps.some(x => x.kind === 'thread') ? 'menu' : LOOK.actions;
   if (info && !info.fs.length) info = null;
@@ -545,17 +602,24 @@ function phone(p) {
   });
   /* taps on a picture to pick on: the program says whether they give a value, which goes in the box beside it */
   d.querySelectorAll('.pick[data-prog]').forEach(pic => {
-    const g = PICTURES[pic.dataset.prog], pv = JSON.parse(pic.dataset.pv), inp = pic.nextElementSibling;
+    const g = PICTURES[pic.dataset.prog], pv = JSON.parse(pic.dataset.pv), onScreen = pic.dataset.pickact !== undefined, inp = onScreen ? null : pic.nextElementSibling;
     let taps = [];
     pic.querySelectorAll('[data-tap]').forEach(x => x.onclick = () => {
       taps.push(x.dataset.tap);
       const r = g.pick(taps, pv === null ? undefined : pv);
       if (r.more) { x.classList.add('from'); return; }
       pic.querySelectorAll('.from').forEach(y => y.classList.remove('from')); taps = [];
+      if (r.value !== undefined && onScreen) {
+        /* the taps give the act's last open place: proposed at once, or told why not */
+        const w = acts[+pic.dataset.pickact], val = {...w.vals[0], [w.open[0]]: r.value};
+        if (enabled(w.act, view(p).atoms, val)) { u.w = w; propose(p, w.act, val); }
+        else { const s = SIM.schemas.find(x => x.name === w.act.name), b = {}; w.act.names.forEach((n, j) => { if (val[j + 1] !== undefined) b[n] = val[j + 1]; }); W.notes[p].push({refused: w.act.button, why: W.why(s, b)}); render(); }
+        return;
+      }
       if (r.value !== undefined && inp) { inp.value = r.value; redraw(); }
     });
     /* a picture of nothing to pick on draws the value given, tapped or typed */
-    const redraw = () => { if (pv !== null || pic.classList.contains('cb')) return; const cs = g.draw(inp.value === '' ? undefined : inp.value).cells; pic.querySelectorAll('[data-tap]').forEach((x, i) => x.className = cs[i].shade); };
+    const redraw = () => { if (!inp || pv !== null || pic.classList.contains('cb')) return; const cs = g.draw(inp.value === '' ? undefined : inp.value).cells; pic.querySelectorAll('[data-tap]').forEach((x, i) => x.className = cs[i].shade); };
     if (inp) inp.addEventListener('input', redraw);
   });
   /* a slider and the box beside it show one value */
@@ -578,6 +642,7 @@ function partial(act, c, env, p) {
 /* one way: done at once; several: a sheet of the people or the things to choose; a typed name: a field */
 function act(p, w) {
   const u = ui[p];
+  u.w = w; CURP = p;
   if (!w.open.length && w.vals.length === 1) return propose(p, w.act, w.vals[0]);
   const varying = Object.keys(w.vals[0]).map(Number).filter(i => i !== w.act.me && !w.open.includes(i) && w.vals.some(v => !same(v[i], w.vals[0][i])));
   if (w.open.length + varying.length > 1) return form(p, w, varying);
@@ -612,12 +677,19 @@ function field(act, c, k, attr, val) {
   if (lv.as === 'long') return `<textarea ${attr} rows="3" placeholder="${ph}"></textarea>`;
   if (lv.as === 'slider') return `<span class="slide"><input type="range" ${lv.typed ? '' : attr} min="${lv.from}" max="${lv.to}" value="${lv.from}"><output>${lv.from}</output>${lv.typed ? `<input type="number" ${attr} value="${lv.from}" class="num">` : ''}</span>`;
   if (lv.as === 'date') return `<input type="date" ${attr} data-date="1">`;
-  return `<input ${attr} ${num ? 'type="number" value="1" class="num"' : `placeholder="${ph}"`}>`;
+  /* a new name the UI style gives: the first of Game1, Game2, ... that no fact of the person's holds yet */
+  const fresh = lv.fresh && CURP ? freshName(CURP, lv.fresh) : null;
+  return `<input ${attr} ${num ? 'type="number" value="1" class="num"' : fresh ? `value="${esc(fresh)}"` : `placeholder="${ph}"`}>`;
+}
+function freshName(p, f) {
+  const used = new Set(view(p).atoms.flatMap(a => a.args).filter(x => typeof x === 'string'));
+  for (let i = f.n; ; i++) if (!used.has(f.stem + i)) return f.stem + i;
 }
 /* a date is the number of its day */
 function fieldValue(el) { return el.dataset.date ? (el.value ? String(Math.floor(Date.parse(el.value) / 864e5)) : '') : el.value.trim(); }
 /* a form: a list for each place to pick, a field for each place to type, the act's button to propose */
 function form(p, w, varying) {
+  CURP = p;
   const u = ui[p], act = w.act, ks = [...varying, ...w.open].sort((a, b) => a - b);
   const opts = k => w.open.includes(k) ? null : [...new Map(w.vals.map(v => [JSON.stringify(v[k]), v[k]])).values()];
   /* the form is the clause's sentence, with a control in place of each name to choose */
@@ -758,7 +830,7 @@ function designPanel() {
   h += `<div class="drow"><div class="dl"></div><button class="hb" id="share">Copy a link to this design</button></div>`;
   $('#design').innerHTML = h;
   document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { MN = b.dataset.m; module(); });
-  document.querySelectorAll('[data-look]').forEach(b => b.onclick = () => { setGlobal(b.dataset.look, b.dataset.v); codePanel(); designPanel(); render(); });
+  document.querySelectorAll('[data-look]').forEach(b => b.onclick = () => { MYLOOK[b.dataset.look] = b.dataset.v; try { localStorage.setItem('grassroots-mylook', JSON.stringify(MYLOOK)); } catch (e) {} setGlobal(b.dataset.look, b.dataset.v); codePanel(); designPanel(); render(); });
   $('#share').onclick = () => {
     const u = new URL(location.href); u.search = '';
     u.searchParams.set('c', CN); u.searchParams.set('ui', MN);
@@ -801,8 +873,8 @@ $('#allof').onclick = allOf;
   } catch (e) {}
 })();
 const cache = {};
-const get = async u => cache[u] || (cache[u] = await (await fetch(u)).text());
-const getOpt = async u => { if (u in cache) return cache[u]; try { const r = await fetch(u); return cache[u] = r.ok ? await r.text() : ''; } catch (e) { return cache[u] = ''; } };
+const get = async u => cache[u] || (cache[u] = await (await fetch(u, {cache: 'no-cache'})).text());
+const getOpt = async u => { if (u in cache) return cache[u]; try { const r = await fetch(u, {cache: 'no-cache'}); return cache[u] = r.ok ? await r.text() : ''; } catch (e) { return cache[u] = ''; } };
 /* the look's sentences set the look; a button of the panel rewrites its sentence */
 function applyLook() {
   LK = GUI.readLook(LOOKTXT); LR = GUI.checkLook(SPEC, P.ui, LK);
@@ -820,6 +892,7 @@ async function module() {
   R = GUI.check(SPEC, P.ui);
   LOOKTXT = MN === 'custom' ? (mineLook(CN) || '') : await getOpt(`modules/${CN}.${MN}.style`);
   applyLook();
+  for (const [k, v] of Object.entries(MYLOOK)) if (LOOK[k] !== v) setGlobal(k, v);
   B = CN === 'friendship' ? GUI.brute(SPEC, P.ui, PERSONS) : null;
   PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null});
   segs(); codePanel(); designPanel(); render();
