@@ -37,7 +37,9 @@
     return false;
   };
   /* the arguments of a pattern under a binding: undefined for a wildcard */
-  const inst = (a, b) => a.args.map(x => x === '_' ? undefined : (x in b ? b[x] : x));
+  /* a compound term, {f, a}, as sgn(Prog, Carol), its arguments bound in turn */
+  const val1 = (x, b) => x && typeof x === 'object' && x.f && Array.isArray(x.a) && x.f !== 'num' && x.f !== 'const' ? {f: x.f, a: x.a.map(y => val1(y, b))} : typeof x === 'string' && x in b ? b[x] : x;
+  const inst = (a, b) => a.args.map(x => x === '_' ? undefined : val1(x, b));
   World.prototype.holds = function (c, b) {
     if (c.or) return c.or.some(cs => cs.every(x => this.holds(x, b)));
     if (c.and) return c.and.every(x => this.holds(x, b));

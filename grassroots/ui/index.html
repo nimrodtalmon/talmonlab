@@ -133,6 +133,8 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .cb span.from { box-shadow:inset 0 0 0 3px #e0a030; }
 .cb.pick span { cursor:pointer; }
 .pic { display:grid; gap:3px; margin:6px 0 8px; }
+.phone .openapp { padding:10px 12px 0; }
+.phone .openapp button { width:100%; }
 .picnote { margin:10px 12px 0; font-size:13px; color:var(--p-mute, #777); text-align:center; }
 .picnote.on { color:var(--p-acc, #1a7f6b); font-weight:600; }
 .pic span { display:flex; align-items:center; justify-content:center; min-height:26px; font-size:11.5px; border-radius:6px; background:#eee; color:#555; user-select:none; }
@@ -264,15 +266,15 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
   <section class="panel"><h3 style="margin-bottom:8px">Design</h3><div id="design"></div></section>
   <section class="panel" id="codepanel"><div id="code"></div></section>
 </div>
-<script src="ui.js?v=1795728693"></script>
-<script src="engine.js?v=1795728693"></script>
-<script src="real.js?v=1795728693"></script>
-<script src="chess.js?v=1795728693"></script>
-<script src="pictures.js?v=1795728693"></script>
-<script src="qr.js?v=1795728693"></script>
+<script src="ui.js?v=1795729046"></script>
+<script src="engine.js?v=1795729046"></script>
+<script src="real.js?v=1795729046"></script>
+<script src="chess.js?v=1795729046"></script>
+<script src="pictures.js?v=1795729046"></script>
+<script src="qr.js?v=1795729046"></script>
 <script>
 const CONTRACTS = {
-  app: {title: 'The Grassroots App itself (home)', modules: {home: 'Home', mechanical: 'Mechanical'}},
+  app: {title: 'The Grassroots App (home: install and open apps)', modules: {home: 'Home', mechanical: 'Mechanical'}},
   chat: {title: 'Chat (proposed)', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
   groups: {title: 'Groups', modules: {chats: 'Chats', mechanical: 'Mechanical'}},
   agora: {title: 'Agora (barter market)', modules: {market: 'Market', mechanical: 'Mechanical'}},
@@ -306,16 +308,48 @@ let TAPPED = 0;
 /* real agents: ?real=1 runs the screens on the contract's real app, where it has one (real-NAME.json) */
 const REAL = q.get('real') === '1', AGENTS = q.get('agents') || (/^(localhost|127\.)/.test(location.hostname) ? 'http://127.0.0.1:4501' : '/uiagents');
 let REALMAP = null;
-let CN = q.get('c') in CONTRACTS ? q.get('c') : 'chat', MN = null, SIM = null, SPEC = null, P = null, R = null, B = null, W = null, EXPLAIN = false, TN = 0;
+let CN = q.get('c') in CONTRACTS ? q.get('c') : 'app', MN = null, SIM = null, SPEC = null, P = null, R = null, B = null, W = null, EXPLAIN = false, TN = 0;
 /* the look's text, as read, and its checks */
 let LOOKTXT = '', LK = {of: {}, global: {}, lines: [], errors: []}, LR = {errors: [], ok: true};
-const ui = {};
+let ui = {};
+/* ---------- the super-app ----------
+   With the Grassroots App itself (?c=app), each phone starts at App's Home, the App contract's own screens, and
+   opens there the apps installed: an app is a context of its own, its contract, UI structure, UI style and world,
+   shared by the persons, and each phone shows one.  Nothing here draws a screen: every screen is the general
+   renderer's, from the context's contract, UI structure and UI style. */
+const CTX = {}, AT = {};
+let HOME = false, MAINCN = null;
+const grab = () => ({CN, MN, SIM, SPEC, P, R, B, W, LK, LR, LOOKTXT, REALMAP, ui, LOOK: {...LOOK}});
+function use(c) { if (!c) return; ({CN, MN, SIM, SPEC, P, R, B, W, LK, LR, LOOKTXT, REALMAP, ui} = c); Object.assign(LOOK, c.LOOK); }
+function keep() { if (HOME && CTX[CN]) Object.assign(CTX[CN], grab()); }
+/* run f in the context of a phone's app, then back in the page's */
+function inCtx(c, f) { return (...xs) => { if (!HOME || !c) return f(...xs); keep(); use(c); try { return f(...xs); } finally { keep(); use(CTX[MAINCN]); } }; }
+/* the apps a phone can open: the contracts the demo has, by the name a program of App names */
+const appOf = x => { const v = x && typeof x === 'object' && x.f === 'sgn' ? x.a[0] : x; return typeof v === 'string' && v in CONTRACTS && v !== 'app' ? v : null; };
+async function ctxOf(name) {
+  if (CTX[name]) return CTX[name];
+  keep();
+  CN = name; MN = Object.keys(CONTRACTS[name].modules)[0];
+  SIM = JSON.parse(await get(`sim-${name}.json`));
+  SPEC = {acts: GUI.acts(SIM), vocab: SIM.vocab, env: SIM.env, personal: GUI.personal(SIM)};
+  REALMAP = JSON.parse((await getOpt(`real-${name}.json`)) || 'null');
+  P = GUI.resolve(SPEC, GUI.read(await get(`modules/${name}.${MN}.ui`))); R = GUI.check(SPEC, P.ui);
+  LOOKTXT = await getOpt(`modules/${name}.${MN}.style`); applyLook();
+  for (const [k, v] of Object.entries(MYLOOK)) if (LOOK[k] !== v) setGlobal(k, v);
+  B = null; ui = {}; PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null});
+  newWorld();
+  CTX[name] = grab();
+  use(CTX[MAINCN]);
+  return CTX[name];
+}
+async function openApp(p, name) { await ctxOf(name); AT[p] = name; render(); }
+function goHome(p) { AT[p] = MAINCN; render(); }
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const cap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 const isP = x => PERSONS.includes(x);
 const isT = x => x && typeof x === 'object' && 't' in x;
-const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x === 'object' && 'coin' in x ? '#' + x.coin : drawnBy(x) ? drawnBy(x).label : String(x);
+const show = x => isT(x) ? '“' + x.t + '”' : isP(x) ? cap(x) : x && typeof x === 'object' && x.f && Array.isArray(x.a) ? (x.f === 'sgn' ? show(x.a[0]) : x.f + '(' + x.a.map(show).join(', ') + ')') : typeof x === 'string' && x in CONTRACTS ? CONTRACTS[x].title.replace(/ \(.*\)$/, '') : x && typeof x === 'object' && 'coin' in x ? '#' + x.coin : drawnBy(x) ? drawnBy(x).label : String(x);
 /* a value the UI style draws by a drawing program (pictures.js): the program, if one draws a value of its kind */
 const drawnBy = x => Object.values(LK.of).filter(r => r.as === 'drawn').map(r => PICTURES[r.by]).find(g => g && g.accepts(x));
 /* a picture: the program's cells, in its columns; with pick, each cell taps */
@@ -330,7 +364,7 @@ function ordered(xs, title) {
 }
 const lead = x => Array.isArray(x) ? (x.find(y => !isP(y) && !(y && typeof y === 'object' && 'coin' in y)) ?? x[0]) : x;
 const av = (p0, cls) => { const p = isT(p0) && p0.by ? p0.by : p0; return avOf(p, cls); };
-const avOf = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc(String(p)[0].toUpperCase())}</span>`;
+const avOf = (p, cls) => isP(p) ? `<span class="av${cls ? ' ' + cls : ''}" style="background:${COL[p]}">${cap(p)[0]}</span>` : `<span class="av grp${cls ? ' ' + cls : ''}">${esc((show(p) || '?')[0].toUpperCase())}</span>`;
 const K = (...ks) => `data-k="${ks.filter(Boolean).join(' ')}"`;
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -431,7 +465,28 @@ function propose(p, act, val) {
 }
 function answer(p, id, yes) { W.notes[p].length = 0; W.answer(id, p, yes); render(); later(); }
 /* Carol and Dave are scripted persons: they answer yes to every question, after a moment */
-function later() { clearTimeout(TN); TN = setTimeout(() => { let n = 0; for (const s of SCRIPTED) for (const a of view(s).asks) { W.answer(a.id, s, true); n++; } if (n) { render(); later(); } }, 700); }
+function later() { clearTimeout(TN); TN = setTimeout(() => {
+  let n = 0;
+  const once = () => {
+    for (const s of SCRIPTED) for (const a of view(s).asks) { W.answer(a.id, s, true); n++; }
+    if (CN === 'app') n += developer();
+  };
+  if (HOME) { keep(); for (const c of Object.values(CTX)) { use(c); once(); keep(); } use(CTX[MAINCN]); } else once();
+  if (n) { render(); later(); }
+}, 700); }
+/* Carol is a developer: she publishes the apps of the demo, and offers each to every friend who has not got it */
+const DEV = 'carol';
+function developer() {
+  if (!HOME || !SIM.schemas.some(s => s.name === 'offer')) return 0;
+  let n = 0;
+  const S = x => SIM.schemas.find(s => s.name === x), mine = view(DEV).atoms;
+  for (const a of Object.keys(CONTRACTS)) if (a !== 'app' && !mine.some(x => x.p === 'program' && x.args[0] === a)) { W.propose(S('publish'), {Carol: DEV, Prog: a}); n++; }
+  for (const f of mine.filter(x => x.p === 'friend').map(x => x.args[0])) {
+    const has = view(f).atoms.filter(x => x.p === 'program' || x.p === 'installed').map(x => appOf(x.args[0]));
+    for (const a of Object.keys(CONTRACTS)) if (a !== 'app' && !has.includes(a)) { W.propose(S('offer'), {Carol: DEV, Alice: f, Prog: a, Erin: DEV}); n++; }
+  }
+  return n;
+}
 
 /* ---------- a phone ---------- */
 function phone(p) {
@@ -454,7 +509,7 @@ function phone(p) {
     const i = (u.after || []).findIndex(x => x.button === n.done);
     if (i < 0) continue;
     const [x] = u.after.splice(i, 1);
-    setTimeout(() => {
+    setTimeout(inCtx(HOME ? CTX[CN] : null, () => {
       if (x.next) {
         /* a chain's next step: the act of its button, the names it shares with the step before bound alike */
         const step = Object.values(P.ui.containers).flatMap(C => C.components).find(y => y.id === x.next), a1 = SPEC.acts.find(y => y.name === step.act), val = {};
@@ -464,7 +519,7 @@ function phone(p) {
         if (chainC && chainC.then) (u.after = u.after || []).push({button: a1.button, then: chainC.then});
         propose(p, a1, val);
       } else if (x.then) { u.at = x.then; u.env = {}; u.stack = []; u.tab = 0; u.sheet = null; render(); }
-    }, 0);
+    }), 0);
   }
   /* a new message in a thread, from someone else: a note, and a mark on the list item that opens it */
   u.seen = u.seen || new Set();
@@ -607,7 +662,11 @@ function phone(p) {
   const bell = LOOK.questions === 'bell' && asks.length ? `<button class="ib bell" data-bell="1">${asks.length}</button>` : '';
   const wchip = waiting.length ? `<span class="wait" title="${waiting.join(' · ')}"><span class="spin"></span>${waiting.length}</span>` : '';
   const lms = P.ui.landmarks || [], lmrow = lms.length ? [P.ui.start, ...lms].map(s => `<button class="${s === u.at ? 'cur' : ''}" data-land="${esc(s)}">${esc(s)}</button>`).join('') : '';
-  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : ''}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  /* the super-app: from an app, its Home; on the screen of an installed app, the app opened */
+  const homeBtn = HOME && CN !== MAINCN && u.at === P.ui.start && !(u.stack || []).length ? `<button class="back" data-home="1" title="The Grassroots App's Home">⌂</button>` : '';
+  const opens = HOME && CN === MAINCN && C.aboutPred === 'installed' && env.it ? [].concat(env.it).map(appOf).find(x => x) : null;
+  if (opens) zone.top = `<div class="openapp"><button class="pri" data-open="${esc(opens)}">Open ${esc(CONTRACTS[opens].title.replace(/ \(.*\)$/, ''))}</button></div>` + zone.top;
+  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : homeBtn}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   /* an empty screen says where to start: its first marked action, or its first */
   const first = (zone.bottom + zone.bar).match(/<button[^>]*class="[^"]*prim[^"]*"[^>]*>([^<]+)/) || (zone.bottom + zone.bar).match(/<button[^>]*>([^<]+)/);
   zone.middle = zone.middle.replace('@@HINT@@', first ? ` <br>Start with “${first[1]}”.` : '');
@@ -623,6 +682,8 @@ function phone(p) {
   d.innerHTML = h + '</div>';
   /* a tap right after the screen changed is not taken: a double tap must not hit what moved under the finger */
   const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => { if (Date.now() - TAPPED < 350) return; TAPPED = Date.now(); f(b); });
+  on('[data-open]', b => openApp(p, b.dataset.open));
+  on('[data-home]', () => goHome(p));
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
   on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.tab = 0; u.sheet = null; render(); });
   /* a landmark is reached from every screen, and starts the way back afresh */
@@ -870,9 +931,23 @@ function codePanel() {
 let SHOWN = 0;
 function render() {
   $('#phones').innerHTML = '';
-  PHONES.forEach((p, i) => { const d = phone(p); if (i === SHOWN) d.classList.add('shown'); $('#phones').appendChild(d); });
+  keep();
+  const asks = {};
+  PHONES.forEach((p, i) => {
+    const c = HOME ? CTX[AT[p] || MAINCN] : null;
+    if (c) use(c);
+    const d = phone(p);
+    asks[p] = view(p).asks.length;
+    if (c) {
+      keep();
+      /* a tap on the phone acts in its app's context */
+      for (const ev of ['click', 'keydown', 'input', 'change']) d.addEventListener(ev, () => { keep(); use(c); }, true);
+    }
+    if (i === SHOWN) d.classList.add('shown'); $('#phones').appendChild(d);
+  });
+  if (HOME) use(CTX[MAINCN]);
   document.querySelectorAll('[data-ph]').forEach(b => {
-    const p = PHONES[+b.dataset.ph], n = view(p).asks.length;
+    const p = PHONES[+b.dataset.ph], n = asks[p];
     b.classList.toggle('on', +b.dataset.ph === SHOWN);
     b.innerHTML = `${cap(p)}'s phone${n ? ` <span class="dot">${n}</span>` : ''}`;
     b.onclick = () => { SHOWN = +b.dataset.ph; render(); };
@@ -1001,12 +1076,19 @@ async function start() {
   MN = MN || (qm in CONTRACTS[CN].modules ? qm : Object.keys(CONTRACTS[CN].modules)[0]);
   REALMAP = JSON.parse((await getOpt(`real-${CN}.json`)) || 'null');
   newWorld(); contractPanel(); scriptsLine();
+  /* the Grassroots App itself: the super-app, each phone at its Home */
+  HOME = CN === 'app'; MAINCN = CN;
+  for (const k of Object.keys(CTX)) delete CTX[k];
   await module();
+  if (HOME) { CTX[CN] = grab(); PHONES.forEach(p => AT[p] = CN); later(); }
   /* a shared link's look, once */
   if (!start.done) { start.done = true; let any = false; for (const [k, v] of Object.entries(LOOKS)) { const x = q.get(k); if (x in v.opts && x !== LOOK[k]) { setGlobal(k, x); any = true; } } if (any) { codePanel(); designPanel(); render(); } }
 }
 $('#mode').onclick = () => { const u = new URL(location.href); if (REAL) u.searchParams.delete('real'); else u.searchParams.set('real', '1'); location.href = u.toString(); };
-$('#reset').onclick = () => { newWorld(); PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null}); render(); };
+$('#reset').onclick = () => {
+  if (HOME) { for (const k of Object.keys(CTX)) if (k !== MAINCN) delete CTX[k]; PHONES.forEach(p => AT[p] = MAINCN); }
+  newWorld(); PERSONS.forEach(p => ui[p] = {at: P.ui.start, env: {}, sheet: null}); if (HOME) { CTX[MAINCN] = grab(); later(); } render();
+};
 $('#explain').onclick = () => { EXPLAIN = !EXPLAIN; $('#explain').classList.toggle('on', EXPLAIN); render(); };
 start();
 </script>
