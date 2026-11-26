@@ -150,7 +150,7 @@ function drop(scr, d) {
   if (d.kind === 'act') return insert(scr, actionLine(SPEC.acts.find(a => a.name === d.name), C));
   const addTo = (c, p) => { const xs = lines(), i = lineOf(c.id) - 1; xs[i] = /\bWITH\b/.test(xs[i]) || c.kind !== 'list' ? xs[i].replace(/(:\s*[\w, ]+?|WITH\s+[\w, ]+?)(\s+OPENS\s+\w+)?\s*$/, (m, a, b) => a + ', ' + p + (b || '')) : xs[i].replace(/(PERSONS)/, '$1 WITH ' + p); setLines(xs); };
   if (d.kind === 'everyone') {
-    if (!start) return toast('Everyone is listed on the start screen');
+    if (!start) return toast('Persons are listed on the start screen');
     if (!P.ui.containers.Person) addScreen(['SCREEN Person ABOUT Bob:', '    QUESTIONS']);
     return insert(scr, 'LIST People: PERSONS OPENS Person');
   }
@@ -204,7 +204,7 @@ function palette() {
   }).join('');
   const preds = [...new Set(Object.keys(SIM.vocab).filter(p => !(SIM.env || []).includes(p)).concat(SPEC.acts.flatMap(a => a.req.concat(a.forb).map(([p]) => p))))].filter(p => p !== 'today').sort();
   const hid = new Set(R.hidden);
-  $('#preds').innerHTML = `<span class="pchip ev" draggable="true" data-drag='{"kind":"everyone"}'>Everyone</span>` + preds.map(p => `<span class="pchip" draggable="true" data-drag='${esc(JSON.stringify({kind: 'pred', p}))}' data-k="pred:${p}" title="${esc(SIM.vocab[p] ? SIM.vocab[p].phrase : p)}">${hid.has(p) ? '<span class="badm">✗</span> ' : ''}${esc(p)}</span>`).join('');
+  $('#preds').innerHTML = `<span class="pchip ev" draggable="true" data-drag='{"kind":"everyone"}'>Persons</span>` + preds.map(p => `<span class="pchip" draggable="true" data-drag='${esc(JSON.stringify({kind: 'pred', p}))}' data-k="pred:${p}" title="${esc(SIM.vocab[p] ? SIM.vocab[p].phrase : p)}">${hid.has(p) ? '<span class="badm">✗</span> ' : ''}${esc(p)}</span>`).join('');
   document.querySelectorAll('[data-drag]').forEach(x => {
     x.ondragstart = e => e.dataTransfer.setData('text/plain', x.dataset.drag);
     /* on a phone, tap a chip, then a screen */
