@@ -24,6 +24,8 @@ SCREEN Person ABOUT Bob:
     Join: Alice may add Bob to Grupo, Grupo FROM leader
     Point friend: Alice may point to Bob
     Unpoint: Alice may cease pointing to Bob
+    Resign: Alice may end her guardianship of Bob, Bob FROM parent
+    Retire: Those who decide for Bob may retire Bob, Bob FROM parent, Codecider TYPED
 
 SCREEN Groups ABOUT Alice:
     LIST Groups: "Alice is a member of the group Grupo of Bob" WITH leader OPENS Group
@@ -86,6 +88,8 @@ SCREEN Org ABOUT Orga:
     Retire: Those who decide for Orga may retire Orga, Orga FROM officer, Codecider TYPED
     Leave: Alice may end her participation in Orga
     Officer leave: Alice may end her participation and her office in Orga
+    Unfriend: Alice may end her friendship with Orga
+    Officer unfriend:
 
 SCREEN More ABOUT Alice:
     LIST Has guardian: "Alice has Y2 as a guardian"

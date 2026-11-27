@@ -63,6 +63,8 @@ header b { font-size:16px; }
 .cl.chg { border-left:3px solid #f2c94c; }
 .voc { font-family:var(--mono); font-size:11.5px; padding:2px 6px; border-radius:6px; }
 .hit { background:var(--hit) !important; }
+button.glow { box-shadow:0 0 0 3px #f2c94c; animation:glow 1.2s ease-in-out 3; }
+@keyframes glow { 50% { box-shadow:0 0 0 6px #f2c94c88; } }
 button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 0 0 3px #f2c94c; }
 .phones { display:flex; gap:20px; }
 .col { display:flex; flex-direction:column; gap:12px; align-items:center; }
@@ -70,6 +72,10 @@ button.pri.hit, button.sec.hit { background:var(--acc) !important; box-shadow:0 
 .scr { position:relative; width:100%; height:100%; background:#f8f8f6; border-radius:31px; overflow:hidden; display:flex; flex-direction:column; }
 .top { display:flex; align-items:center; gap:10px; padding:26px 14px 10px; background:#fff; border-bottom:1px solid var(--line); }
 .top .who { flex:1; min-width:0; }
+.top { flex-wrap:wrap; }
+.crumbbar { flex-basis:100%; margin:-12px 0 -4px; font-size:11.5px; color:#8a8f98; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }
+.crumbbar button { all:unset; cursor:pointer; color:#5b6470; }
+.crumbbar i { font-style:normal; margin:0 5px; color:#b5bac2; }
 .top .nm { font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .top .st { font-size:11.5px; color:var(--mute); }
 .back { border:0; background:none; color:var(--acc); font-size:24px; padding:0 2px 0 0; line-height:1; }
@@ -334,7 +340,7 @@ const grab = () => ({CN, MN, SIM, SPEC, P, R, B, W, LK, LR, LOOKTXT, REALMAP, ui
 function use(c) { if (!c) return; ({CN, MN, SIM, SPEC, P, R, B, W, LK, LR, LOOKTXT, REALMAP, ui} = c); Object.assign(LOOK, c.LOOK); }
 function keep() { if (HOME && CTX[CN]) Object.assign(CTX[CN], grab()); }
 /* run f in the context of a phone's app, then back in the page's */
-function inCtx(c, f) { return (...xs) => { if (!HOME || !c) return f(...xs); keep(); use(c); try { return f(...xs); } finally { keep(); use(CTX[MAINCN]); } }; }
+function inCtx(c, f) { return (...xs) => { if (!HOME || !c) return f(...xs); const was = CTX[CN]; keep(); use(c); try { return f(...xs); } finally { keep(); use(was || CTX[MAINCN]); } }; }
 /* the apps a phone can open: the contracts the demo has, by the name a program of App names */
 const appOf = x => { const v = x && typeof x === 'object' && x.f === 'sgn' ? x.a[0] : x; return typeof v === 'string' && v in CONTRACTS && v !== 'app' ? v : null; };
 async function ctxOf(name) {
@@ -363,14 +369,82 @@ function needed(act) {
   const adds = new Set((s.effects || []).filter(e => e && e.p && !e.neg).map(e => e.p));
   return SIM.schemas.every(b => b === s || (b.pre || []).some(c => c && adds.has(c.p) && !c.neg));
 }
-function ruleOffer(p, act) {
-  if (!HOME || CN !== MAINCN || act.names.length !== 1 || !needed(act) || RULEASKED[p + ':' + act.name]) return;
-  RULEASKED[p + ':' + act.name] = true;
-  ui[p].rule = {act: act.name, button: act.button};
+/* an act two persons take together whose fact other acts of the contract require, such as becoming friends */
+const addsOf = s => new Set((s.effects || []).filter(e => e && e.p && !e.neg).map(e => e.p));
+const both = s => (s.by || []).length === 2;
+function joint(act) {
+  const s = SIM.schemas.find(x => x.name === act.name); if (!s || act.names.length !== 2 || !both(s)) return false;
+  const adds = addsOf(s);
+  if (!adds.size || adds.has('identity')) return false;
+  return SIM.schemas.some(b => b !== s && (b.pre || []).some(c => c && adds.has(c.p) && !c.neg));
 }
+function ruleOffer(p, act) {
+  if (!HOME || CN !== MAINCN || RULEASKED[p + ':' + act.name]) return;
+  const one = act.names.length === 1 && needed(act), two = joint(act);
+  if (!one && !two) return;
+  RULEASKED[p + ':' + act.name] = true;
+  ui[p].rule = {act: act.name, button: act.button, two};
+}
+/* the persons with whom p took a joint act on Home: those its facts there name beside her */
+function partners(p, name) {
+  return inCtx(CTX[MAINCN], () => {
+    const s = SIM.schemas.find(x => x.name === name); if (!s) return [];
+    const adds = new Set((s.effects || []).filter(e => e && e.p && !e.neg).map(e => e.p));
+    const out = new Set();
+    /* the person's view holds her own facts without her: friend(Carol) */
+    for (const a of view(p).atoms) if (adds.has(a.p)) { const xs = a.args.length === 2 && same(a.args[0], p) ? a.args.slice(1) : a.args; if (xs.length === 1 && isP(xs[0]) && xs[0] !== p) out.add(xs[0]); }
+    return [...out];
+  })();
+}
+/* in an app, p's joint rule: with each partner who has an identity here, the act, or the first step of the way to it */
+function jointByRule(p, n0) {
+  const act = SPEC.acts.find(a => a.name === n0), s = act && SIM.schemas.find(x => x.name === n0);
+  if (!act || !s) return 0;
+  const me = act.names[act.me - 1], other = act.names.find(x => x !== me);
+  let n = 0;
+  for (const q of partners(p, n0)) {
+    const atoms = view(p).atoms;
+    if (!view(q).atoms.some(a => a.p === 'identity')) continue;
+    const val = {[act.me]: p, [act.names.indexOf(other) + 1]: q};
+    const busy = W.notes && view(p).pending.some(x => Object.values(x.b).some(v => same(v, q)));
+    if (busy) continue;
+    let take = null, tb = null;
+    if (enabled(act, atoms, val)) { take = s; tb = {[me]: p, [other]: q}; }
+    else {
+      /* the way: an act of hers with the partner, two of them, that brings what is missing */
+      for (const a2 of SPEC.acts) {
+        if (a2 === act || a2.names.length !== 2) continue;
+        const s2 = SIM.schemas.find(x => x.name === a2.name), m2 = a2.names[a2.me - 1], o2 = a2.names.find(x => x !== m2);
+        const v2 = {[a2.me]: p, [a2.names.indexOf(o2) + 1]: q};
+        if (!s2 || !enabled(a2, atoms, v2)) continue;
+        const w = W.why(s, {[me]: p, [other]: q});
+        if (w && (s2.effects || []).some(e => e.p === w.p && !e.neg)) { take = s2; tb = {[m2]: p, [o2]: q}; break; }
+      }
+    }
+    if (!take) continue;
+    W.propose(take, tb); n++;
+  }
+  return n;
+}
+/* a question to q from someone q took a joint act with on Home, about an act q's rule names or a step on its way:
+   answered yes for q, as q asked */
+function answerByRule(q) {
+  let n = 0;
+  for (const name of RULES[q] || []) {
+    if (!JOINT[q + ':' + name]) continue;
+    const ps = partners(q, name);
+    for (const a of view(q).asks) {
+      const from = Object.values(a.b).find(v => v !== q && isP(v));
+      if (from && ps.includes(from)) { W.answer(a.id, q, true); W.notes[q].push({msg: cap(from) + ': answered for you, as you asked', at: Date.now()}); n++; }
+    }
+  }
+  return n;
+}
+const JOINT = {};
 function byRule(p, c) {
   inCtx(c, () => {
     for (const n of RULES[p] || []) {
+      if (JOINT[p + ':' + n]) { jointByRule(p, n); continue; }
       const act = SPEC.acts.find(a => a.name === n && a.names.length === 1);
       if (!act || !enabled(act, view(p).atoms, {[act.me]: p})) continue;
       const s = SIM.schemas.find(x => x.name === act.name);
@@ -479,19 +553,24 @@ function fixedOf(act, c, env, p) {
 function varsOf(s) { const o = new Set(); const walk = c => { if (!c) return; if (c.forall) { walk(c.over); (c.then || []).forEach(walk); return; } (c.args || []).forEach(x => typeof x === 'string' && o.add(x)); }; (s.pre || []).forEach(walk); (s.effects || []).forEach(walk); return o; }
 /* the places on which an act of the person can be taken now, from where she is: this screen, the start screen and
    the landmarks, each with its own subject */
-function placings(p, a) {
-  const u = ui[p], out = [], seen = new Set();
-  for (const at of [u.at, P.ui.start, ...(P.ui.landmarks || [])]) {
-    if (seen.has(at)) continue; seen.add(at);
+function placings(p, a, about) {
+  const u = ui[p], out = [], seen = new Set(), envs = [];
+  for (const at of [u.at, P.ui.start, ...(P.ui.landmarks || [])]) if (!seen.has(at)) { seen.add(at); envs.push([at, at === u.at ? u.env : {}]); }
+  /* and the screen about a value the act names, such as the developer one must trust: the step is taken there */
+  for (const v of about || []) for (const [at, C] of Object.entries(P.ui.containers)) {
+    if (at === u.at || !C.params || C.params.length !== 1 || !(typeof v === 'string' && isP(v)) || v === p) continue;
+    if (C.aboutPred) continue;
+    envs.push([at, {[C.params[0]]: v}, v]);
+  }
+  for (const [at, env, aboutV] of envs) {
     const C = P.ui.containers[at]; if (!C) continue;
-    const env = at === u.at ? u.env : {};
     for (const c of C.components) {
       if (c.kind !== 'action' || c.act !== a.name) continue;
-      if (!c.step) { out.push({at, c, act: a, chain: null, env, comps: C.components}); continue; }
+      if (!c.step) { out.push({at, c, act: a, chain: null, env, comps: C.components, about: aboutV}); continue; }
       /* a step of a chain: the chain's button takes it, by its first step, the names it shares bound alike */
       const chain = C.components.find(x => x.kind === 'chain' && (x.stepIds || []).includes(c.id)), c0 = chain && C.components.find(x => x.id === chain.stepIds[0]);
       const a0 = c0 && SPEC.acts.find(x => x.name === c0.act);
-      if (a0) out.push({at, c: c0, act: a0, chain, env, comps: C.components});
+      if (a0) out.push({at, c: c0, act: a0, chain, env, comps: C.components, about: aboutV});
     }
   }
   return out;
@@ -524,12 +603,13 @@ function wayTo(p, s, b, depth) {
       if (!ok) continue;
       if (!mine) { if (!(me2 in b2) || b2[me2] !== p) return {...res, other: a}; continue; }
       /* one of hers: taken now from one of the screens she reaches, or on the way, by the fact in its way */
-      for (const pl of placings(p, a)) {
+      const about = Object.values(b2).filter(x => x !== p);
+      for (const pl of placings(p, a, about)) {
         const {vals, open} = offers(pl.act, pl.c, atoms, p, pl.env, pl.comps);
         const fit = vals.filter(v => Object.entries(b2).every(([n, x]) => { const k = pl.act.names.indexOf(n) + 1; return !k || v[k] === undefined || same(v[k], x); }));
-        if (fit.length) return {...res, first: {act: pl.act, vals: fit, open, c: pl.c, chain: pl.chain, at: pl.at}, rest: []};
+        if (fit.length) return {...res, first: {act: pl.act, vals: fit, open, c: pl.c, chain: pl.chain, at: pl.at, env: pl.env, about: pl.about}, rest: []};
       }
-      if (placings(p, a).length) {
+      if (placings(p, a, about).length) {
         const r = wayTo(p, s2, b2, depth + 1);
         if (r && r.first) return {...res, first: r.first, rest: [...r.rest, lab(a.button)]};
       }
@@ -552,7 +632,9 @@ function hintOf(p, act, c, env, label, acts, used) {
   if (r.first) {
     const f = r.first, key = (f.chain || f.c).id, fl = lab(f.chain ? f.chain.button : f.c.button || f.act.button), then = [...r.rest, label].map(esc).join(', then ');
     /* two hints with one first step: its button is in the first of them */
-    if (used.has(key)) way = `<div class="hway"><small>First “${esc(fl)}”, then ${then}.</small></div>`;
+    /* a step on the screen about someone else: the button opens that screen, the step shown there */
+    if (f.about !== undefined) way = `<div class="hway"><button class="sec" data-goto='${esc(JSON.stringify({at: f.at, env: f.env, glow: fl}))}'>${esc(show(f.about))}’s page ›</button><small>there “${esc(fl)}”, then ${then}</small></div>`;
+    else if (used.has(key)) way = `<div class="hway"><small>First “${esc(fl)}”, then ${then}.</small></div>`;
     else { used.add(key); way = `<div class="hway"><button class="sec" data-act="${acts.length}">${esc(fl)}</button><small>then ${then}</small></div>`; acts.push({act: f.act, vals: f.vals, open: f.open, c: f.c, chain: f.chain || undefined}); }
   } else if (r.other) way = `<div class="hway"><small>It comes when another person takes “${esc(lab(r.other.button))}”.</small></div>`;
   return {html: `<div class="hint" ${K('line:' + c.line, 'act:' + act.name)}><div>To <b>${esc(label)}</b>: ${esc(why)}.</div>${way}</div>`, first: r.first};
@@ -627,6 +709,8 @@ function offers(act, c, atoms, me, env, comps) {
 /* ---------- acting ---------- */
 function propose(p, act, val) {
   const u0 = ui[p], w = u0 && u0.w;
+  /* a step of a chain before its last is on the way to the chain's act: no rule is offered for it */
+  const onTheWay = !!(w && w.act.name === act.name && w.chain && w.chain.stepIds[1]);
   if (w && w.act.name === act.name) {
     const next = w.chain ? w.chain.stepIds[1] : null, then = w.chain ? w.chain.then : w.c && w.c.then, thenIt = w.chain ? w.chain.thenIt : w.c && w.c.thenIt;
     if (next || then) (u0.after = u0.after || []).push({button: act.button, next, val, act, then, thenIt});
@@ -639,7 +723,7 @@ function propose(p, act, val) {
   W.notes[p].length = 0;
   W.propose(s, b);
   if (ui[p]) ui[p].sheet = null;
-  ruleOffer(p, act);
+  if (!onTheWay) ruleOffer(p, act);
   render(); later();
 }
 function answer(p, id, yes) { W.notes[p].length = 0; W.answer(id, p, yes); render(); later(); }
@@ -648,6 +732,8 @@ function later() { clearTimeout(TN); TN = setTimeout(() => {
   let n = 0;
   const once = () => {
     for (const s of SCRIPTED) for (const a of view(s).asks) { W.answer(a.id, s, true); n++; }
+    for (const q of PERSONS) if (!SCRIPTED.includes(q)) n += answerByRule(q);
+    if (HOME && CN !== MAINCN) for (const q of PERSONS) for (const nm of RULES[q] || []) if (JOINT[q + ':' + nm]) n += jointByRule(q, nm);
     for (const s of SCRIPTED) n += playByPicture(s);
     if (CN === 'app') n += developer();
   };
@@ -812,6 +898,8 @@ function phone(p) {
     const v = pos === null ? env.it : Array.isArray(env.it) ? env.it[pos - 1] : undefined, g = PICTURES[LK.of[n].by];
     if (g && g.accepts(v)) { zone.middle += `@@PIC${drawnHere.length}@@`; drawnHere.push({n, prog: LK.of[n].by, v}); }
   }
+  /* two acts of one name on a screen, each taking no value, are one button: the first the contract allows now */
+  const shownLab = new Set();
   for (const c of comps) {
     if (c.hidden || byHint.has(c.id)) continue;
     const lk = 'line:' + c.line;
@@ -884,6 +972,7 @@ function phone(p) {
         composer += `<div class="compose" ${K(lk, 'act:' + act.name)}>${long ? `<textarea rows="2" placeholder="${esc(lab(act.button))}" data-compose="${acts.length}"></textarea>` : `<input placeholder="${esc(lab(act.button))}" data-compose="${acts.length}">`}<button data-send="${acts.length}">➤</button></div>` + (EXPLAIN ? `<div class="expl">${sentence(act, vals[0])}</div>` : '');
         acts.push({act, vals, open, c}); continue;
       }
+      if (!open.length && vals.length === 1) { if (shownLab.has(lab(act.button))) { acts.push({act, vals, open, c}); continue; } shownLab.add(lab(act.button)); }
       const twin = comps.filter(x => x.kind === 'action' && !x.step && x.button === c.button).length > 1;
       const sub = EXPLAIN || twin ? `<small>${sentence(act, vals.length === 1 && !open.length ? vals[0] : partial(act, c, env, p)).replace(/<\/?b>/g, '')}</small>` : '';
       /* the look puts an action in the menu or the bar, or first and marked */
@@ -913,7 +1002,15 @@ function phone(p) {
   const homeBtn = HOME && CN !== MAINCN && u.at === P.ui.start && !(u.stack || []).length ? `<button class="back" data-home="1" title="The Grassroots App's Home">⌂</button>` : '';
   const opens = HOME && CN === MAINCN && C.aboutPred === 'installed' && env.it ? [].concat(env.it).map(appOf).find(x => x) : null;
   if (opens) zone.top = `<div class="openapp"><button class="pri" data-open="${esc(opens)}">Open ${esc(CONTRACTS[opens].title.replace(/ \(.*\)$/, ''))}</button></div>` + zone.top;
-  let h = `<div class="scr"><div class="top">${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : homeBtn}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}<button class="ib" data-help="1" title="Help">?</button>${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
+  /* where the person is: the super-app, the app, and the screens she came through, each a step back */
+  const appName = n => CONTRACTS[n].title.replace(/ \(.*\)$/, '').replace(/^The /, '');
+  const crumbs = [];
+  if (HOME && CN !== MAINCN) crumbs.push(`<button data-home="1">${esc(appName(MAINCN))}</button>`);
+  crumbs.push(`<button data-crumb="-1">${esc(appName(CN))}</button>`);
+  (u.stack || []).forEach((b, i) => { if (b.at !== P.ui.start || (b.env && b.env.it !== undefined)) crumbs.push(`<button data-crumb="${i}">${esc(b.at)}${b.env && b.env.it !== undefined ? ' ' + esc(show(lead(b.env.it))) : ''}</button>`); });
+  if ((u.stack || []).length || u.at !== P.ui.start) crumbs.push(`<span>${esc(u.at)}</span>`);
+  const crumb = `<div class="crumbbar">${crumbs.join('<i>›</i>')}</div>`;
+  let h = `<div class="scr"><div class="top">${crumb}${(u.stack || []).length ? '<button class="back" data-back="1">‹</button>' : homeBtn}${avatar}<div class="who"><div class="nm">${esc(title)}${u.at === P.ui.start && ident.length ? `<span class="badge" ${K('pred:identity', 'pred:person')}>✓</span>` : ''}</div></div>${wchip}${bell}${u.at === P.ui.start && Object.values(LK.of).some(r => r.as === 'scanned') ? '<button class="ib" data-mycode="1" title="My code">▦</button>' : ''}${info ? '<button class="ib" data-info="1">i</button>' : ''}<button class="ib" data-help="1" title="Help">?</button>${lms.length && LOOK.landmarks === 'menu' ? '<button class="ib" data-lmenu="1" title="Screens">☰</button>' : ''}${(mode === 'menu' && zone.bottom) || zone.menu ? '<button class="ib" data-menu="1">⋯</button>' : ''}</div>`;
   /* an empty screen says where to start: its first marked action, or its first */
   const first = (zone.bottom + zone.bar).match(/<button[^>]*class="[^"]*prim[^"]*"[^>]*>([^<]+)/) || (zone.bottom + zone.bar + hintBar).match(/<button[^>]*>([^<]+)/);
   zone.middle = zone.middle.replace('@@HINT@@', first ? ` <br>Start with “${first[1]}”.` : '');
@@ -922,16 +1019,17 @@ function phone(p) {
   /* the landmarks, as the UI style puts them: a row on top, a bar at the bottom, or a menu behind the name */
   if (lms.length && LOOK.landmarks === 'top') h += `<div class="lmk">${lmrow}</div>`;
   if (lms.length && LOOK.landmarks === 'menu' && u.lmenu) h += `<div class="lmk lmenu">${lmrow}</div>`;
-  const rq = HOME && CN === MAINCN && u.rule ? `<div class="ask rule"><div class="q"><div>Do “${esc(lab(u.rule.button))}” for you in each app you open?</div></div><div class="btns"><button class="pri" data-rule="1">Yes</button><button class="ghost" data-rule="0">No</button></div></div>` : '';
+  const rq = HOME && CN === MAINCN && u.rule ? `<div class="ask rule"><div class="q"><div>${u.rule.two ? `“${esc(lab(u.rule.button))}” in each app you open, with the same people? Their questions there are answered yes for you.` : `Do “${esc(lab(u.rule.button))}” for you in each app you open?`}</div></div><div class="btns"><button class="pri" data-rule="1">Yes</button><button class="ghost" data-rule="0">No</button></div></div>` : '';
   h += `<div class="toasts">${toasts}</div>${rq ? `<div class="zt">${rq}</div>` : ''}<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${hintBar ? `<div class="hints">${hintBar}</div>` : ''}${bar ? `<div class="acts${(bar.match(/<button/g) || []).length > 5 ? ' rows' : ''}">${bar}</div>` : ''}${composer}</div>${lms.length && LOOK.landmarks === 'bottom' ? `<div class="lmk lbot">${lmrow}</div>` : ''}`;
   if (u.menu && menu) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${menu}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
   else if (u.sheet) h += `<div class="shade" data-close="1"></div><div class="sheet">${u.sheet.html}<button class="ghost sys" data-close="1">Cancel</button></div>`;
   d.innerHTML = h + '</div>';
+  if (u.glow) { d.querySelectorAll('button').forEach(x => { if (x.textContent.trim() === u.glow) x.classList.add('glow'); }); u.glow = null; }
   /* a tap right after the screen changed is not taken: a double tap must not hit what moved under the finger */
   const on = (sel, f) => d.querySelectorAll(sel).forEach(b => b.onclick = () => { if (Date.now() - TAPPED < 350) return; TAPPED = Date.now(); f(b); });
   on('[data-open]', b => openApp(p, b.dataset.open));
-  on('[data-rule]', b => { if (b.dataset.rule === '1') (RULES[p] = RULES[p] || new Set()).add(u.rule.act); u.rule = null; render(); });
+  on('[data-rule]', b => { if (b.dataset.rule === '1') { (RULES[p] = RULES[p] || new Set()).add(u.rule.act); if (u.rule.two) JOINT[p + ':' + u.rule.act] = true; } u.rule = null; render(); });
   on('[data-home]', () => goHome(p));
   on('[data-ans]', b => answer(p, +b.dataset.id, b.dataset.ans === '1'));
   on('[data-nav]', b => { const c = comps.find(x => x.id === b.dataset.nav), to = c.event.navigate; (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.env = {[P.ui.containers[to].params[0]]: JSON.parse(b.dataset.item)}; u.at = to; u.tab = 0; u.tabPicked = false; u.sheet = null; render(); });
@@ -939,6 +1037,8 @@ function phone(p) {
   on('[data-lmenu]', () => { u.lmenu = !u.lmenu; render(); });
   on('[data-land]', b => { u.lmenu = false; u.at = b.dataset.land; u.env = {}; u.stack = []; u.tab = 0; u.tabPicked = false; u.sheet = null; u.menu = false; render(); });
   /* back goes to the screen one came from */
+  on('[data-goto]', b => { const g = JSON.parse(b.dataset.goto); (u.stack = u.stack || []).push({at: u.at, env: u.env, tab: u.tab}); u.at = g.at; u.env = g.env; u.tab = 0; u.tabPicked = false; u.sheet = null; u.menu = false; u.glow = g.glow; render(); });
+  on('[data-crumb]', b => { const i = +b.dataset.crumb, st = u.stack || []; const to = i < 0 ? {at: P.ui.start, env: {}, tab: 0} : st[i]; u.stack = i < 0 ? [] : st.slice(0, i); Object.assign(u, to); u.sheet = null; u.menu = false; render(); });
   on('[data-back]', () => { const b = (u.stack || []).pop() || {at: P.ui.start, env: {}, tab: 0}; Object.assign(u, b); u.sheet = null; u.menu = false; render(); });
   on('[data-close]', () => { u.sheet = null; u.menu = false; u.bell = false; render(); });
   on('[data-menu]', () => { u.menu = true; render(); });

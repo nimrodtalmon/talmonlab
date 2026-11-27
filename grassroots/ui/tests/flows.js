@@ -13,7 +13,11 @@ module.exports = {
     await A.has('To Install: it needs that you trust Carol as a developer.');
     await A.has('then Install');
     await shot('2-install-hint');
-    await A.tap('Trust this developer', '.hint');
+    await A.tap('Carol’s page ›', '.hint');
+    await A.has('Grassroots App›Program Chess›Person');
+    await shot('3a-developer-page');
+    await A.tap('Trust their apps');
+    await A.tap('‹');
     await A.has(/\| Install \|/);
     await A.lacks('To Install');
     await shot('3-install-offered');
@@ -24,6 +28,27 @@ module.exports = {
     await A.tap('Open Chess');
     await A.has('Set up my identity', 5000);
     await shot('5-chess-opened');
+  }},
+  /* the person's rules: her identity and her friends, made once on Home, carried into each app she opens */
+  'friends-carried': {url: '?c=app', async run(A, shot) {
+    await A.tap('Set up my identity');
+    await A.tap('Yes', '.rule');
+    await A.tap('Make friends');
+    await A.fill('.sheet input', 'carol');
+    await A.tap('Make friends', '.sheet');
+    await A.has('in each app you open, with the same people?', 8000);
+    await shot('1-rule-asked');
+    await A.tap('Yes', '.rule');
+    await A.has('Chess · Carol', 8000);
+    await A.tap('Chess · Carol');
+    await A.tap('Carol’s page ›', '.hint');
+    await A.tap('Trust their apps');
+    await A.tap('‹');
+    await A.tapSel('button[data-k*="act:install "], button[data-k$="act:install"]');
+    await A.tap('Open Chess');
+    await A.has('done for you, as you asked', 5000);
+    await A.gone('To New game', 8000);
+    await shot('2-chess-with-carol');
   }},
   /* Chess: the hint to a new game, a friend made by it, the game opened by THEN IT, a move and Carol's reply */
   'chess': {url: '?c=chess', async run(A, shot) {

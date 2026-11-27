@@ -30,16 +30,25 @@ class Phone {
   /* a tap, after the demo's guard against double taps */
   async tap(label, scope) {
     await this.pause();
-    const b = this.el.locator((scope ? scope + ' ' : '') + 'button', {hasText: label}).first();
-    await b.scrollIntoViewIfNeeded();
-    await b.click();
+    await this.press(this.el.locator((scope ? scope + ' ' : '') + 'button', {hasText: label}).first());
+  }
+  async tapSel(sel) { await this.pause(); await this.press(this.el.locator(sel).first()); }
+  /* the phone redraws when a message comes: a button taken from under the finger is found again and tapped */
+  async press(b) {
+    for (let i = 0; ; i++) {
+      try { await b.scrollIntoViewIfNeeded(); await b.click(); break; }
+      catch (e) { if (i >= 3 || !/not attached|not visible/.test(e.message)) throw e; await this.page.waitForTimeout(300); }
+    }
     await this.pause(500);
   }
-  async tapSel(sel) { await this.pause(); const b = this.el.locator(sel).first(); await b.scrollIntoViewIfNeeded(); await b.click(); await this.pause(500); }
   async fill(sel, v) { await this.el.locator(sel).first().fill(v); }
   async has(s, ms) {
     const until = Date.now() + (ms || 4000);
     for (;;) { const t = await this.text(); if (typeof s === 'string' ? t.includes(s) : s.test(t)) return t; if (Date.now() > until) throw new Error('expected “' + s + '” on the phone, saw: ' + t.slice(0, 600)); await this.page.waitForTimeout(250); }
+  }
+  async gone(s, ms) {
+    const until = Date.now() + (ms || 6000);
+    for (;;) { const t = await this.text(); if (!t.includes(s)) return t; if (Date.now() > until) throw new Error('expected “' + s + '” to go, saw: ' + t.slice(0, 600)); await this.page.waitForTimeout(250); }
   }
   async lacks(s) { const t = await this.text(); if (t.includes(s)) throw new Error('did not expect “' + s + '”, saw: ' + t.slice(0, 600)); }
   /* the phone as the person sees it */
