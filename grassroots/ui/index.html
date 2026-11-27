@@ -787,8 +787,16 @@ function phone(p) {
      button, if it is on this screen, is the hint's */
   const hints = {}, byHint = new Set(), usedFirst = new Set();
   let hintBar = '';
+  /* an act of the same label offered here is no gap: its copy for another place of the screen's subject takes it */
+  const offeredLabels = new Set();
+  for (const c of comps) {
+    if (c.hidden || c.kind !== 'action' || !c.act) continue;
+    const a = SPEC.acts.find(x => x.name === c.act);
+    if (a && offers(a, c, v.atoms, p, env, comps).vals.length) offeredLabels.add(lab(c.button));
+  }
   for (const c of comps) {
     if (c.hidden || !((c.kind === 'action' && c.act) || c.kind === 'chain') || !lookOn(c.button).important) continue;
+    if (offeredLabels.has(lab(c.button))) continue;
     const st = c.kind === 'chain' ? comps.find(x => x.id === (c.stepIds || [])[0]) : c;
     if (!st || !st.act) continue;
     const a = SPEC.acts.find(x => x.name === st.act);

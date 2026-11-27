@@ -43,7 +43,13 @@ class Phone {
   }
   async lacks(s) { const t = await this.text(); if (t.includes(s)) throw new Error('did not expect “' + s + '”, saw: ' + t.slice(0, 600)); }
   /* the phone as the person sees it */
-  async shot(file) { await this.el.scrollIntoViewIfNeeded(); await this.el.screenshot({path: file}); }
+  async shot(file) {
+    /* the phone redraws when a message comes; a picture taken as it redraws is taken again */
+    for (let i = 0; ; i++) {
+      try { await this.el.scrollIntoViewIfNeeded(); await this.el.screenshot({path: file}); return; }
+      catch (e) { if (i >= 3 || !/not attached|not visible/.test(e.message)) throw e; await this.page.waitForTimeout(300); }
+    }
+  }
 }
 
 async function open(context, url) {
