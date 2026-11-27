@@ -7,6 +7,8 @@ module.exports = {
     await A.tap('Make friends');
     await A.fill('.sheet input', 'carol');
     await A.tap('Make friends', '.sheet');
+    await A.has('“Make friends” in each app you open, with the same people?', 8000);
+    await A.tap('No', '.rule');
     await A.has('Chess · Carol', 8000);
     await shot('1-new-apps');
     await A.tap('Chess · Carol');
@@ -36,7 +38,7 @@ module.exports = {
     await A.tap('Make friends');
     await A.fill('.sheet input', 'carol');
     await A.tap('Make friends', '.sheet');
-    await A.has('in each app you open, with the same people?', 8000);
+    await A.has('“Make friends” in each app you open, with the same people?', 8000);
     await shot('1-rule-asked');
     await A.tap('Yes', '.rule');
     await A.has('Chess · Carol', 8000);

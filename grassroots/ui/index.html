@@ -378,12 +378,12 @@ function joint(act) {
   if (!adds.size || adds.has('identity')) return false;
   return SIM.schemas.some(b => b !== s && (b.pre || []).some(c => c && adds.has(c.p) && !c.neg));
 }
-function ruleOffer(p, act) {
+function ruleOffer(p, act, label) {
   if (!HOME || CN !== MAINCN || RULEASKED[p + ':' + act.name]) return;
   const one = act.names.length === 1 && needed(act), two = joint(act);
   if (!one && !two) return;
   RULEASKED[p + ':' + act.name] = true;
-  ui[p].rule = {act: act.name, button: act.button, two};
+  ui[p].rule = {act: act.name, button: act.button, two, label};
 }
 /* the persons with whom p took a joint act on Home: those its facts there name beside her */
 function partners(p, name) {
@@ -723,7 +723,7 @@ function propose(p, act, val) {
   W.notes[p].length = 0;
   W.propose(s, b);
   if (ui[p]) ui[p].sheet = null;
-  if (!onTheWay) ruleOffer(p, act);
+  if (!onTheWay) ruleOffer(p, act, u0 && u0.chainLabel);
   render(); later();
 }
 function answer(p, id, yes) { W.notes[p].length = 0; W.answer(id, p, yes); render(); later(); }
@@ -821,7 +821,10 @@ function phone(p) {
         val[a1.me] = p;
         const chainC = Object.values(P.ui.containers).flatMap(C => C.components).find(y => y.kind === 'chain' && (y.stepIds || []).includes(x.next));
         if (chainC && chainC.then) (u.after = u.after || []).push({button: a1.button, then: chainC.then, thenIt: chainC.thenIt});
+        /* the chain's last step goes by the chain's name in the rule it may offer: making friends, not befriending */
+        u.chainLabel = chainC && chainC.stepIds[chainC.stepIds.length - 1] === x.next ? lab(chainC.button) : null;
         propose(p, a1, val);
+        u.chainLabel = null;
       } else if (x.thenIt) {
         /* THEN IT: the screen about the fact the act just added, as its list on the start screen or a landmark opens it */
         const t = x.thenIt, a = view(p).atoms.filter(y => y.p === t.pred).sort((m, n) => n.seq - m.seq)[0], S = P.ui.containers[t.screen];
@@ -1019,7 +1022,7 @@ function phone(p) {
   /* the landmarks, as the UI style puts them: a row on top, a bar at the bottom, or a menu behind the name */
   if (lms.length && LOOK.landmarks === 'top') h += `<div class="lmk">${lmrow}</div>`;
   if (lms.length && LOOK.landmarks === 'menu' && u.lmenu) h += `<div class="lmk lmenu">${lmrow}</div>`;
-  const rq = HOME && CN === MAINCN && u.rule ? `<div class="ask rule"><div class="q"><div>${u.rule.two ? `“${esc(lab(u.rule.button))}” in each app you open, with the same people? Their questions there are answered yes for you.` : `Do “${esc(lab(u.rule.button))}” for you in each app you open?`}</div></div><div class="btns"><button class="pri" data-rule="1">Yes</button><button class="ghost" data-rule="0">No</button></div></div>` : '';
+  const rq = HOME && CN === MAINCN && u.rule ? `<div class="ask rule"><div class="q"><div>${u.rule.two ? `“${esc(u.rule.label || lab(u.rule.button))}” in each app you open, with the same people? Their questions there are answered yes for you.` : `Do “${esc(lab(u.rule.button))}” for you in each app you open?`}</div></div><div class="btns"><button class="pri" data-rule="1">Yes</button><button class="ghost" data-rule="0">No</button></div></div>` : '';
   h += `<div class="toasts">${toasts}</div>${rq ? `<div class="zt">${rq}</div>` : ''}<div class="zt">${zone.top}</div>${tabbar}<div class="zm">${zone.middle}</div>${mode === 'button' && zone.bottom ? '<button class="fab" data-menu="1">+</button>' : ''}<div class="zb">${hintBar ? `<div class="hints">${hintBar}</div>` : ''}${bar ? `<div class="acts${(bar.match(/<button/g) || []).length > 5 ? ' rows' : ''}">${bar}</div>` : ''}${composer}</div>${lms.length && LOOK.landmarks === 'bottom' ? `<div class="lmk lbot">${lmrow}</div>` : ''}`;
   if (u.menu && menu) h += `<div class="shade" data-close="1"></div><div class="sheet"><div class="acts col1">${menu}</div><button class="ghost sys" data-close="1">Cancel</button></div>`;
   else if (u.bell && asks.length) h += `<div class="shade" data-close="1"></div><div class="sheet">${asks.join('')}<button class="ghost sys" data-close="1">Close</button></div>`;
